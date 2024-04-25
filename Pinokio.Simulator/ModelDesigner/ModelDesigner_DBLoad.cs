@@ -62,7 +62,7 @@ namespace Pinokio.Designer
                     SimNodeTreeListNode treeNode = simNodeTreeList.FindNodeByKeyID(pinokio3DModel1.SelectedFloorID) as SimNodeTreeListNode;
                     propertyGridControlSimObject.SelectedObject = treeNode.SimNode;
 
-                    SimResultDBManager.Instance.ModelName = Path.GetFileNameWithoutExtension(filePath);
+                    ModelManager.Instance.SimResultDBManager.ModelName = Path.GetFileNameWithoutExtension(filePath);
                     pinokio3DModel1.InitialFilePath = filePath;
                     //MessageBox.Show("Success");
                     FlyoutDialog.Show(Application.OpenForms[0], new FOAInfo("Success"));

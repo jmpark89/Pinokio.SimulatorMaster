@@ -4,14 +4,23 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 VisualStudioVersion = 16.0.33130.400
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Pinokio.Designer", "Pinokio.Simulator\ModelDesigner\Pinokio.Designer.csproj", "{9460EA5A-877C-47D4-A46A-98DCB1539308}"
+	ProjectSection(ProjectDependencies) = postProject
+		{999BBEFE-1D3F-4554-8E86-89494542FB34} = {999BBEFE-1D3F-4554-8E86-89494542FB34}
+	EndProjectSection
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "01.Pinokio.Simulator", "01.Pinokio.Simulator", "{41740F70-6D61-443E-A208-52CD6162AC1F}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Pinokio.SIM", "Pinokio.Simulator\Pinokio.SIM\Pinokio.SIM.csproj", "{3E7C1C33-4CC6-4FFB-9942-87CEA4834107}"
+	ProjectSection(ProjectDependencies) = postProject
+		{999BBEFE-1D3F-4554-8E86-89494542FB34} = {999BBEFE-1D3F-4554-8E86-89494542FB34}
+	EndProjectSection
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "03.Pinokio.Animation.User", "03.Pinokio.Animation.User", "{D5F46651-B867-4F7B-9D3B-3DD4A4B00CFF}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Pinokio.Animation.User", "Pinokio.Animation.User\Pinokio.Animation.User.csproj", "{356FCBAA-1DC3-4412-B98B-20B3D556A4CB}"
+	ProjectSection(ProjectDependencies) = postProject
+		{999BBEFE-1D3F-4554-8E86-89494542FB34} = {999BBEFE-1D3F-4554-8E86-89494542FB34}
+	EndProjectSection
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "02.Pinokio.Model.User", "02.Pinokio.Model.User", "{6406BD86-F09C-47DE-B7A7-E5C4C894917C}"
 EndProject

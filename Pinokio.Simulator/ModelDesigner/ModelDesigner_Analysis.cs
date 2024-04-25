@@ -50,13 +50,13 @@ namespace Pinokio.Designer
 
                 if (openFileDlg.ShowDialog() == DialogResult.OK)
                 {
-                    if (!openFileDlg.FileName.Contains(SimResultDBManager.Instance.ModelName))
+                    if (!openFileDlg.FileName.Contains(ModelManager.Instance.SimResultDBManager.ModelName))
                     {
                         FlyoutDialog.Show(Application.OpenForms[0], new FOAInfo("Failed. \nPlease open the model file with the same name"));
                         return;
                     }
 
-                    SimResultDBManager.Instance.LoadDBPath = openFileDlg.FileName;
+                    ModelManager.Instance.SimResultDBManager.LoadDBPath = openFileDlg.FileName;
 
                     ProductionReportForm reportForm = new ProductionReportForm(true, this.pinokio3DModel1, this);
                     reportForm.Show();
@@ -79,12 +79,12 @@ namespace Pinokio.Designer
 
                 if (openFileDlg.ShowDialog() == DialogResult.OK)
                 {
-                    if (!openFileDlg.FileName.Contains(SimResultDBManager.Instance.ModelName))
+                    if (!openFileDlg.FileName.Contains(ModelManager.Instance.SimResultDBManager.ModelName))
                     {
                         FlyoutDialog.Show(Application.OpenForms[0], new FOAInfo("Failed. \nPlease open the model file with the same name"));
                         return;
                     }
-                    SimResultDBManager.Instance.LoadDBPath = openFileDlg.FileName;
+                    ModelManager.Instance.SimResultDBManager.LoadDBPath = openFileDlg.FileName;
                     AMHSReportForm reportForm = new AMHSReportForm(true, this.pinokio3DModel1, this);
                     reportForm.Show();
                 }

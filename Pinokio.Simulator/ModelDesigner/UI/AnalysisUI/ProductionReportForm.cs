@@ -94,20 +94,20 @@ namespace Pinokio.Designer
             cboxEditStepGroup.SelectedIndex = 0;
             cboxEditEqpPlanOperationRate.SelectedIndex = 0;
 
-            SimResultDBManager.Instance.SelectResultMain(isLoad);
-            SimResultDBManager.Instance.SelectEqpNameInEqpPlans(isLoad);
-            SimResultDBManager.Instance.SelectNodeNameInout(isLoad);
-            SimResultDBManager.Instance.SelectGroupNameInEqpPlans(isLoad);
+            ModelManager.Instance.SimResultDBManager.SelectResultMain(isLoad);
+            ModelManager.Instance.SimResultDBManager.SelectEqpNameInEqpPlans(isLoad);
+            ModelManager.Instance.SimResultDBManager.SelectNodeNameInout(isLoad);
+            ModelManager.Instance.SimResultDBManager.SelectGroupNameInEqpPlans(isLoad);
 
             if (isLoad)
             {
-                _simStartTime = SimResultDBManager.Instance.LoadedSimulationStartTime;
-                _simEndTime = SimResultDBManager.Instance.LoadedSimulationEndTime;
+                _simStartTime = ModelManager.Instance.SimResultDBManager.LoadedSimulationStartTime;
+                _simEndTime = ModelManager.Instance.SimResultDBManager.LoadedSimulationEndTime;
             }
             else
             {
-                _simStartTime = SimResultDBManager.Instance.SimulationStartTime;
-                _simEndTime = SimResultDBManager.Instance.SimulationEndTime;
+                _simStartTime = ModelManager.Instance.SimResultDBManager.SimulationStartTime;
+                _simEndTime = ModelManager.Instance.SimResultDBManager.SimulationEndTime;
             }
 
             ProductionReportPages.SelectedTabPageIndex = 0;
@@ -136,11 +136,11 @@ namespace Pinokio.Designer
             pinokio3DModel1 = pinokio3DModel;
             _modelDesigner = modelDesigner;
 
-            foreach (string eqpName in SimResultDBManager.Instance.EqpNames)
+            foreach (string eqpName in ModelManager.Instance.SimResultDBManager.EqpNames)
             {
                 _selectedStepEqpNames.Add(eqpName);
             }
-            foreach (string nodeName in SimResultDBManager.Instance.NodeInoutNames)
+            foreach (string nodeName in ModelManager.Instance.SimResultDBManager.NodeInoutNames)
             {
                 _selectedNodeInoutNames.Add(nodeName);
             }
@@ -333,7 +333,7 @@ namespace Pinokio.Designer
                             partSteps.Clear();
                             if (_selectedStepNames.Count > 0)
                             {
-                                partSteps = SimResultDBManager.Instance.SelectPartStepLog(fromTime, toTime, _selectedStepNames, _loadReport, _isStep, _isProduct);
+                                partSteps = ModelManager.Instance.SimResultDBManager.SelectPartStepLog(fromTime, toTime, _selectedStepNames, _loadReport, _isStep, _isProduct);
                                 partSteps = partSteps.OrderBy(x => x.Key.WipStartDateTime).ToDictionary(pair => pair.Key, pair => pair.Value);
                             }
                         }
@@ -342,7 +342,7 @@ namespace Pinokio.Designer
                             partSteps.Clear();
                             if (_selectedProductNames.Count > 0)
                             {
-                                partSteps = SimResultDBManager.Instance.SelectPartStepLog(fromTime, toTime, _selectedProductNames, _loadReport, _isStep, _isProduct);
+                                partSteps = ModelManager.Instance.SimResultDBManager.SelectPartStepLog(fromTime, toTime, _selectedProductNames, _loadReport, _isStep, _isProduct);
                                 partSteps = partSteps.OrderBy(x => x.Key.WipStartDateTime).ToDictionary(pair => pair.Key, pair => pair.Value);
                             }
                         }
@@ -351,7 +351,7 @@ namespace Pinokio.Designer
                             partSteps.Clear();
                             if (_selectedStepEqpNames.Count > 0)
                             {
-                                partSteps = SimResultDBManager.Instance.SelectPartStepLog(fromTime, toTime, _selectedStepEqpNames, _loadReport, _isStep, _isProduct);
+                                partSteps = ModelManager.Instance.SimResultDBManager.SelectPartStepLog(fromTime, toTime, _selectedStepEqpNames, _loadReport, _isStep, _isProduct);
                                 partSteps = partSteps.OrderBy(x => x.Key.WipStartDateTime).ToDictionary(pair => pair.Key, pair => pair.Value);
                             }
                         }
@@ -364,7 +364,7 @@ namespace Pinokio.Designer
                             eqpSteps.Clear();
                             if (_selectedEqpGroupByNames.Count > 0)
                             {
-                                eqpSteps = SimResultDBManager.Instance.SelectEqpStepLog(fromTime, toTime, _selectedEqpGroupByNames, _selectedStepGroupNames, _loadReport,_isEqpGroup,_isGroupCheck);
+                                eqpSteps = ModelManager.Instance.SimResultDBManager.SelectEqpStepLog(fromTime, toTime, _selectedEqpGroupByNames, _selectedStepGroupNames, _loadReport,_isEqpGroup,_isGroupCheck);
                                 eqpSteps = eqpSteps.OrderBy(x => x.Key.ActivatedDateTime).ToDictionary(pair => pair.Key, pair => pair.Value);
                                 foreach (EqpStep eqpPlan in eqpSteps.Keys)
                                 {
@@ -378,7 +378,7 @@ namespace Pinokio.Designer
                             eqpSteps.Clear();
                             if (_selectedStepGroupByNames.Count > 0)
                             {
-                                eqpSteps = SimResultDBManager.Instance.SelectEqpStepLog(fromTime, toTime, _selectedStepGroupByNames, _selectedEqpGroupNames, _loadReport,_isEqpGroup, _isGroupCheck);
+                                eqpSteps = ModelManager.Instance.SimResultDBManager.SelectEqpStepLog(fromTime, toTime, _selectedStepGroupByNames, _selectedEqpGroupNames, _loadReport,_isEqpGroup, _isGroupCheck);
                                 eqpSteps = eqpSteps.OrderBy(x => x.Key.ActivatedDateTime).ToDictionary(pair => pair.Key, pair => pair.Value);
                                 foreach (EqpStep eqpPlan in eqpSteps.Keys)
                                 {
@@ -389,7 +389,7 @@ namespace Pinokio.Designer
                         }
                         if (_isGroupCheck&& _isEqpGroup)
                         {
-                            eqpSteps = SimResultDBManager.Instance.SelectEqpStepLog(fromTime, toTime, _selectedEqpGroupByNames, _selectedStepGroupNames, _loadReport, _isEqpGroup, _isGroupCheck);
+                            eqpSteps = ModelManager.Instance.SimResultDBManager.SelectEqpStepLog(fromTime, toTime, _selectedEqpGroupByNames, _selectedStepGroupNames, _loadReport, _isEqpGroup, _isGroupCheck);
                             eqpSteps = eqpSteps.OrderBy(x => x.Key.ActivatedDateTime).ToDictionary(pair => pair.Key, pair => pair.Value);
                             foreach (EqpStep eqpPlan in eqpSteps.Keys)
                             {
@@ -399,7 +399,7 @@ namespace Pinokio.Designer
                         }
                         else if (_isGroupCheck &&!_isEqpGroup)
                         {
-                            eqpSteps = SimResultDBManager.Instance.SelectEqpStepLog(fromTime, toTime, _selectedStepGroupByNames, _selectedEqpGroupNames, _loadReport, _isEqpGroup, _isGroupCheck);
+                            eqpSteps = ModelManager.Instance.SimResultDBManager.SelectEqpStepLog(fromTime, toTime, _selectedStepGroupByNames, _selectedEqpGroupNames, _loadReport, _isEqpGroup, _isGroupCheck);
                             eqpSteps = eqpSteps.OrderBy(x => x.Key.ActivatedDateTime).ToDictionary(pair => pair.Key, pair => pair.Value);
                             foreach (EqpStep eqpPlan in eqpSteps.Keys)
                             {
@@ -409,7 +409,7 @@ namespace Pinokio.Designer
                         }
                         else
                         {
-                            eqpSteps = SimResultDBManager.Instance.SelectEqpStepLog(fromTime, toTime, _selectedEqpGroupByNames, _selectedStepGroupNames, _loadReport, _isEqpGroup, _isGroupCheck);
+                            eqpSteps = ModelManager.Instance.SimResultDBManager.SelectEqpStepLog(fromTime, toTime, _selectedEqpGroupByNames, _selectedStepGroupNames, _loadReport, _isEqpGroup, _isGroupCheck);
                             eqpSteps = eqpSteps.OrderBy(x => x.Key.ActivatedDateTime).ToDictionary(pair => pair.Key, pair => pair.Value);
                             foreach (EqpStep eqpPlan in eqpSteps.Keys)
                             {
@@ -427,7 +427,7 @@ namespace Pinokio.Designer
                             inouts.Clear();
                             if (_selectedNodeInoutNames.Count > 0)
                             {
-                                inouts = SimResultDBManager.Instance.SelectFactoryInoutLog(fromTime, toTime, _selectedNodeInoutNames, _loadReport, _isNode);
+                                inouts = ModelManager.Instance.SimResultDBManager.SelectFactoryInoutLog(fromTime, toTime, _selectedNodeInoutNames, _loadReport, _isNode);
                                 inouts = inouts.OrderBy(x => x.Key.InoutTime).ToDictionary(pair => pair.Key, pair => pair.Value);
                             }
                         }
@@ -436,7 +436,7 @@ namespace Pinokio.Designer
                             inouts.Clear();
                             if (_selectedProductInoutNames.Count > 0)
                             {
-                                inouts = SimResultDBManager.Instance.SelectFactoryInoutLog(fromTime, toTime, _selectedProductInoutNames, _loadReport, _isNode);
+                                inouts = ModelManager.Instance.SimResultDBManager.SelectFactoryInoutLog(fromTime, toTime, _selectedProductInoutNames, _loadReport, _isNode);
                                 inouts = inouts.OrderBy(x => x.Key.InoutTime).ToDictionary(pair => pair.Key, pair => pair.Value);
                             }
                         }

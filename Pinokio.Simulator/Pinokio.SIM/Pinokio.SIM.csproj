@@ -128,6 +128,28 @@
       <SpecificVersion>False</SpecificVersion>
       <HintPath>..\..\3rdParty\DevExpress.XtraPrinting.v20.1.dll</HintPath>
     </Reference>
+    <Reference Include="Logger, Version=1.0.0.0, Culture=neutral, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\..\3rdParty\Logger.dll</HintPath>
+    </Reference>
+    <Reference Include="Pinokio.Animation">
+      <HintPath>..\..\3rdParty\Pinokio.Animation.dll</HintPath>
+    </Reference>
+    <Reference Include="Pinokio.Auth">
+      <HintPath>..\..\3rdParty\Pinokio.Auth.dll</HintPath>
+    </Reference>
+    <Reference Include="Pinokio.Model.Base">
+      <HintPath>..\..\3rdParty\Pinokio.Model.Base.dll</HintPath>
+    </Reference>
+    <Reference Include="Pinokio.Model.User">
+      <HintPath>..\..\3rdParty\Pinokio.Model.User.dll</HintPath>
+    </Reference>
+    <Reference Include="Pinokio.Simulation">
+      <HintPath>..\..\3rdParty\Pinokio.Simulation.dll</HintPath>
+    </Reference>
+    <Reference Include="Pinokio.UI.Base">
+      <HintPath>..\..\3rdParty\Pinokio.UI.Base.dll</HintPath>
+    </Reference>
     <Reference Include="Simulation.Engine, Version=1.0.0.0, Culture=neutral, processorArchitecture=x86">
       <SpecificVersion>False</SpecificVersion>
       <HintPath>..\..\3rdParty\Simulation.Engine.dll</HintPath>
@@ -198,29 +220,9 @@
       <Project>{356fcbaa-1dc3-4412-b98b-20b3d556a4cb}</Project>
       <Name>Pinokio.Animation.User</Name>
     </ProjectReference>
-    <ProjectReference Include="..\..\Pinokio.Animation\Pinokio.Animation.csproj">
-      <Project>{b4fd4513-661f-42a7-8f9e-6dc2513d0992}</Project>
-      <Name>Pinokio.Animation</Name>
-    </ProjectReference>
-    <ProjectReference Include="..\..\Pinokio.Model\Pinokio.Model.Base\Pinokio.Model.Base.csproj">
-      <Project>{65ce109f-18f1-40aa-b553-0ce1c614624c}</Project>
-      <Name>Pinokio.Model.Base</Name>
-    </ProjectReference>
-    <ProjectReference Include="..\..\Utils\Pinokio.Auth\Pinokio.Auth.csproj">
-      <Project>{f8c2b7f0-060d-4c99-ac60-fc5094ecd072}</Project>
-      <Name>Pinokio.Auth</Name>
-    </ProjectReference>
-    <ProjectReference Include="..\..\Utils\Pinokio.UI.Base\Pinokio.UI.Base.csproj">
-      <Project>{ed6a2482-ea34-4974-9762-a8150b248c75}</Project>
-      <Name>Pinokio.UI.Base</Name>
-    </ProjectReference>
     <ProjectReference Include="..\ModelDesigner\Pinokio.Designer.csproj">
       <Project>{9460ea5a-877c-47d4-a46a-98dcb1539308}</Project>
       <Name>Pinokio.Designer</Name>
-    </ProjectReference>
-    <ProjectReference Include="..\Pinokio.Simulation\Simulation.csproj">
-      <Project>{228d7e17-efb3-470d-bdbd-57cbf1ef84e8}</Project>
-      <Name>Simulation</Name>
     </ProjectReference>
   </ItemGroup>
   <ItemGroup>

@@ -65,7 +65,7 @@ namespace Pinokio.Designer
                 case 0:
                     if (stepType.Contains("Equipment"))
                     {
-                        foreach (string eqpName in SimResultDBManager.Instance.EqpNames)
+                        foreach (string eqpName in ModelManager.Instance.SimResultDBManager.EqpNames)
                         {
                             
                                 if (selectedStepEqpNames.Contains(eqpName))
@@ -88,7 +88,7 @@ namespace Pinokio.Designer
                     }
                     else if (stepType.Contains("Step"))
                     {
-                        foreach (string eqpStepName in SimResultDBManager.Instance.EqpStepNames)
+                        foreach (string eqpStepName in ModelManager.Instance.SimResultDBManager.EqpStepNames)
                         {
                             if (selectedStepNames.Contains(eqpStepName))
                             {
@@ -110,7 +110,7 @@ namespace Pinokio.Designer
                     }
                     else if (stepType.Contains("Product"))
                     {
-                        foreach (string productName in SimResultDBManager.Instance.ProductNames)
+                        foreach (string productName in ModelManager.Instance.SimResultDBManager.ProductNames)
                         {
                             if (selectedProductNames.Contains(productName))
                             {
@@ -137,7 +137,7 @@ namespace Pinokio.Designer
                     {
                         if (eqpType.Contains("EQP_GROUP"))
                         {
-                            foreach (string eqpGroup in SimResultDBManager.Instance.EqpGroupNames)
+                            foreach (string eqpGroup in ModelManager.Instance.SimResultDBManager.EqpGroupNames)
                             {
                                 if (selectedEqpGroupByNames.Contains(eqpGroup))
                                 {
@@ -161,7 +161,7 @@ namespace Pinokio.Designer
                         }
                         if (eqpType.Contains("STEP_GROUP"))
                         {
-                                foreach (string stepGroup in SimResultDBManager.Instance.StepGroupNames)
+                                foreach (string stepGroup in ModelManager.Instance.SimResultDBManager.StepGroupNames)
                                 {
 
                                     if (selectedStepGroupByNames.Contains(stepGroup))
@@ -193,12 +193,12 @@ namespace Pinokio.Designer
                             {
                                 if (!selectedStepGroupByNames[i].Contains("ALL"))
                                 {
-                                    for (int j = 0; SimResultDBManager.Instance.StepGroupNames.Count > j; j++)
+                                    for (int j = 0; ModelManager.Instance.SimResultDBManager.StepGroupNames.Count > j; j++)
                                     {
-                                        if (selectedStepGroupByNames[i].Contains(SimResultDBManager.Instance.StepGroupNames[j]))
+                                        if (selectedStepGroupByNames[i].Contains(ModelManager.Instance.SimResultDBManager.StepGroupNames[j]))
                                         {
                                             
-                                            checkedListBox.Items.Add(SimResultDBManager.Instance.EqpNames[j].ToString(), true);
+                                            checkedListBox.Items.Add(ModelManager.Instance.SimResultDBManager.EqpNames[j].ToString(), true);
                                             checkOk = true;
                                         }
                                     }
@@ -244,7 +244,7 @@ namespace Pinokio.Designer
                 case 2:
                     if (NodeInoutType.Contains("Node"))
                     {
-                        foreach (string nodeName in SimResultDBManager.Instance.NodeInoutNames)
+                        foreach (string nodeName in ModelManager.Instance.SimResultDBManager.NodeInoutNames)
                         {
                             if (selectedNodeInoutNames.Contains(nodeName))
                             {
@@ -267,7 +267,7 @@ namespace Pinokio.Designer
 
                     else if (NodeInoutType.Contains("Product"))
                     {
-                        foreach (string productName in SimResultDBManager.Instance.ProductNames)
+                        foreach (string productName in ModelManager.Instance.SimResultDBManager.ProductNames)
                         {
                             if (selectedProductInoutNames.Contains(productName))
                             {

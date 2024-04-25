@@ -67,18 +67,18 @@ namespace Pinokio.Designer
         {
             InitializeComponent();
 
-            SimResultDBManager.Instance.Select4CommandTrend(isLoad);
-            SimResultDBManager.Instance.Select4MRTrend(isLoad);
+            ModelManager.Instance.SimResultDBManager.Select4CommandTrend(isLoad);
+            ModelManager.Instance.SimResultDBManager.Select4MRTrend(isLoad);
 
             if (isLoad)
             {
-                _simStartTime = SimResultDBManager.Instance.LoadedSimulationStartTime;
-                _simEndTime = SimResultDBManager.Instance.LoadedSimulationEndTime;
+                _simStartTime = ModelManager.Instance.SimResultDBManager.LoadedSimulationStartTime;
+                _simEndTime = ModelManager.Instance.SimResultDBManager.LoadedSimulationEndTime;
             }
             else
             {
-                _simStartTime = SimResultDBManager.Instance.SimulationStartTime;
-                _simEndTime = SimResultDBManager.Instance.SimulationEndTime;
+                _simStartTime = ModelManager.Instance.SimResultDBManager.SimulationStartTime;
+                _simEndTime = ModelManager.Instance.SimResultDBManager.SimulationEndTime;
             }
 
             for (int i = 0; i < AMHSTabPages.TabPages.Count; i++)
@@ -93,11 +93,11 @@ namespace Pinokio.Designer
             _trendTimeInterval = 60;
             _trendKPITimeUnit = TIME_UNIT.Hour;
 
-            foreach(string startMR in SimResultDBManager.Instance.StartMRNames)
+            foreach(string startMR in ModelManager.Instance.SimResultDBManager.StartMRNames)
             {
                 _selectedStartMRNames.Add(startMR);
             }
-            foreach (string endMR in SimResultDBManager.Instance.EndMRNames)
+            foreach (string endMR in ModelManager.Instance.SimResultDBManager.EndMRNames)
             {
                 _selectedEndMRNames.Add(endMR);
             }
@@ -129,15 +129,15 @@ namespace Pinokio.Designer
                     
                     break;
                 case 1: 
-                    foreach (string subCSName in SimResultDBManager.Instance.SubCSNames)
+                    foreach (string subCSName in ModelManager.Instance.SimResultDBManager.SubCSNames)
                         GetCbox().Properties.Items.Add(subCSName);
                     break;
                 case 2:
-                    foreach (string subCSName in SimResultDBManager.Instance.SubCSNames)
+                    foreach (string subCSName in ModelManager.Instance.SimResultDBManager.SubCSNames)
                         GetCbox().Properties.Items.Add(subCSName);
                     break;
                 case 3:
-                    foreach (string subCSName in SimResultDBManager.Instance.SubCSNames)
+                    foreach (string subCSName in ModelManager.Instance.SimResultDBManager.SubCSNames)
                         GetCbox().Properties.Items.Add(subCSName);
                     break;
             }
@@ -310,11 +310,11 @@ namespace Pinokio.Designer
                     case 0:
                         if (_isStartCheck)
                         {
-                            mrs = SimResultDBManager.Instance.SelectMRLog(fromTime, toTime, _selectedStartMRNames, _selectedEndMRNames, _loadReport, _isStartCheck);
+                            mrs = ModelManager.Instance.SimResultDBManager.SelectMRLog(fromTime, toTime, _selectedStartMRNames, _selectedEndMRNames, _loadReport, _isStartCheck);
                             mrs = mrs.OrderBy(x => x.Key.ActivatedDateTime).ToDictionary(pair => pair.Key, pair => pair.Value);
                             
                             _selectedEndMRNames.Clear();
-                            foreach (string endMR in SimResultDBManager.Instance.EndMRNames)
+                            foreach (string endMR in ModelManager.Instance.SimResultDBManager.EndMRNames)
                             {
                                 _selectedEndMRNames.Add(endMR);
                             }
@@ -323,18 +323,18 @@ namespace Pinokio.Designer
                         else
                         {
                             
-                                mrs = SimResultDBManager.Instance.SelectMRLog(fromTime, toTime, _selectedStartMRNames, _selectedEndMRNames, _loadReport, _isStartCheck);
+                                mrs = ModelManager.Instance.SimResultDBManager.SelectMRLog(fromTime, toTime, _selectedStartMRNames, _selectedEndMRNames, _loadReport, _isStartCheck);
                                 mrs = mrs.OrderBy(x => x.Key.ActivatedDateTime).ToDictionary(pair => pair.Key, pair => pair.Value);
                             
                             
                         }
                         break;
                     case 1:
-                        commands = SimResultDBManager.Instance.SelectCommandLog(fromTime, toTime, selectedItem, _selectedSubCSNames, _loadReport);
+                        commands = ModelManager.Instance.SimResultDBManager.SelectCommandLog(fromTime, toTime, selectedItem, _selectedSubCSNames, _loadReport);
                         commands = commands.OrderBy(x => x.Key.ActivatedDateTime).ToDictionary(pair => pair.Key, pair => pair.Value);
                         break;
                     case 2:
-                        commands = SimResultDBManager.Instance.SelectCommandLog(fromTime, toTime, selectedItem, _selectedSubCSNames, _loadReport);
+                        commands = ModelManager.Instance.SimResultDBManager.SelectCommandLog(fromTime, toTime, selectedItem, _selectedSubCSNames, _loadReport);
                         commands = commands.OrderBy(x => x.Key.ActivatedDateTime).ToDictionary(pair => pair.Key, pair => pair.Value);
                                        
                         GridCommandTrendLog ChartDistribution = new GridCommandTrendLog(fromTime, commands.Keys.OrderBy(x => x.TotalTime).ToList());
@@ -352,7 +352,7 @@ namespace Pinokio.Designer
                         _dicChartCommandDistribution.Add(fromTime, ChartDistribution.dicSigma);                       
                         break;
                     case 3:
-                        commands = SimResultDBManager.Instance.SelectCommandLog(fromTime, toTime, selectedItem, _selectedSubCSNames, _loadReport);
+                        commands = ModelManager.Instance.SimResultDBManager.SelectCommandLog(fromTime, toTime, selectedItem, _selectedSubCSNames, _loadReport);
                         commands = commands.OrderBy(x => x.Key.ActivatedDateTime).ToDictionary(pair => pair.Key, pair => pair.Value);
 
                         foreach (Command command in commands.Keys)                        

@@ -158,6 +158,9 @@
     <Reference Include="DocumentFormat.OpenXml, Version=2.18.0.0, Culture=neutral, PublicKeyToken=8fb06cb64d019a17, processorArchitecture=MSIL">
       <HintPath>..\..\packages\DocumentFormat.OpenXml.2.18.0\lib\net46\DocumentFormat.OpenXml.dll</HintPath>
     </Reference>
+    <Reference Include="Logger">
+      <HintPath>..\..\3rdParty\Logger.dll</HintPath>
+    </Reference>
     <Reference Include="Microsoft.Bcl.AsyncInterfaces, Version=6.0.0.0, Culture=neutral, PublicKeyToken=cc7b13ffcd2ddd51, processorArchitecture=MSIL">
       <HintPath>..\..\packages\Microsoft.Bcl.AsyncInterfaces.6.0.0\lib\net461\Microsoft.Bcl.AsyncInterfaces.dll</HintPath>
     </Reference>
@@ -182,6 +185,39 @@
     </Reference>
     <Reference Include="Microsoft.WindowsAPICodePack.Shell, Version=1.1.5.0, Culture=neutral, PublicKeyToken=8985beaab7ea3f04, processorArchitecture=MSIL">
       <HintPath>..\..\packages\Microsoft-WindowsAPICodePack-Shell.1.1.5\lib\net472\Microsoft.WindowsAPICodePack.Shell.dll</HintPath>
+    </Reference>
+    <Reference Include="Pinokio.Animation">
+      <HintPath>..\..\3rdParty\Pinokio.Animation.dll</HintPath>
+    </Reference>
+    <Reference Include="Pinokio.Auth">
+      <HintPath>..\..\3rdParty\Pinokio.Auth.dll</HintPath>
+    </Reference>
+    <Reference Include="Pinokio.Communication">
+      <HintPath>..\..\3rdParty\Pinokio.Communication.dll</HintPath>
+    </Reference>
+    <Reference Include="Pinokio.Database">
+      <HintPath>..\..\3rdParty\Pinokio.Database.dll</HintPath>
+    </Reference>
+    <Reference Include="Pinokio.DevTool">
+      <HintPath>..\..\3rdParty\Pinokio.DevTool.dll</HintPath>
+    </Reference>
+    <Reference Include="Pinokio.Geometry">
+      <HintPath>..\..\3rdParty\Pinokio.Geometry.dll</HintPath>
+    </Reference>
+    <Reference Include="Pinokio.Model.Base">
+      <HintPath>..\..\3rdParty\Pinokio.Model.Base.dll</HintPath>
+    </Reference>
+    <Reference Include="Pinokio.Model.User">
+      <HintPath>..\..\3rdParty\Pinokio.Model.User.dll</HintPath>
+    </Reference>
+    <Reference Include="Pinokio.Object">
+      <HintPath>..\..\3rdParty\Pinokio.Object.dll</HintPath>
+    </Reference>
+    <Reference Include="Pinokio.Simulation">
+      <HintPath>..\..\3rdParty\Pinokio.Simulation.dll</HintPath>
+    </Reference>
+    <Reference Include="Pinokio.UI.Base">
+      <HintPath>..\..\3rdParty\Pinokio.UI.Base.dll</HintPath>
     </Reference>
     <Reference Include="PresentationCore" />
     <Reference Include="PresentationFramework" />
@@ -719,53 +755,9 @@
     </Compile>
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\..\ErrorLogger\Logger.csproj">
-      <Project>{49B785B8-59E1-4130-BE1F-7FFE8D6A4D4B}</Project>
-      <Name>Logger</Name>
-    </ProjectReference>
     <ProjectReference Include="..\..\Pinokio.Animation.User\Pinokio.Animation.User.csproj">
       <Project>{356fcbaa-1dc3-4412-b98b-20b3d556a4cb}</Project>
       <Name>Pinokio.Animation.User</Name>
-    </ProjectReference>
-    <ProjectReference Include="..\..\Pinokio.Animation\Pinokio.Animation.csproj">
-      <Project>{b4fd4513-661f-42a7-8f9e-6dc2513d0992}</Project>
-      <Name>Pinokio.Animation</Name>
-    </ProjectReference>
-    <ProjectReference Include="..\..\Pinokio.DevTool\Pinokio.DevTool.csproj">
-      <Project>{f6a4ee6f-e9dc-427c-8590-6a000ede2795}</Project>
-      <Name>Pinokio.DevTool</Name>
-    </ProjectReference>
-    <ProjectReference Include="..\..\Pinokio.Model\Pinokio.Model.Base\Pinokio.Model.Base.csproj">
-      <Project>{65ce109f-18f1-40aa-b553-0ce1c614624c}</Project>
-      <Name>Pinokio.Model.Base</Name>
-    </ProjectReference>
-    <ProjectReference Include="..\..\Utils\Pinokio.Auth\Pinokio.Auth.csproj">
-      <Project>{F8C2B7F0-060D-4C99-AC60-FC5094ECD072}</Project>
-      <Name>Pinokio.Auth</Name>
-    </ProjectReference>
-    <ProjectReference Include="..\..\Utils\Pinokio.Communication\Pinokio.Communication.csproj">
-      <Project>{54A3D958-F020-464F-9822-785B70E23C22}</Project>
-      <Name>Pinokio.Communication</Name>
-    </ProjectReference>
-    <ProjectReference Include="..\..\Utils\Pinokio.Database\Pinokio.Database.csproj">
-      <Project>{f2a7cd59-7f40-4364-872e-d068e1184f90}</Project>
-      <Name>Pinokio.Database</Name>
-    </ProjectReference>
-    <ProjectReference Include="..\..\Utils\Pinokio.Geometry\Pinokio.Geometry.csproj">
-      <Project>{1DE53915-9011-4D18-B68B-26C888CEFF56}</Project>
-      <Name>Pinokio.Geometry</Name>
-    </ProjectReference>
-    <ProjectReference Include="..\..\Utils\Pinokio.Object\Pinokio.Object.csproj">
-      <Project>{1DB54010-ED18-4BAB-A80C-6348F7D5E8CE}</Project>
-      <Name>Pinokio.Object</Name>
-    </ProjectReference>
-    <ProjectReference Include="..\..\Utils\Pinokio.UI.Base\Pinokio.UI.Base.csproj">
-      <Project>{ED6A2482-EA34-4974-9762-A8150B248C75}</Project>
-      <Name>Pinokio.UI.Base</Name>
-    </ProjectReference>
-    <ProjectReference Include="..\Pinokio.Simulation\Simulation.csproj">
-      <Project>{228d7e17-efb3-470d-bdbd-57cbf1ef84e8}</Project>
-      <Name>Simulation</Name>
     </ProjectReference>
   </ItemGroup>
   <ItemGroup>
@@ -812,6 +804,9 @@
   <ItemGroup>
     <Analyzer Include="..\..\packages\Microsoft.CodeAnalysis.Analyzers.3.3.3\analyzers\dotnet\cs\Microsoft.CodeAnalysis.Analyzers.dll" />
     <Analyzer Include="..\..\packages\Microsoft.CodeAnalysis.Analyzers.3.3.3\analyzers\dotnet\cs\Microsoft.CodeAnalysis.CSharp.Analyzers.dll" />
+  </ItemGroup>
+  <ItemGroup>
+    <WCFMetadata Include="Connected Services\" />
   </ItemGroup>
   <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />
   <Target Name="EnsureNuGetPackageBuildImports" BeforeTargets="PrepareForBuild">

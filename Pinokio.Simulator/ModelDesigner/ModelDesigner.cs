@@ -107,7 +107,7 @@ namespace Pinokio.Designer
                 Pinokio3Dmodel.DelegateAddPartReference += new deleAlarmAddPartReference(ModifyEntityTreeList);
                 Pinokio3Dmodel.DelegateRemovePartReference += new deleAlarmRemovePartReference(DeletePartReference);
                 (new Simulator()).OnStartSimulation += Simulator_OnStartSimulation;
-                new SimResultDBManager();
+                ModelManager.Instance.SimResultDBManager = new UserSimResultDBManager();
 
                 Initialize3DModel();
                 Initialize3DOptions();

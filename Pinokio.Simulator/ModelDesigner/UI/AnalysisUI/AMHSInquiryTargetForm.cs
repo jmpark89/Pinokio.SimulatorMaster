@@ -63,7 +63,7 @@ namespace Pinokio.Designer
                 case 0:
                     if (isStartBtn&& !isEndBtn)
                     {
-                        foreach (string startName in SimResultDBManager.Instance.StartMRNames)
+                        foreach (string startName in ModelManager.Instance.SimResultDBManager.StartMRNames)
                         {
 
                             if (selectedStartMRNames.Contains(startName))
@@ -86,7 +86,7 @@ namespace Pinokio.Designer
                     }
                     else if (isEndBtn&& selectedStartMRNames.Count>0)
                     {
-                        foreach (string endName in SimResultDBManager.Instance.EndMRNames)
+                        foreach (string endName in ModelManager.Instance.SimResultDBManager.EndMRNames)
                         {
 
                             if (selectedEndMRNames.Contains(endName))
@@ -110,7 +110,7 @@ namespace Pinokio.Designer
 
                     break;
                 case 1:
-                    foreach (string csName in SimResultDBManager.Instance.SubCSNames)
+                    foreach (string csName in ModelManager.Instance.SimResultDBManager.SubCSNames)
                     {
                         if ((csType == stringAll || csName.Contains(csType)) && selectedSubCSNames.Contains(csName))
                             checkedListBox.Items.Add(csName, true);
@@ -119,7 +119,7 @@ namespace Pinokio.Designer
                     }
                     break;
                 case 2:
-                    foreach (string csName in SimResultDBManager.Instance.SubCSNames)
+                    foreach (string csName in ModelManager.Instance.SimResultDBManager.SubCSNames)
                     {
                         if ((csType == stringAll || csName.Contains(csType)) && selectedSubCSNames.Contains(csName))
                             checkedListBox.Items.Add(csName, true);
@@ -128,7 +128,7 @@ namespace Pinokio.Designer
                     }
                     break;
                 case 3:
-                    foreach (string csName in SimResultDBManager.Instance.SubCSNames)
+                    foreach (string csName in ModelManager.Instance.SimResultDBManager.SubCSNames)
                     {
                         if ((csType == stringAll || csName.Contains(csType)) && selectedSubCSNames.Contains(csName))
                             checkedListBox.Items.Add(csName, true);
