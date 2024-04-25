@@ -64,6 +64,7 @@
     <Compile Include="Container_v2_L2.cs" />
     <Compile Include="ConveyorLineStation.cs" />
     <Compile Include="DataMartSample.cs" />
+    <Compile Include="KPI\UserSimResultDBManager.cs" />
     <Compile Include="SingleLifter\Elevator.cs" />
     <Compile Include="SingleLifter\ElevatorLine.cs" />
     <Compile Include="SingleLifter\ElevatorLineStation.cs" />

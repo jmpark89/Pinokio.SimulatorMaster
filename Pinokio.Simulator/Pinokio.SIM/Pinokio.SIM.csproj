@@ -202,10 +202,6 @@
       <Project>{b4fd4513-661f-42a7-8f9e-6dc2513d0992}</Project>
       <Name>Pinokio.Animation</Name>
     </ProjectReference>
-    <ProjectReference Include="..\..\Pinokio.Model.User\Pinokio.Model.User.csproj">
-      <Project>{999bbefe-1d3f-4554-8e86-89494542fb34}</Project>
-      <Name>Pinokio.Model.User</Name>
-    </ProjectReference>
     <ProjectReference Include="..\..\Pinokio.Model\Pinokio.Model.Base\Pinokio.Model.Base.csproj">
       <Project>{65ce109f-18f1-40aa-b553-0ce1c614624c}</Project>
       <Name>Pinokio.Model.Base</Name>

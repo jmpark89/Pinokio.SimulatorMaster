@@ -59,14 +59,14 @@ namespace Pinokio.Model.User
                 SimPort newP = new SimPort(EXT_PORT.LEAVE, part, this);
                 ExternalFunction(simTime, newP);
                 FactoryInout factoryInout = new FactoryInout(SimEngine.Instance.SimDateTime, Convert.ToUInt32(this.ID.ToString()), this.Name, part.ID.ToString(), part.Name, "Output", part.ProductID, part.ProductName);
-                SimResultDBManager.Instance.UploadFactoryInoutLog(factoryInout);
+                ModelManager.Instance.SimResultDBManager.UploadFactoryInoutLog(factoryInout);
                 ModelManager.Instance.RemovePart(part);
                 ModelManager.Instance.DeletePart(part);
 
                 foreach (Part subPart in part.Parts)
                 {
                     factoryInout = new FactoryInout(SimEngine.Instance.SimDateTime, Convert.ToUInt32(this.ID.ToString()), this.Name, subPart.ID.ToString(), subPart.Name, "Output", subPart.ProductID, subPart.ProductName);
-                    SimResultDBManager.Instance.UploadFactoryInoutLog(factoryInout);
+                    ModelManager.Instance.SimResultDBManager.UploadFactoryInoutLog(factoryInout);
                     ModelManager.Instance.RemovePart(subPart);
                     ModelManager.Instance.DeletePart(subPart);
                 }

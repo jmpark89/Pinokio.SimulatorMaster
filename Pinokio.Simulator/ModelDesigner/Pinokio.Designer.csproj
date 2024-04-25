@@ -735,10 +735,6 @@
       <Project>{f6a4ee6f-e9dc-427c-8590-6a000ede2795}</Project>
       <Name>Pinokio.DevTool</Name>
     </ProjectReference>
-    <ProjectReference Include="..\..\Pinokio.Model.User\Pinokio.Model.User.csproj">
-      <Project>{999bbefe-1d3f-4554-8e86-89494542fb34}</Project>
-      <Name>Pinokio.Model.User</Name>
-    </ProjectReference>
     <ProjectReference Include="..\..\Pinokio.Model\Pinokio.Model.Base\Pinokio.Model.Base.csproj">
       <Project>{65ce109f-18f1-40aa-b553-0ce1c614624c}</Project>
       <Name>Pinokio.Model.Base</Name>
