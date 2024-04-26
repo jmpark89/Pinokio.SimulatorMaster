@@ -187,6 +187,9 @@
     <Reference Include="Microsoft.WindowsAPICodePack.Shell, Version=1.1.5.0, Culture=neutral, PublicKeyToken=8985beaab7ea3f04, processorArchitecture=MSIL">
       <HintPath>..\..\packages\Microsoft-WindowsAPICodePack-Shell.1.1.5\lib\net472\Microsoft.WindowsAPICodePack.Shell.dll</HintPath>
     </Reference>
+    <Reference Include="MySql.Data">
+      <HintPath>..\..\3rdParty\MySql.Data.dll</HintPath>
+    </Reference>
     <Reference Include="Pinokio.Animation">
       <HintPath>..\..\3rdParty\Pinokio.Animation.dll</HintPath>
     </Reference>

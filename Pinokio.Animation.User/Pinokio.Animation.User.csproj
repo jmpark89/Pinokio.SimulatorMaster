@@ -62,6 +62,9 @@
       <SpecificVersion>False</SpecificVersion>
       <HintPath>..\3rdParty\Logger.dll</HintPath>
     </Reference>
+    <Reference Include="MySql.Data">
+      <HintPath>..\3rdParty\MySql.Data.dll</HintPath>
+    </Reference>
     <Reference Include="Pinokio.Animation">
       <HintPath>..\3rdParty\Pinokio.Animation.dll</HintPath>
     </Reference>
