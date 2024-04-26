@@ -128,6 +128,9 @@
       <SpecificVersion>False</SpecificVersion>
       <HintPath>..\..\3rdParty\DevExpress.XtraPrinting.v20.1.dll</HintPath>
     </Reference>
+    <Reference Include="log4net">
+      <HintPath>..\..\3rdParty\log4net.dll</HintPath>
+    </Reference>
     <Reference Include="Logger, Version=1.0.0.0, Culture=neutral, processorArchitecture=MSIL">
       <SpecificVersion>False</SpecificVersion>
       <HintPath>..\..\3rdParty\Logger.dll</HintPath>
