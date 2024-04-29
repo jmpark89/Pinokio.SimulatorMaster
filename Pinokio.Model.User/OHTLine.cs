@@ -125,7 +125,9 @@ namespace Pinokio.Model.User
         {
             double v = 0;
             double v0 = MaxSpeed;
-            double reservationPosition = Length - Physics.GetLength_v_v0_a(v, v0, deceleration);
+            double reservationPosition = Length;
+            if(deceleration > 0)
+                reservationPosition -= Physics.GetLength_v_v0_a(v, v0, deceleration);
 
             return reservationPosition;
         }
