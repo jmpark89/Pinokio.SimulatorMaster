@@ -2126,7 +2126,9 @@ namespace Pinokio.Model.User
                             }
                         }
 
-                        double maxStopReadyLength = Physics.GetLength_v_v0_a(0, totalMaxSpeed, Deceleration);
+                        double maxStopReadyLength = 0;
+                        if(Deceleration > 0)
+                            maxStopReadyLength = Physics.GetLength_v_v0_a(0, totalMaxSpeed, Deceleration);
                         double maxStopReadyPos = nextOHTPos - IntervalLength - maxStopReadyLength;
 
                         if (maxStopReadyPos > cutPos)
