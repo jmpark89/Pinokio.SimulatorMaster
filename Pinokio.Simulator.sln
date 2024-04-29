@@ -21,8 +21,6 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "02.Pinokio.Model.User", "02
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Pinokio.Model.User", "Pinokio.Model.User\Pinokio.Model.User.csproj", "{999BBEFE-1D3F-4554-8E86-89494542FB34}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Pinokio.Designer", "Pinokio.Simulator\ModelDesigner\Pinokio.Designer.csproj", "{9460EA5A-877C-47D4-A46A-98DCB1539308}"
-EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -41,10 +39,6 @@ Global
 		{999BBEFE-1D3F-4554-8E86-89494542FB34}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{999BBEFE-1D3F-4554-8E86-89494542FB34}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{999BBEFE-1D3F-4554-8E86-89494542FB34}.Release|Any CPU.Build.0 = Release|Any CPU
-		{9460EA5A-877C-47D4-A46A-98DCB1539308}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{9460EA5A-877C-47D4-A46A-98DCB1539308}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{9460EA5A-877C-47D4-A46A-98DCB1539308}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{9460EA5A-877C-47D4-A46A-98DCB1539308}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -53,7 +47,6 @@ Global
 		{3E7C1C33-4CC6-4FFB-9942-87CEA4834107} = {41740F70-6D61-443E-A208-52CD6162AC1F}
 		{356FCBAA-1DC3-4412-B98B-20B3D556A4CB} = {D5F46651-B867-4F7B-9D3B-3DD4A4B00CFF}
 		{999BBEFE-1D3F-4554-8E86-89494542FB34} = {6406BD86-F09C-47DE-B7A7-E5C4C894917C}
-		{9460EA5A-877C-47D4-A46A-98DCB1539308} = {41740F70-6D61-443E-A208-52CD6162AC1F}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {6F6F61F6-650E-4F61-967B-A500C68817B7}
