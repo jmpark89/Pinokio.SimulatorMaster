@@ -26,6 +26,14 @@ namespace Pinokio.Model.User
         private List<OHTZCU> _reservationZCUs;
         private const int BYPASS = 102;
         private Time bypassStartTime = 0;
+        private bool _isSimpleMoveMode = true;
+
+        [StorableAttribute(true)]
+        public bool IsSimpleMoveMode
+        {
+            get { return _isSimpleMoveMode; }
+            set { _isSimpleMoveMode = value; }
+        }
 
         public OCS Ocs
         {
@@ -504,6 +512,8 @@ namespace Pinokio.Model.User
 
         protected override void ArriveToIdle(Time simTime, SimPort port)
         {
+            if (Name == "OHT_94")
+                ;
             Ocs.SetIdleDestinationAndRoute(simTime, this);
             SimPort simPort1 = new SimPort(INT_PORT.MOVE, this);
             InternalFunction(simTime, simPort1);
@@ -734,7 +744,7 @@ namespace Pinokio.Model.User
 
                 bool isScheduled = false;
                 int ohtIdx = Line.LstObjectIndex[oht.ID];
-
+                
                 List<PosData> ohtPosData = oht.PosDatas;
                 int ohtPosDatasCount = ohtPosData.Count;
                 double destPos = CalculateDestPos(curTime, oht, oht.Destination);
@@ -753,7 +763,12 @@ namespace Pinokio.Model.User
                 if (!(Math.Round(lastScheduledPos, 0) >= Math.Round(destPos, 0) && ohtPosDatasCount > 0))
                 {
                     MakeReservation(oht, lastScheduledPos, lastScheduledTime);
-                    EvtData evtData = oht.GeneratePosData(curTime, destPos);
+                    EvtData evtData;
+                    if (_isSimpleMoveMode)
+                        evtData = oht.GenerateSimpledPosData(curTime, destPos);
+                    else
+                        evtData = oht.GeneratePosData(curTime, destPos);
+
                     if (evtData._time > 0)
                     {
                         isScheduled = true;
@@ -781,7 +796,10 @@ namespace Pinokio.Model.User
                 }
                 else if (Math.Round(lastScheduledPos, 0) == Math.Round(destPos, 0) && oht.Route.Count > 1)
                 {
-                    SimPort newPort = new SimPort(EXT_PORT.REQUEST_TO_ENTER, oht, this);                    
+                    if (oht.Name == "OHT_94" && Line.Name == "OHTLine_64")
+                        ;
+
+                    SimPort newPort = new SimPort(EXT_PORT.REQUEST_TO_ENTER, oht, this);
                     oht.Route[1].ExternalFunction(curTime, newPort);
                 }
 
@@ -2223,6 +2241,141 @@ namespace Pinokio.Model.User
             }
         }
 
+        public EvtData GenerateSimpledPosData(Time simTime, double destPos)
+        {
+            Time endTime = simTime;
+            double startPos;
+            double startSpeed;
+            int index = Line.LstObjectIndex[this.ID];
+            if (PosDatas.Count == 0)
+            {
+                int idx = Line.LstObjectIndex[this.ID];
+                startPos = Line.LstStartPos[idx];
+                startSpeed = Line.MaxSpeed;
+            }
+            else
+            {
+                if (simTime < PosDatas[0]._endTime)
+                    startPos = PosDatas[0]._startPos + (simTime - PosDatas[0]._startTime).TotalSeconds * Line.MaxSpeed;
+                else
+                    startPos = PosDatas.Last()._endPos;
+            }
+
+            double moveLength = 0;
+
+            if (index > 0)
+            {
+                // 현재 라인의 앞에 누가 있음
+
+                if (Line.LstPosData[index - 1].Count == 0)
+                {
+//                    ErrorLogger.SaveLog("앞에 누가있는데 멈춰 있음");
+                    // 앞에 누가있는데 멈춰 있음
+                }
+                else
+                {
+                    PosData frontPosData = Line.LstPosData[index - 1].LastOrDefault();
+                    moveLength = (frontPosData._endPos - this.Size.X - _minimumDistance) - startPos;
+                }
+            }
+            else
+            {
+                // 현재 라인의 앞에 누가 없을 경우 셋팅. 이후 진행방향 앞쪽 라인 확인
+                moveLength = Line.Length - startPos;
+
+                foreach (TransportLine toLine in Line.EndPoint.OutLines)
+                {
+                    if (toLine.EnteredObjects.Count > 0)
+                    {
+                        //진행경로가 아닌데 intervalLength보다 더 가는 계획이 있으면 경로짜는 oht가 지나가면서 충돌에 영향을 주지않는다고 판단하고 고려하지 않음.
+                        if (!Route.Contains(toLine)
+                            &&
+                            ((toLine.LstPosData[toLine.EnteredObjects.Count - 1].Count > 0 && toLine.LstPosData[toLine.EnteredObjects.Count - 1].Last()._endPos > MinimumDistance)
+                            || (toLine.LstPosData[toLine.EnteredObjects.Count - 1].Count == 0 && toLine.LstStartPos[toLine.EnteredObjects.Count - 1] > MinimumDistance))
+                            )
+                            continue;
+                        else
+                            ;
+                        PosData frontPosData = toLine.LstPosData[toLine.EnteredObjects.Count - 1].LastOrDefault();
+
+                        moveLength = (frontPosData._endPos - this.Size.X - _minimumDistance);
+                        if (moveLength <= 0)
+                        {
+                            moveLength = CalPositionAtTime(toLine, startPos, simTime);
+                        }
+                        else
+                            moveLength += (Line.Length - startPos);
+                        break;
+                    }
+                }
+            }
+
+            if (moveLength > 0)
+            {
+                if (startPos + moveLength > destPos)
+                    moveLength = destPos - startPos;
+
+                if (moveLength > _dispatchingDistance)
+                    moveLength = _dispatchingDistance;
+
+                endTime = simTime + moveLength / Line.MaxSpeed;
+                PosData posData = new PosData(0, Line.MaxSpeed, simTime, endTime, startPos, startPos + moveLength);
+                PosDatas.Add(posData);
+            }
+            else
+                return new EvtData(false, 0);
+
+            bool isArrive = false;
+            if (Math.Round(PosDatas.Last()._endPos, 0) >= Math.Round(destPos, 0))
+                isArrive = true;
+
+            return new EvtData(isArrive, PosDatas.Last()._endTime);
+        }
+        private double CalPositionAtTime(TransportLine toLine, double startPos, Time simTime)
+        {
+            PosData frontPosData = toLine.LstPosData[toLine.EnteredObjects.Count - 1].LastOrDefault();
+
+            if (frontPosData._endTime == 0)
+                return Line.Length - startPos;
+
+            double vehiclePosition = frontPosData._startPos;
+
+            if (Math.Round((double)frontPosData._startTime, 2) == Math.Round((double)simTime, 2))
+                vehiclePosition = frontPosData._startPos;
+            else if (Math.Round((double)frontPosData._endTime, 2) >= Math.Round((double)simTime, 2))
+                vehiclePosition = frontPosData._endPos;
+            else
+                vehiclePosition = frontPosData._startPos + Physics.GetLength_v0_a_t(frontPosData._startSpeed, frontPosData._celerate, (double)(simTime - frontPosData._startTime));
+            
+            vehiclePosition = Math.Min(vehiclePosition, frontPosData._endPos);
+            
+            double betweenAandB = vehiclePosition + (Line.Length - startPos);
+
+            double moveLength = betweenAandB - this.Size.X - _minimumDistance;
+
+            if (Math.Round(betweenAandB) <= this.Size.X + _minimumDistance)
+                return 0;
+
+            return moveLength;
+        }
+        private Time GetPosDataFromStartPointToEndPoint(uint objID, Time simTime, double startPos, PVector3 fromPoint, PVector3 endPoint)
+        {
+            Time endTime = simTime;
+            try
+            {
+                int index = Line.LstObjectIndex[objID];
+                double length = (endPoint - fromPoint).Length() - startPos;
+                endTime = simTime + length / Line.MaxSpeed;
+                PosData posData = new PosData(0, Line.MaxSpeed, simTime, endTime, startPos, startPos + length);
+                Line.LstPosData[index].Add(posData);
+            }
+            catch (Exception ex)
+            {
+                ErrorLogger.SaveLog(ex);
+            }
+            return endTime;
+        }
+
         public void FindFrontObject(TransportPoint point, double intervalLength, List<TransportLine> route, double length, double searchStopLength, ref List<TransportPoint> visitedPoints, ref List<List<PosData>> lstlstPreOpd, ref List<double> lstLengthForToLine, ref List<double> lstPreOhtStartPosition, ref List<bool> lstPreOhtStoped)
         {
             try
@@ -2374,7 +2527,7 @@ namespace Pinokio.Model.User
             return false;
         }
 
-        public PosData cutPosDataByTime(PosData opd, double time)
+        public PosData CutPosDataByTime(PosData opd, double time)
         {
             double v0 = opd._startSpeed;
             double a = opd._celerate;
@@ -2388,7 +2541,7 @@ namespace Pinokio.Model.User
 
             return new PosData(a, v0, opd._startTime, opd._startPos, endSpeed, opd._startTime + t, opd._startPos + endPos);
         }
-        public PosData cutPosDataByPos(PosData opd, double pos)
+        public PosData CutPosDataByPos(PosData opd, double pos)
         {
             double a = opd._celerate;
             double s = pos - opd._startPos;
@@ -2409,6 +2562,7 @@ namespace Pinokio.Model.User
 
             return new PosData(a, v0, opd._startTime, opd._startPos, v, opd._startTime + t, pos);
         }
+
         public List<PosData> cutListPosDataByTime(List<PosData> lstOpd, double cutTime)
         {
             List<PosData> returnList = new List<PosData>();
@@ -2420,7 +2574,7 @@ namespace Pinokio.Model.User
                 {
                     if (lstOpd[i]._startTime < cutTime)
                     {
-                        returnList.Add(cutPosDataByTime(lstOpd[i], (double)(cutTime - lstOpd[i]._startTime)));
+                        returnList.Add(CutPosDataByTime(lstOpd[i], (double)(cutTime - lstOpd[i]._startTime)));
                         break;
                     }
                 }
@@ -2438,7 +2592,7 @@ namespace Pinokio.Model.User
                 {
                     if (lstOpd[i]._startPos < cutPos)
                     {
-                        returnList.Add(cutPosDataByPos(lstOpd[i], cutPos));
+                        returnList.Add(CutPosDataByPos(lstOpd[i], cutPos));
                         break;
                     }
                     else
@@ -2446,6 +2600,20 @@ namespace Pinokio.Model.User
                 }
             }
             return returnList;
+        }
+
+        public void CutListPosDataByPos(List<PosData> lstOpd, double cutPos)
+        {
+            for (int i = 0; i < lstOpd.Count; i++)
+            {
+                if (lstOpd[i]._startPos < cutPos)
+                {
+                    lstOpd[i] = CutPosDataByPos(lstOpd[i], cutPos);
+                    break;
+                }
+                else
+                    break;
+            }
         }
     }
     #endregion

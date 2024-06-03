@@ -39,7 +39,7 @@ namespace Pinokio.Animation.User
                     double l = 2000;
                     Mesh mBox = Mesh.CreateBox(l, l, l);
                     mBox.Translate(-l / 2, -l / 2, 0);
-                    mBox.ColorMethod = colorMethodType.byParent;
+                    mBox.ColorMethod = colorMethodType.byEntity;
                     mBox.Color = System.Drawing.Color.FromArgb(128, System.Drawing.Color.Blue);
                     bl.Entities.Add(mBox);
 
