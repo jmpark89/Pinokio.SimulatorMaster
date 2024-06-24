@@ -45,7 +45,7 @@ namespace Pinokio.Animation.User
 
         public static void CreateBlock(PinokioBaseModel model, params object[] objects)
         {
-            AnimationModelManager.CreatePart(nameof(RefOHCV), Path.Combine(UtillFunction.Get3DFolderPath(), "ohcv2.obj"), model, 1, new Point3D(0, 0, 0), 0, System.Drawing.Color.Pink);
+            AnimationModelManager.CreatePart(nameof(RefOHCV), "C:\\Carlo\\Pinokio\\Pinokio.Asset\\ohcv2.obj", model, 1, new Point3D(0, 0, 0), 0, System.Drawing.Color.Pink);
         }
         protected override string GetTypeName()
         {

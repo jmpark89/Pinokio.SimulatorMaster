@@ -13,6 +13,9 @@ namespace Pinokio.Model.User
     using System.Text;
     using System.Threading.Tasks;
 
+    /// <summary>
+    /// Step 없이 일정시간 머물다가 나가는 목적의 Node
+    /// </summary>
     public class Stay : TXNode
     {
         [StorableAttribute(false)]
@@ -217,7 +220,7 @@ namespace Pinokio.Model.User
 
         public override bool IsEnter(SimPort port)
         {
-            if (Capa > EnteredObjects.Count)
+            if (Capa == -1 || Capa > EnteredObjects.Count)
             {
                 Time timeNow = SimEngine.Instance.TimeNow;
                 SimPort newPort = new SimPort(INT_PORT.ARRIVE_TO_LOAD, port.Object);

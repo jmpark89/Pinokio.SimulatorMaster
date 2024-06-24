@@ -151,9 +151,6 @@
     <Reference Include="Pinokio.Model.Base">
       <HintPath>..\..\3rdParty\Pinokio.Model.Base.dll</HintPath>
     </Reference>
-    <Reference Include="Pinokio.Model.User">
-      <HintPath>..\..\3rdParty\Pinokio.Model.User.dll</HintPath>
-    </Reference>
     <Reference Include="Pinokio.Simulation">
       <HintPath>..\..\3rdParty\Pinokio.Simulation.dll</HintPath>
     </Reference>
@@ -229,6 +226,10 @@
     <ProjectReference Include="..\..\Pinokio.Animation.User\Pinokio.Animation.User.csproj">
       <Project>{356fcbaa-1dc3-4412-b98b-20b3d556a4cb}</Project>
       <Name>Pinokio.Animation.User</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\..\Pinokio.Model.User\Pinokio.Model.User.csproj">
+      <Project>{999bbefe-1d3f-4554-8e86-89494542fb34}</Project>
+      <Name>Pinokio.Model.User</Name>
     </ProjectReference>
   </ItemGroup>
   <ItemGroup>

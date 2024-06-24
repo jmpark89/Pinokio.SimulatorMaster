@@ -85,6 +85,13 @@
     <Compile Include="Battery.cs" />
     <Compile Include="Container_v2_L2.cs" />
     <Compile Include="ConveyorLineStation.cs" />
+    <Compile Include="CSC.cs" />
+    <Compile Include="CSCCS.cs" />
+    <Compile Include="CSCLine.cs" />
+    <Compile Include="CSCLineStation.cs" />
+    <Compile Include="CSCPoint.cs" />
+    <Compile Include="CSCZCU.cs" />
+    <Compile Include="CSCZCUReservation.cs" />
     <Compile Include="DataMartSample.cs" />
     <Compile Include="KPI\UserSimResultDBManager.cs" />
     <Compile Include="SingleLifter\Elevator.cs" />

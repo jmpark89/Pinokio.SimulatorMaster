@@ -48,7 +48,7 @@ namespace Pinokio.Animation.User
             {
                 // Write your code here.
                 Block block = NodeReference.LoadModelFile("C:\\Carlo\\Pinokio\\Pinokio.Asset\\3D\\Palette_3.obj", "RefPalette", model);
-                block.Entities[0].ColorMethod = colorMethodType.byParent;
+                block.Entities[0].ColorMethod = colorMethodType.byEntity;
                 block.Entities[0].Color = System.Drawing.Color.SandyBrown;
                 model.Blocks.Add(block);
             }

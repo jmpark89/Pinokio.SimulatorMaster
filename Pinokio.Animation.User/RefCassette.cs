@@ -34,7 +34,7 @@ namespace Pinokio.Animation.User
         {
             try
             {
-                string path = Path.Combine(UtillFunction.Get3DFolderPath(), "LCD\\LCDPart.obj");
+                string path = "C:\\Carlo\\Pinokio\\Pinokio.Asset\\LCD\\LCDPart.obj";
                 if (File.Exists(path))
                 {
                     string blockName = System.Reflection.MethodBase.GetCurrentMethod().DeclaringType.Name;
@@ -68,7 +68,7 @@ namespace Pinokio.Animation.User
                     double l = 1000;
                     Mesh mBox = Mesh.CreateBox(l, l, l);
                     mBox.Translate(-l / 2, -l / 2, 0);
-                    mBox.ColorMethod = colorMethodType.byParent;
+                    mBox.ColorMethod = colorMethodType.byEntity;
                     mBox.Color = System.Drawing.Color.FromArgb(128, System.Drawing.Color.Blue);
                     bl.Entities.Add(mBox);
 

@@ -45,8 +45,7 @@ namespace Pinokio.Animation.User
 
         public static void CreateBlock(PinokioBaseModel model, params object[] objects)
         {
-
-            Block block = NodeReference.LoadModelFile("C:\\Carlo\\Pinokio\\Pinokio.Asset\\ohs.obj", nameof(RefCSC), model);
+            Block block = LoadModelFile("C:\\Carlo\\Pinokio\\Pinokio.Asset\\ohs.obj", nameof(RefCSC), model);
 
             foreach (Entity ent in block.Entities)
             {

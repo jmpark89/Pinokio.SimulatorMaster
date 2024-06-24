@@ -82,11 +82,6 @@ namespace Pinokio.Model.User
             }
         }
 
-        public bool IsStoped
-        {
-            get;set;
-        }
-
         public AGVZCU CurZcu
         {
             get; set;

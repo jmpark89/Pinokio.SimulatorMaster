@@ -11,7 +11,22 @@ namespace Pinokio.Model.User
         private bool _waitAllowed; // waitAllowed 여부
         private bool _bumpAllowed; // BumpAllowed 여부
 
-        public new OHTLine Line { get; set; }
+        private OHTLine _line;
+
+        public new OHTLine Line
+        {
+            get
+            {
+                if (base.Line != null && _line == null)
+                    _line = base.Line as OHTLine;
+
+                return _line;
+            }
+            set
+            {
+                _line = value;
+            }
+        }
 
         [Browsable(true)]
         public bool WaitAllowed

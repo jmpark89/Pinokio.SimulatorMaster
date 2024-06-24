@@ -99,13 +99,13 @@ namespace Pinokio.Animation.User
                 {
                     tr = new Transformation(_core.RotateMatrix);
                     rotationAxis = Vector3D.AxisZ; // Z축을 중심으로 회전하는 예시
-                    angle = -Math.PI / 2; // 회전 각도 (도 단위)
+                    angle = Math.PI / 2; // 회전 각도 (도 단위)
                 }
                 else if (line.Direction.Y == -1)
                 {
                     tr = new Transformation(_core.RotateMatrix);
                     rotationAxis = Vector3D.AxisZ; // Z축을 중심으로 회전하는 예시
-                    angle = Math.PI / 2; // 회전 각도 (도 단위)
+                    angle = -Math.PI / 2; // 회전 각도 (도 단위)
                 }
                 // 회전 변환 생성
                 Transformation rotation = new Rotation(angle, rotationAxis);

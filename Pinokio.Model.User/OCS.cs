@@ -6,6 +6,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using Pinokio.Model.Base;
+using Logger;
 
 namespace Pinokio.Model.User
 {
@@ -74,7 +75,7 @@ namespace Pinokio.Model.User
 
         public void Initialize()
         {
-            BumpDistance = 4900;
+            BumpDistance = 8000;
             DispatchingIntervalTime = 5;
             _dicRailPoint = new Dictionary<string, OHTPoint>();
             _dicRailLine = new Dictionary<string, OHTLine>();
@@ -189,73 +190,64 @@ namespace Pinokio.Model.User
 
         public override void SetIdleDestinationAndRoute(Time simTime, Vehicle vehicle)
         {
-            int iteration = 0;
-            BAY bay = null;
-            List<int> ranList = new List<int>();
             try
             {
+                bool isStop = false;
+
                 if (FactoryManager.Instance.Bays.Count() != 0)
                 {
-                    while (bay == null)
+                    List<TransportLine> vehicleRoutes = new List<TransportLine>();
+
+                    BAY currentBay = vehicle.Bay != "" && !vehicle.Bay.Contains("InterBay") ?
+                                     FactoryManager.Instance.Bays[vehicle.Bay] : null;
+
+                    if (currentBay == null) //InterBay 혹은 Bay가 아닌 경우
                     {
-                        if (vehicle.Bay != string.Empty)
-                        {
-                            if (!ranList.Contains(FactoryManager.Instance.Bays.Keys.ToList().IndexOf(vehicle.Bay)))
-                            {
-                                FactoryManager.Instance.Bays[vehicle.Bay].RemoveBumpingOHT(vehicle.Name);
-                                ranList.Add(FactoryManager.Instance.Bays.Keys.ToList().IndexOf(vehicle.Bay));
-                                continue;
-                            }
-                        }
-
-                        int randomNumber = random.Next(0, FactoryManager.Instance.Bays.Keys.Count);
-
-                        bay = FactoryManager.Instance.Bays.Values.ElementAt(randomNumber);
-
-                        if (bay.IdleVehicleMaxCount == 0)
-                            bay.IdleVehicleMaxCount = 40;
-
-                        if (bay.BumpingOHTs.Count() > bay.IdleVehicleMaxCount)
-                        {
-                            bay = null;
-                        }
-                        if (iteration > 10000)
-                        {
-                            ;
-                        }
-                        iteration += 1;
+                        BAY findBay = FindLeastOccupiedBay();
+                        vehicle.Destination = FindLineStation(findBay, vehicle, ref vehicleRoutes);
+                        findBay.AddBumpingOHT(vehicle.Name, VEHICLE_STATE.IDLE);
                     }
-
-
-                    LineStation lineStation = null;
-                    //LineStation lineStation = LstLineStation.ElementAt(randomNumber);
-
-                    iteration = 0;
-
-                    while (lineStation == null)
+                    else if (currentBay.BumpingOHTs.Count <= currentBay.IdleVehicleMaxCount) // Bay에 잔류 가능
                     {
-
-                        int randomNum2 = random.Next(0, bay.Lines.Count);
-                        string lineName = bay.Lines.ElementAt(randomNum2);
-
-                        lineStation = LineStations.Find(x => x.Line.Name == lineName);
-
-                        if (iteration > 10000)
+                        if (currentBay.BumpingOHTs.ContainsKey(vehicle.Name) && currentBay.BumpingOHTs[vehicle.Name] == false) // 한번 BumpingStation에 왔었음. 정지. (이때는 도착했을 경우.
                         {
-                            //throw new Exception("무한 루프를 중지합니다.");
-                            ;
+                            currentBay.BumpingOHTs[vehicle.Name] = true;
+                            isStop = true;
                         }
-                        iteration += 1;
+                        else
+                        {
+                            currentBay.AddBumpingOHT(vehicle.Name, VEHICLE_STATE.IDLE); // 현재 Bay에서 처음으로 IDLE 상태. BumpingStation으로 최초 보냄.
+                            currentBay.BumpingOHTs[vehicle.Name] = false;
+                            vehicle.Destination = FindLineStation(currentBay, vehicle, ref vehicleRoutes);
+                        }
                     }
-                    vehicle.Destination = lineStation;
+                    else //가장 BumpingOHT가 적은 곳으로 이동
+                    {
+                        BAY destinationBay = FindAvailableNeighborBay(currentBay, vehicle) ?? FindLeastOccupiedBay();
+                        currentBay.RemoveBumpingOHT(vehicle.Name);
+                        vehicle.Destination = FindLineStation(destinationBay, vehicle, ref vehicleRoutes);
+                        destinationBay.AddBumpingOHT(vehicle.Name, VEHICLE_STATE.IDLE);
+                    }
+                    // 경로 설정
+                    if (isStop == true)
+                    {
+                        ((OHT)vehicle).IsStoped = true;
+                        return;
+                    }
+                    else
+                        ((OHT)vehicle).IsStoped = false;
 
-                    vehicle.Route = GetPath(simTime, vehicle);
-                    vehicle.Bay = bay.Name;
-                    //bay.IdleVehicleMaxCount += 1;
-                    bay.AddBumpingOHT(vehicle.Name, VEHICLE_STATE.IDLE);
+                    if (vehicleRoutes.Count() != 0)
+                        vehicle.Route = vehicleRoutes;
+                    else
+                        vehicle.Route = GetPath(simTime, vehicle);
                 }
                 else
                 {
+                    int iteration = 0;
+                    BAY bay = null;
+                    List<int> ranList = new List<int>();
+
                     LineStation lineStation = LineStations.Find(x => x != ((LineStation)vehicle.Destination));
 
                     vehicle.Destination = lineStation;
@@ -264,8 +256,154 @@ namespace Pinokio.Model.User
             }
             catch (Exception ex)
             {
-                throw;
+                ErrorLogger.SaveLog(ex);
             }
+        }
+
+        private BAY FindAvailableNeighborBay(BAY currentBay, Vehicle vehicle)
+        {
+            double minOHT = double.MaxValue;
+            BAY possibleNeighborBay = null;
+            foreach (BAY neighborBay in currentBay.NeighborBay)
+            {
+                if (neighborBay.BumpingOHTs.Count < neighborBay.IdleVehicleMaxCount && neighborBay.BumpingOHTs.Count < minOHT)
+                {
+                    minOHT = neighborBay.BumpingOHTs.Count;
+                    possibleNeighborBay = neighborBay;
+                }
+            }
+            if (possibleNeighborBay != null)
+                return possibleNeighborBay;
+            else
+                return SearchNearestBayBFS(currentBay, vehicle);
+            return null;
+        }
+        public BAY SearchNearestBayBFS(BAY currentBay, Vehicle vehicle)
+        {
+            TransportLine line = vehicle.Line;
+            Queue<TransportLine> checkLines = new Queue<TransportLine>();
+            checkLines.Enqueue(line);
+            Dictionary<uint, bool> isUsed = new Dictionary<uint, bool>();
+            BAY possibleNeighborBay = null;
+
+            while (checkLines.Count != 0)
+            {
+                TransportLine currentLine = checkLines.Dequeue();
+                List<TransportLine> toLines = currentLine.EndPoint.OutLines;
+
+                try
+                {
+                    foreach (TransportLine toLine in toLines)
+                    {
+                        if (isUsed.ContainsKey(toLine.ID))
+                            continue;
+
+                        if (((OHTLine)toLine).Bay != null && ((OHTLine)toLine).Bay != "" && !((OHTLine)toLine).Bay.Contains("Inter"))
+                        {
+                            BAY comparedBay = FactoryManager.Instance.Bays[((OHTLine)toLine).Bay];
+                            if (comparedBay.BumpingStations.Count > 0 && ((OHTLine)line).Bay != ((OHTLine)toLine).Bay && comparedBay.BumpingOHTs.Count < comparedBay.IdleVehicleMaxCount)
+                            {
+                                possibleNeighborBay = comparedBay;
+                                return possibleNeighborBay;
+                            }
+                        }
+                        checkLines.Enqueue(toLine);
+                        isUsed[toLine.ID] = true;
+                    }
+                }
+                catch (Exception ex)
+                {
+                    ErrorLogger.SaveLog(ex);
+                }
+            }
+            return null;
+        }
+
+        private BAY FindLeastOccupiedBay()
+        {
+            return FactoryManager.Instance.Bays.Values.OrderBy(bay => bay.BumpingOHTs.Count).First();
+        }
+
+        private LineStation FindLineStation(BAY bay, Vehicle vehicle, ref List<TransportLine> RealRoute)
+        {
+            if (((OHTLine)vehicle.Route[0]).Bay != bay.Name)
+            {
+                return bay.BumpingStations.Keys.ToList().Last();
+            }
+            
+            double dispatchDist = 0;
+
+             if (vehicle.PosDatas.Count == 0)
+                dispatchDist = vehicle.DispatchingDistance;
+            else
+                dispatchDist = vehicle.DispatchingDistance + vehicle.PosDatas.Last()._endPos;
+
+            TransportLine line = null;
+            if (vehicle.Destination != null)
+            {
+                LineStation station = vehicle.Destination as LineStation; 
+                //line = bay.BumpingStations[station].Line;
+                double stationLength = 0;
+                TransportLine stationLine = vehicle.Destination.GetLineNStationLength(ref stationLength); 
+                LineStation tempStation_A = station;//현재목적지
+                LineStation tempStation_B = null;//다음목적지
+                while (dispatchDist > stationLength)
+                {
+                    try
+                    {
+                        tempStation_B = bay.BumpingStations[tempStation_A];
+                        if (tempStation_A.Line == tempStation_B.Line)
+                        {
+                            stationLength += tempStation_B.Length - tempStation_A.Length;
+                        }
+                        else
+                            stationLength += tempStation_B.Length;
+
+                        tempStation_A = tempStation_B;
+                    }
+                    catch (Exception ex)
+                    {
+                        ErrorLogger.SaveLog(ex);
+                        tempStation_B = bay.BumpingStations.Keys.ToList().Last();
+                        line = tempStation_B.Line;
+                        RealRoute = CalculateRouteToCurrent(line, vehicle.Route[0], bay.Name);
+                        return tempStation_B;
+                    }
+                }
+                if (tempStation_B == null)
+                    tempStation_B = bay.BumpingStations[tempStation_A];
+                line = tempStation_B.Line;
+
+                RealRoute = CalculateRouteToCurrent(line, vehicle.Route[0], bay.Name);
+                return tempStation_B;
+            }
+            else
+            {
+                line = bay.BumpingStations.Keys.ToList().Last().Line;
+                RealRoute = CalculateRouteToCurrent(line, vehicle.Route[0], bay.Name);
+                return bay.BumpingStations.Keys.ToList().Last();
+            }
+
+        }
+
+        private List<TransportLine> CalculateRouteToCurrent(TransportLine endLine, TransportLine curLine, string bayName)
+        {
+            List<TransportLine> tempRoute = new List<TransportLine>();
+            TransportLine tempLine = endLine;
+
+            tempRoute.Add(tempLine);
+            while (tempLine != curLine)
+            {
+                foreach (TransportLine inputLine in tempLine.StartPoint.InLines)
+                {
+                    if (((OHTLine)inputLine).Bay != bayName)
+                        continue;
+                    tempRoute.Add(inputLine);
+                    tempLine = inputLine;
+                }
+            }
+            tempRoute.Reverse();
+            return tempRoute;
         }
 
         /// <summary>
@@ -295,10 +433,15 @@ namespace Pinokio.Model.User
                 else if (line.Name != command.AcquireRoute.Last().Name)
                     command.WaitingDistance += line.Length;
             }
-            string lineName = LineStations.FirstOrDefault(x => x.Name == vehicle.Destination.Name).Line.Name;
-            BAY bay = FactoryManager.Instance.Bays.FirstOrDefault(kv => kv.Value.Lines.Contains(lineName)).Value;
-            if (bay != null)
+            TransportLine lineName = LineStations.FirstOrDefault(x => x.Name == vehicle.Destination.Name).Line;
+            BAY bayss = FactoryManager.Instance.Bays.FirstOrDefault(kv => kv.Value.TransportLines.Contains(vehicle.Line)).Value;
+            List<BAY> bays = FactoryManager.Instance.Bays.Values.Where(x => x.BumpingOHTs.ContainsKey(vehicle.Name)).ToList();
+            foreach(BAY bay in bays)
+            {
                 bay.RemoveBumpingOHT(vehicle.Name);
+            }
+            if (bayss != null)
+                bayss.RemoveBumpingOHT(vehicle.Name);
 
             SimPort port = new SimPort(EXT_PORT.MOVE, vehicle, this);
             vehicle.ExternalFunction(simTime, port);

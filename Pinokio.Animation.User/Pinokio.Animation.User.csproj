@@ -104,6 +104,32 @@
     <Compile Include="2.SubView\ModifyUserNodeValueForm.Designer.cs">
       <DependentUpon>ModifyUserNodeValueForm.cs</DependentUpon>
     </Compile>
+    <Compile Include="BatteryEquipment\RefAging.cs" />
+    <Compile Include="BatteryEquipment\RefAnodeCoating.cs" />
+    <Compile Include="BatteryEquipment\RefAnodeDelivery.cs" />
+    <Compile Include="BatteryEquipment\RefAnodeMixing.cs" />
+    <Compile Include="BatteryEquipment\RefAnodePunching.cs" />
+    <Compile Include="BatteryEquipment\RefCalendering.cs" />
+    <Compile Include="BatteryEquipment\RefCathodeCoating.cs" />
+    <Compile Include="BatteryEquipment\RefCathodeDelivery.cs" />
+    <Compile Include="BatteryEquipment\RefCathodeMixing.cs" />
+    <Compile Include="BatteryEquipment\RefCathodePuncing.cs" />
+    <Compile Include="BatteryEquipment\RefElectrolyteFilling.cs" />
+    <Compile Include="BatteryEquipment\RefForming.cs" />
+    <Compile Include="BatteryEquipment\RefGradingCharging.cs" />
+    <Compile Include="BatteryEquipment\RefNotching.cs" />
+    <Compile Include="BatteryEquipment\RefSortAndPacking.cs" />
+    <Compile Include="BatteryEquipment\RefStacking.cs" />
+    <Compile Include="BatteryEquipment\RefStacking2.cs" />
+    <Compile Include="BatteryProduct\RefBatteryCell.cs" />
+    <Compile Include="BatteryProduct\RefBatteryPallet.cs" />
+    <Compile Include="BatteryProduct\RefMinusCell.cs" />
+    <Compile Include="BatteryProduct\RefMinusLiquid.cs" />
+    <Compile Include="BatteryProduct\RefMinusRoll.cs" />
+    <Compile Include="BatteryProduct\RefPlusCell.cs" />
+    <Compile Include="BatteryProduct\RefPlusLiquid.cs" />
+    <Compile Include="BatteryProduct\RefPlusRoll.cs" />
+    <Compile Include="BatteryProduct\RefSeparator.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="RefCassette.cs" />
     <Compile Include="RefBattery.cs" />

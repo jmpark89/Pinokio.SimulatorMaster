@@ -39,8 +39,8 @@ namespace Pinokio.Animation.User
 
         public new static void CreateBlock(PinokioBaseModel model, params object[] objects)
         {
-            AnimationModelManager.CreatePart(_blockName, Path.Combine(UtillFunction.Get3DFolderPath(), "StraightConveyor_Leg.obj"), model, 30, new Point3D(0, 0, 0), 255, System.Drawing.Color.Gray);
-            AnimationModelManager.CreatePart(InnerBlockName, Path.Combine(UtillFunction.Get3DFolderPath(), "StraightConveyor_Inner.obj"), model, 30, new Point3D(0, 0, 0), 255, System.Drawing.Color.Gray);
+            AnimationModelManager.CreatePart(_blockName, "C:\\Carlo\\Pinokio\\Pinokio.Asset\\StraightConveyor_Leg.obj", model, 30, new Point3D(0, 0, 0), 255, System.Drawing.Color.Gray);
+            AnimationModelManager.CreatePart(InnerBlockName, "C:\\Carlo\\Pinokio\\Pinokio.Asset\\StraightConveyor_Inner.obj", model, 30, new Point3D(0, 0, 0), 255, System.Drawing.Color.Gray);
         }
     }
 }
