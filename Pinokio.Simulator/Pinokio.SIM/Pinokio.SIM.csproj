@@ -64,6 +64,10 @@
     <ApplicationIcon>PINOKIO SIM.ico</ApplicationIcon>
   </PropertyGroup>
   <ItemGroup>
+    <Reference Include="CSScriptLib, Version=4.6.2.0, Culture=neutral, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\..\3rdParty\CSScriptLib.dll</HintPath>
+    </Reference>
     <Reference Include="devDept.Eyeshot.Control.Win.v12, Version=12.0.520.0, Culture=neutral, PublicKeyToken=5385d83d2fb4d7d9, processorArchitecture=MSIL">
       <SpecificVersion>False</SpecificVersion>
       <HintPath>..\..\3rdParty\devDept.Eyeshot.Control.Win.v12.dll</HintPath>
