@@ -32,6 +32,10 @@ namespace Pinokio.Designer
         [Description("투입 Node ID")]
         public  override uint InputNodeID { get => _inputNodeID; set => _inputNodeID = value; }
 
+        [Browsable(true), Description("투입량")]
+        [DisplayName("Count")]
+        public uint EditManufactureQty { get => ManufactureQty; set => ManufactureQty = value; }
+
         public ProductionScheduleDataEdit()
             : base()
         {

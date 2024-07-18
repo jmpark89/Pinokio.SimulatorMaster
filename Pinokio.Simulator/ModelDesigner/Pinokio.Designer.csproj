@@ -115,6 +115,7 @@
       <HintPath>..\..\3rdParty\DevExpress.Utils.v20.1.dll</HintPath>
     </Reference>
     <Reference Include="DevExpress.Utils.v20.1.UI, Version=20.1.3.0, Culture=neutral, PublicKeyToken=b88d1754d700e49a, processorArchitecture=MSIL" />
+    <Reference Include="DevExpress.Xpo.v20.1, Version=20.1.3.0, Culture=neutral, PublicKeyToken=b88d1754d700e49a" />
     <Reference Include="DevExpress.XtraBars.v20.1, Version=20.1.3.0, Culture=neutral, PublicKeyToken=b88d1754d700e49a, processorArchitecture=MSIL">
       <SpecificVersion>False</SpecificVersion>
       <HintPath>..\..\3rdParty\DevExpress.XtraBars.v20.1.dll</HintPath>
@@ -187,37 +188,44 @@
     <Reference Include="Microsoft.WindowsAPICodePack.Shell, Version=1.1.5.0, Culture=neutral, PublicKeyToken=8985beaab7ea3f04, processorArchitecture=MSIL">
       <HintPath>..\..\packages\Microsoft-WindowsAPICodePack-Shell.1.1.5\lib\net472\Microsoft.WindowsAPICodePack.Shell.dll</HintPath>
     </Reference>
-    <Reference Include="MySql.Data">
-      <HintPath>..\..\3rdParty\MySql.Data.dll</HintPath>
-    </Reference>
-    <Reference Include="Pinokio.Animation">
+    <Reference Include="Pinokio.Animation, Version=1.0.0.0, Culture=neutral, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
       <HintPath>..\..\3rdParty\Pinokio.Animation.dll</HintPath>
     </Reference>
-    <Reference Include="Pinokio.Auth">
+    <Reference Include="Pinokio.Auth, Version=1.0.0.0, Culture=neutral, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
       <HintPath>..\..\3rdParty\Pinokio.Auth.dll</HintPath>
     </Reference>
-    <Reference Include="Pinokio.Communication">
+    <Reference Include="Pinokio.Communication, Version=1.0.0.0, Culture=neutral, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
       <HintPath>..\..\3rdParty\Pinokio.Communication.dll</HintPath>
     </Reference>
-    <Reference Include="Pinokio.Database">
+    <Reference Include="Pinokio.Database, Version=3.1.8965.19527, Culture=neutral, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
       <HintPath>..\..\3rdParty\Pinokio.Database.dll</HintPath>
     </Reference>
-    <Reference Include="Pinokio.DevTool">
+    <Reference Include="Pinokio.DevTool, Version=1.0.0.0, Culture=neutral, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
       <HintPath>..\..\3rdParty\Pinokio.DevTool.dll</HintPath>
     </Reference>
-    <Reference Include="Pinokio.Geometry">
+    <Reference Include="Pinokio.Geometry, Version=3.1.8965.19527, Culture=neutral, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
       <HintPath>..\..\3rdParty\Pinokio.Geometry.dll</HintPath>
     </Reference>
-    <Reference Include="Pinokio.Model.Base">
+    <Reference Include="Pinokio.Model.Base, Version=3.2.8965.19527, Culture=neutral, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
       <HintPath>..\..\3rdParty\Pinokio.Model.Base.dll</HintPath>
     </Reference>
-    <Reference Include="Pinokio.Object">
+    <Reference Include="Pinokio.Object, Version=3.1.8965.19475, Culture=neutral, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
       <HintPath>..\..\3rdParty\Pinokio.Object.dll</HintPath>
     </Reference>
-    <Reference Include="Pinokio.Simulation">
+    <Reference Include="Pinokio.Simulation, Version=3.1.8965.19529, Culture=neutral, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
       <HintPath>..\..\3rdParty\Pinokio.Simulation.dll</HintPath>
     </Reference>
-    <Reference Include="Pinokio.UI.Base">
+    <Reference Include="Pinokio.UI.Base, Version=1.0.0.0, Culture=neutral, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
       <HintPath>..\..\3rdParty\Pinokio.UI.Base.dll</HintPath>
     </Reference>
     <Reference Include="PresentationCore" />
@@ -352,6 +360,7 @@
     <Compile Include="PinokioEditorModel.cs">
       <SubType>Component</SubType>
     </Compile>
+    <Compile Include="SnapShotManager.cs" />
     <Compile Include="UI\AnalysisUI\AMHSInquiryTargetForm.cs">
       <SubType>Form</SubType>
     </Compile>
@@ -378,12 +387,6 @@
       <DependentUpon>AMHSReportFormDetails.cs</DependentUpon>
     </Compile>
     <Compile Include="UI\AnalysisUI\CommandTrendLog.cs" />
-    <Compile Include="UI\AnalysisUI\CustomReport.cs">
-      <SubType>Component</SubType>
-    </Compile>
-    <Compile Include="UI\AnalysisUI\CustomReport.Designer.cs">
-      <DependentUpon>CustomReport.cs</DependentUpon>
-    </Compile>
     <Compile Include="UI\AnalysisUI\PartStepTrendLog.cs" />
     <Compile Include="UI\AnalysisUI\FactoryInoutTrendLog.cs" />
     <Compile Include="UI\AnalysisUI\KPIDetailRouteRailEdgeInfo.cs" />
@@ -503,6 +506,12 @@
     </Compile>
     <Compile Include="UI\Modeling\EditScriptCodeForm.Designer.cs">
       <DependentUpon>EditScriptCodeForm.cs</DependentUpon>
+    </Compile>
+    <Compile Include="UI\Modeling\IntegrityTestForm.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="UI\Modeling\IntegrityTestForm.Designer.cs">
+      <DependentUpon>IntegrityTestForm.cs</DependentUpon>
     </Compile>
     <Compile Include="UI\PropertyEditor\AddPoductEditor.cs" />
     <Compile Include="UI\PropertyEditor\SelectBreakDownEqpEditor.cs" />
@@ -640,9 +649,6 @@
     <EmbeddedResource Include="UI\AnalysisUI\AMHSReportFormDetails.resx">
       <DependentUpon>AMHSReportFormDetails.cs</DependentUpon>
     </EmbeddedResource>
-    <EmbeddedResource Include="UI\AnalysisUI\CustomReport.resx">
-      <DependentUpon>CustomReport.cs</DependentUpon>
-    </EmbeddedResource>
     <EmbeddedResource Include="UI\AnalysisUI\KPIGridChartExampleForm.resx">
       <DependentUpon>KPIGridChartExampleForm.cs</DependentUpon>
     </EmbeddedResource>
@@ -687,6 +693,9 @@
     </Compile>
     <EmbeddedResource Include="UI\Modeling\EditScriptCodeForm.resx">
       <DependentUpon>EditScriptCodeForm.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="UI\Modeling\IntegrityTestForm.resx">
+      <DependentUpon>IntegrityTestForm.cs</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="UI\PropertyUI\EditEquipmentDlg.resx">
       <DependentUpon>EditEquipmentDlg.cs</DependentUpon>
@@ -807,12 +816,8 @@
     <None Include="Resources\time2_32x32.png" />
   </ItemGroup>
   <ItemGroup>
-    <Analyzer Include="..\..\3rdParty\log4net.dll" />
     <Analyzer Include="..\..\packages\Microsoft.CodeAnalysis.Analyzers.3.3.3\analyzers\dotnet\cs\Microsoft.CodeAnalysis.Analyzers.dll" />
     <Analyzer Include="..\..\packages\Microsoft.CodeAnalysis.Analyzers.3.3.3\analyzers\dotnet\cs\Microsoft.CodeAnalysis.CSharp.Analyzers.dll" />
-  </ItemGroup>
-  <ItemGroup>
-    <WCFMetadata Include="Connected Services\" />
   </ItemGroup>
   <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />
   <Target Name="EnsureNuGetPackageBuildImports" BeforeTargets="PrepareForBuild">

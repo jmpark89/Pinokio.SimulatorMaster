@@ -53,7 +53,7 @@ namespace Pinokio.Designer
         {
             for (int i=0; gridViewEquipment.Columns.Count > i; i++)
             {
-                if (i == 0 || i == 1 || i == 2||i==14||i==15)
+                if (i == 0 || i == 1 || i == 2||i==17||i==18)
                 {
 
                 }
@@ -66,8 +66,8 @@ namespace Pinokio.Designer
             gridViewEquipment.Columns[0].Caption = "Step Type";
             gridViewEquipment.Columns[1].Caption = "Step Group";
             gridViewEquipment.Columns[2].Caption = "Eqp Group";
-            gridViewEquipment.Columns[14].Caption = "ID";
-            gridViewEquipment.Columns[15].Caption = "이름";
+            gridViewEquipment.Columns[17].Caption = "ID";
+            gridViewEquipment.Columns[18].Caption = "이름";
 
             this.gridViewEquipment.OptionsBehavior.ReadOnly = true;
         }

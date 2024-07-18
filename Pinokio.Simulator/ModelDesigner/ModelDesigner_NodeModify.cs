@@ -92,11 +92,12 @@ namespace Pinokio.Designer
 
         private void DeletePartReference(PartReference EntityReference)
         {
-            partTreeList.BeginInvoke(new Action(() =>
-            {
-                PartTreeListNode treeNode = (PartTreeListNode)partTreeList.FindNodeByKeyID(EntityReference.ID);
-                partTreeList.DeleteNode(treeNode);
-            }));
+            if (ModelManager.Instance.AnimationNode != null && ModelManager.Instance.AnimationNode.IsUse)
+                partTreeList.BeginInvoke(new Action(() =>
+                {
+                    PartTreeListNode treeNode = (PartTreeListNode)partTreeList.FindNodeByKeyID(EntityReference.ID);
+                    partTreeList.DeleteNode(treeNode);
+                }));
         }
 
         private void CutNode()

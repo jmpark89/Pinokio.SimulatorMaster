@@ -29,25 +29,25 @@ namespace Pinokio.Designer
         /// Input Product 종류 + 개수
         /// </summary>
         [Browsable(false)]
-        public new Dictionary<uint, uint> InputProducts { get => _inputProducts; set => _inputProducts = value; }
+        public new Dictionary<uint, Tuple<uint, UNIT_TYPE>> InputProducts { get => _inputProducts; set => _inputProducts = value; }
         /// <summary>
         /// Ouput Product 종류 + 개수
         /// </summary>
         [Browsable(false)]
-        public new Dictionary<uint, uint> OutputProducts { get => _outputProducts; set => _outputProducts = value; }
+        public new Dictionary<uint, Tuple<uint, UNIT_TYPE>> OutputProducts { get => _outputProducts; set => _outputProducts = value; }
 
 
         [Browsable(true),
             Description("Input Products"),
             Editor(typeof(StepInOutProductsEditor), typeof(UITypeEditor))]
         [DisplayName("07. Input Products")]
-        public Dictionary<uint, uint> EditInputProducts { get => _inputProducts; set => _inputProducts = value; }
+        public Dictionary<uint, Tuple<uint, UNIT_TYPE>> EditInputProducts { get => _inputProducts; set => _inputProducts = value; }
 
         [Browsable(true),
             Description("Output Products"),
             Editor(typeof(StepInOutProductsEditor), typeof(UITypeEditor))]
         [DisplayName("08. Output Products")]
-        public Dictionary<uint, uint> EditOutputProducts { get => _outputProducts; set => _outputProducts = value; }
+        public Dictionary<uint, Tuple<uint, UNIT_TYPE>> EditOutputProducts { get => _outputProducts; set => _outputProducts = value; }
 
         public StepDataEdit(StepData pd) 
             : base(pd)

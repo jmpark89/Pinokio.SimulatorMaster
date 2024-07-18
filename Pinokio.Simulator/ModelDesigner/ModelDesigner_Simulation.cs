@@ -23,17 +23,26 @@ namespace Pinokio.Designer
 {
     public partial class ModelDesigner : UserControl
     {
+        [NonSerialized]
         public static List<string> vehicleCommandTreeNodeNames = new List<string> { "Idle", "Move To Load", "Loading", "Move To Unload", "Unloading", "Stage" };
+        [NonSerialized] 
         public static List<string> commandTreeNodeNames = new List<string> { "Queued Commands", "Waiting Commands", "Loading Commands", "Transferring Commands", "Unloading Commands" };
+        [NonSerialized] 
         public static List<string> eqpStepTreeNodeNames = new List<string> { "Dispatching EqpSteps", "Waiting EqpSteps", "Processing EqpSteps" };
+        [NonSerialized] 
         public static List<string> partStepTreeNodeNames = new List<string> { "WIP PartSteps", "Assigned PartSteps", "Track-In PartSteps", "Processing PartSteps", "Step-End PartSteps" };
+        [NonSerialized] 
         TreeListNode selectedNode = new TreeListNode();
+        [NonSerialized] 
         private List<string> _csNames = new List<string>();
+        [NonSerialized]
         System.Timers.Timer Treetimer = new System.Timers.Timer();
         public double AccelRate { get { return Convert.ToDouble(beSimulationAcceleration.EditValue); } }
         public string SimTime { get { return beiCurrentSimTimeView.EditValue == null ? "0" : beiCurrentSimTimeView.EditValue.ToString(); } }
+        [NonSerialized]
         System.Timers.Timer lineStatusTimer = new System.Timers.Timer();
 
+        [NonSerialized] 
         public Dictionary<string, Tuple<NodeReference, Color>> changedNodeRef = new Dictionary<string, Tuple<NodeReference, Color>>();
 
         private bool IsExistUpdateNode(UpdateNode node)
@@ -78,30 +87,38 @@ namespace Pinokio.Designer
                 {
                     ModelManager.Instance.AddAnimationNode(0.1, true);
                     ModelManager.Instance.AnimationNode.AnimationEvent += this.AnimationEvent;
+                    ModelManager.Instance.AnimationNode.EvtCalendar = SimEngine.Instance.EventCalender;
                 }
 
                 if (!IsExistUpdateNode(ModelManager.Instance.SetAccelerationTimeNode))
                 {
                     ModelManager.Instance.AddSetAccelerationTimeNode(0.1, true);
+                    ModelManager.Instance.SetAccelerationTimeNode.EvtCalendar = SimEngine.Instance.EventCalender;
                 }
 
                 if (!IsExistUpdateNode(ModelManager.Instance.MeasureAccelerationTimeNode))
                 {
                     ModelManager.Instance.AddAccelerationTimeNode(10, true);
+                    ModelManager.Instance.MeasureAccelerationTimeNode.EvtCalendar = SimEngine.Instance.EventCalender;
                 }
 
                 if (!IsExistUpdateNode(ModelManager.Instance.TimeNode))
                 {
                     ModelManager.Instance.AddSimTimeNode(1, true);
                     ModelManager.Instance.TimeNode.SimTimeGetEvent += this.SimTimeEvent;
+                    ModelManager.Instance.TimeNode.EvtCalendar = SimEngine.Instance.EventCalender;
                 }
 
                 if (!IsExistSettingNode(ModelManager.Instance.EngineStopNode))
+                {
                     ModelManager.Instance.EngineStopNode = ModelManager.Instance.AddEngineStopNode(true);
+                    ModelManager.Instance.EngineStopNode.EvtCalendar = SimEngine.Instance.EventCalender;
+                }
 
                 if (!IsExistSettingNode(ModelManager.Instance.EnginePauseNode))
                 {
                     ModelManager.Instance.EnginePauseNode = ModelManager.Instance.AddEnginePauseNode(true);
+                    ModelManager.Instance.EnginePauseNode.EvtCalendar = SimEngine.Instance.EventCalender;
 
                     if (!ModelManager.Instance.EnginePauseNode.CreatedPauseSetting)
                     {
@@ -111,7 +128,10 @@ namespace Pinokio.Designer
                 }
 
                 if (!IsExistSettingNode(ModelManager.Instance.EngineWarmUpNode))
+                {
                     ModelManager.Instance.EngineWarmUpNode = ModelManager.Instance.AddEngineWarmUpNode(true);
+                    ModelManager.Instance.EngineWarmUpNode.EvtCalendar = SimEngine.Instance.EventCalender;
+                }
             }
             catch (Exception ex)
             {
@@ -434,6 +454,68 @@ namespace Pinokio.Designer
             }
         }
 
+        public void startSnapShotSimulation()
+        {
+            try
+            {
+                _modelActionType = ModelActionType.None;
+                pinokio3DModel1.ObjectManipulator.Cancel();
+                ClearSelection();
+
+                if (ModelManager.Instance.EnginePauseNode != null)
+                    ModelManager.Instance.EnginePauseNode.IsPause = false;
+
+                changeVisibleNeedlessNodes(false);
+
+                DoChangeVisibleOfBBI(bbiSimRun, DevExpress.XtraBars.BarItemVisibility.Never);
+                DoChangeVisibleOfBBI(bbiSimPause, DevExpress.XtraBars.BarItemVisibility.Always);
+                DoChangeVisibleOfBBI(bbiSimStop, DevExpress.XtraBars.BarItemVisibility.Always);
+                DoChangeVisibleOfBBI(bbiDockPart, DevExpress.XtraBars.BarItemVisibility.Always);
+                DoChangeVisibleOfBBI(bbiDockLineStatus, DevExpress.XtraBars.BarItemVisibility.Always);
+                DoChangeVisibleOfBBI(bbiDockLineStatusDetail, DevExpress.XtraBars.BarItemVisibility.Always);
+                bbiDockInsertNode.Enabled = false;
+                bbiDockInsertCoupledModel.Enabled = false;
+                this.dockPanelSimNodeProperties.Visibility = DockVisibility.Visible;
+                this.dockPanelSimNodeProperties.Show();
+
+                this.dockPanelInsertRefNode.Hide();
+                this.dockPanelInsertCoupledModel.Hide();
+                this.dockPanelInsertedSimNodes.Visibility = DockVisibility.Visible;
+                this.dockPanelInsertedSimNodes.Dock = DockingStyle.Right;
+                this.dockPanelParts.Visibility = DevExpress.XtraBars.Docking.DockVisibility.Visible;
+                this.dockPanelParts.DockTo(dockPanelInsertedSimNodes);
+                simpleButtonRemoveTreeNode.Enabled = false;
+
+                layoutControlItemRemoveSimNode.Visibility = DevExpress.XtraLayout.Utils.LayoutVisibility.Never;
+                this.simNodeTreeList.OptionsDragAndDrop.DragNodesMode = DevExpress.XtraTreeList.DragNodesMode.None;
+
+                AddTreeListLineStatus();
+
+                this.dockPanelLineStatus.Visibility = DockVisibility.Visible;
+                this.dockPanelLineStatusDetail.Visibility = DockVisibility.Visible;
+
+                lineStatusTimer = new System.Timers.Timer();
+                lineStatusTimer.Interval = 1000;
+                lineStatusTimer.Elapsed += new System.Timers.ElapsedEventHandler(LineStatusTimer_Elapsed);
+                lineStatusTimer.Start();
+
+                this.pinokio3DModel1.Invalidate();
+
+                var startTime = (DateTime)beiSimStartTimeSetting.EditValue;
+                var endTime = (DateTime)beiSimEndTimeSetting.EditValue;
+
+                AnimationOnOff();
+
+                double warmUpPeriod = Convert.ToDouble(BeiDays.EditValue) * 24 * 60 + Convert.ToDouble(BeiHours.EditValue) * 60 + Convert.ToDouble(BeiMinutes.EditValue);
+                Simulator.Instance.RunSnapShot(warmUpPeriod * 60);
+            }
+            catch (Exception ex)
+            {
+                ErrorLogger.SaveLog(ex);
+            }
+        }
+
+
         private void SimulationEnd()
         {
             DoChangeVisibleOfBBI(bbiSimRun, DevExpress.XtraBars.BarItemVisibility.Never);
@@ -564,6 +646,7 @@ namespace Pinokio.Designer
             InitWarmUpPeriod();
             InitializePreviousEntities();
             InitializePreviousSimNodes();
+            InitializeBays();
 
             PasteSimulationInitializeState();
 
@@ -1010,7 +1093,10 @@ namespace Pinokio.Designer
         }
 
         void timer_TreeCommand(object sender, System.Timers.ElapsedEventArgs e)
-        { BeginInvoke(new TimerTreeCommand(treeList_Row)); }
+        {
+            if (ModelManager.Instance.AnimationNode != null && ModelManager.Instance.AnimationNode.IsUse)
+                BeginInvoke(new TimerTreeCommand(treeList_Row)); 
+        }
         private void cbTree_Interval_SelectedIndexChanged(object sender, EventArgs e)
         {
             cbTree_Interval_TimerSetting();
@@ -1353,7 +1439,8 @@ namespace Pinokio.Designer
         {
             try
             {
-                treeListLineStatus.BeginInvoke(new TimerEventFiredDelegate(UpdateSimulationStatus));
+                if(ModelManager.Instance.AnimationNode != null && ModelManager.Instance.AnimationNode.IsUse)
+                    treeListLineStatus.BeginInvoke(new TimerEventFiredDelegate(UpdateSimulationStatus));
             }
             catch (Exception ex)
             {

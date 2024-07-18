@@ -11,19 +11,18 @@ namespace Pinokio.Designer
 {
     public class ProductDataEdit : ProductData
     {
-        
         [Browsable(true)]
-        [DisplayName("06. Reference Name")]
+        [DisplayName("08. Reference Name")]
         [Editor(typeof(SelectEntityReferenceEditor), typeof(UITypeEditor))]
         [Description("Reference Class Name")]
         public string EditReferenceName { get => DisplayedReferenceName; set => DisplayedReferenceName = value; }
 
         [Browsable(true), Description("IDs of Step"), Editor(typeof(StepsEditor), typeof(UITypeEditor))]
-        [DisplayName("07. IDs of Step")]
+        [DisplayName("09. IDs of Step")]
         public List<uint> EditIdsOfStep { get => IdsOfStep; set => IdsOfStep = value; }
 
         [Browsable(true), Description("Production Schedules"), Editor(typeof(ProductionScheduleEditor), typeof(UITypeEditor))]
-        [DisplayName("08. Production Scheduless")]
+        [DisplayName("10. Production Scheduless")]
         public List<ProductionSchedule> EditProductionSchedules
         {
             get => ProductionSchedules;
@@ -36,7 +35,7 @@ namespace Pinokio.Designer
                 ProductionSchedules = value;
             }
         }
-        
+
         public ProductDataEdit(ProductData manufacturedGoodsData)
             : base(manufacturedGoodsData)
         {

@@ -12,6 +12,7 @@ using Pinokio.Designer;
 using Pinokio.Animation;
 using Simulation.Engine;
 using Pinokio.Model.Base;
+using devDept.Eyeshot.Entities;
 
 namespace Pinokio.Designer
 {
@@ -42,7 +43,10 @@ namespace Pinokio.Designer
             try
             {
                 dataInVisualListGrid.Clear();
-
+                foreach (var dic in _visibleCheckedInfo)
+                {
+                    dataInVisualListGrid.Add(new DataInVisualListGrid() { Visible = dic.Value, NodeType = dic.Key });
+                }
                 foreach (var dic in dicSimNodeType)
                 {
                     if (_visibleCheckedInfo.ContainsKey(dic.Key))
@@ -70,6 +74,18 @@ namespace Pinokio.Designer
 
             foreach (var rowData in dataInVisualListGrid)
             {
+                #region cho 추가
+                if (rowData.NodeType == "Blueprint")
+                {
+                    _visibleCheckedInfo[rowData.NodeType] = rowData.Visible;
+                    continue;
+                }
+                if (rowData.NodeType == "Label")
+                {
+                    _visibleCheckedInfo[rowData.NodeType] = rowData.Visible;
+                    continue;
+                } 
+                #endregion
                 if (rowData.Visible == false)
                 {
                     foreach (SimNodeTreeListNode node in _dicSimNodeType[rowData.NodeType])

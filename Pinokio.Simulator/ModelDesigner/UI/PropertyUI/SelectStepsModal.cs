@@ -51,6 +51,11 @@ namespace Pinokio.Designer
 
                 foreach (uint id  in stepIdsOfGood)
                 {
+                    if (stepListBoxDatas.FirstOrDefault(x => x.ID == id) == null)
+                    {
+                        MessageBox.Show("STEP이 수정되었습니다. 다시 등록해주세요. ID :" + id);
+                        continue;
+                    }
 
                     StepDatas.Add(new StepData(steps.Find(x => x.ID == id)));
                 }

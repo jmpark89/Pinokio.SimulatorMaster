@@ -79,44 +79,55 @@ namespace Pinokio.Designer
 
                 CopiedClipBoard = CopiedClipBoard.OrderBy(x => x.LoadLevel).ToList();
 
-                foreach (NodeReference node in CopiedClipBoard)
+                try
                 {
-                    Point3D moveTo = new Point3D();
-                    moveTo = node.CurrentPoint + positionEditor;
-
-                    moveTo.X = Math.Round(moveTo.X, 0);
-                    moveTo.Y = Math.Round(moveTo.Y, 0);
-                    moveTo.Z = Math.Round(moveTo.Z, 0);
-
-                    node.Paste(pinokio3DModel1, moveTo, ref dicRefNodesbyPoint, out nodes);
-
-                    if (nodes.Count == 0)
-                        continue;
-                    else
+                    foreach (NodeReference node in CopiedClipBoard)
                     {
-                        NodeReference newNode = nodes[0];
+                        Point3D moveTo = new Point3D();
+                        moveTo = node.CurrentPoint + positionEditor;
 
-                        newNode.Core.ParentNode = ((SimNodeTreeListNode)simNodeTreeList.FindNodeByKeyID(pinokio3DModel1.SelectedFloorID)).SimNode as CoupledModel;
-                        if (newNode.Core is TXNode)
-                            ((TXNode)newNode.Core).UpdateFloor();
+                        moveTo.X = Math.Round(moveTo.X, 0);
+                        moveTo.Y = Math.Round(moveTo.Y, 0);
+                        moveTo.Z = Math.Round(moveTo.Z, 0);
 
-                        newNode.LayerName = pinokio3DModel1.SelectedFloorID.ToString();
-                        pinokio3DModel1.AddNodeReference(newNode);
-                        pinokio3DModel1.Entities.Add(newNode);
+                        node.Paste(pinokio3DModel1, moveTo, ref dicRefNodesbyPoint, out nodes);
+
+                        if (nodes.Count == 0)
+                            continue;
+                        else
+                        {
+                            NodeReference newNode = nodes[0];
+
+                            newNode.Core.ParentNode = ((SimNodeTreeListNode)simNodeTreeList.FindNodeByKeyID(pinokio3DModel1.SelectedFloorID)).SimNode as CoupledModel;
+                            if (newNode.Core is TXNode)
+                                ((TXNode)newNode.Core).UpdateFloor();
+
+                            newNode.LayerName = pinokio3DModel1.SelectedFloorID.ToString();
+                            pinokio3DModel1.AddNodeReference(newNode);
+                            pinokio3DModel1.Entities.Add(newNode);
+                        }
+
+                        undoRedos.AddRange(nodes);
+
+                        List<SimNode> insertedSimNodes = nodes.ConvertAll(x => x.Core);
+                        foreach (NodeReference nodeReference in nodes)
+                        {
+                            nodeReference.FinishAddNode(pinokio3DModel1);
+                            ModelManager.Instance.AddNode(nodeReference.Core);
+
+                            if (nodeReference.Core is Equipment)
+                                FactoryManager.Instance.Eqps.Add(nodeReference.Core.ID, nodeReference.Core as Equipment);
+                        }
+                        ModifyNodeTreeList(insertedSimNodes);
                     }
-
-                    undoRedos.AddRange(nodes);
-
-                    List<SimNode> insertedSimNodes = nodes.ConvertAll(x => x.Core);
-                    foreach (NodeReference nodeReference in nodes)
-                    {
-                        nodeReference.FinishAddNode(pinokio3DModel1);
-                        ModelManager.Instance.AddNode(nodeReference.Core);
-
-                        if (nodeReference.Core is Equipment)
-                            FactoryManager.Instance.Eqps.Add(nodeReference.Core.ID, nodeReference.Core as Equipment);
-                    }
-                    ModifyNodeTreeList(insertedSimNodes);
+                }
+                catch (Exception ex)
+                {
+                    ClearSelectedNode(undoRedos);
+                    SetFloorform();
+                    FloorPlanUpdate();
+                    MessageBox.Show("Paste ERROR. TRY AGAIN");
+                    return;
                 }
 
                 undoRedos = undoRedos.OrderBy(x => x.LoadLevel).ToList();

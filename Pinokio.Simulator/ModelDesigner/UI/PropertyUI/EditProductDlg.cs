@@ -173,7 +173,6 @@ namespace Pinokio.Designer
 
         
         private void gridViewProductLst_CellValueChanged(object sender, DevExpress.XtraGrid.Views.Base.CellValueChangedEventArgs e)
-        
         {
             try
             {
@@ -228,20 +227,32 @@ namespace Pinokio.Designer
         
         private void propertyGridControlProduct_CellValueChanged(object sender, DevExpress.XtraVerticalGrid.Events.CellValueChangedEventArgs e)
         {
+            if (e.Value.Equals(UNIT_TYPE.COUNT))    // Unit Type이 Quantity에서 Count로 변경될 경우, Unit Value 값 정수 처리
+            {
+                var visibileRows = propertyGridControlProduct.VisibleRows;
+          
+                for (int i = 0; i < visibileRows.Count; i++)
+                {
+                    var properties = propertyGridControlProduct.VisibleRows[i].Properties;
+                    if (properties.Caption.Contains("Unit Value"))
+                        properties.Value = Math.Truncate((double)properties.Value);         
+                }                
+            }
+
             gridViewProductLst.UpdateCurrentRow();
         }
-
         
         void _NestedObject_PropertyChanged(object sender, PropertyChangedEventArgs e)
         {
             _dataSource = null;
             gridControlProductLst_etc.DataSource = _dataSource;
-            gridViewProductLst_etc.Columns.Clear();        }
+            gridViewProductLst_etc.Columns.Clear();        
+        }
+
         public void productionChanged_Update(object sender,DevExpress.XtraVerticalGrid.Events.FocusedRowChangedEventArgs e)
         {
             propertyGridControlProduct_FocusedRowChanged(sender, e);
         }
- 
         
         private void propertyGridControlProduct_FocusedRowChanged(object sender, DevExpress.XtraVerticalGrid.Events.FocusedRowChangedEventArgs e)
         {

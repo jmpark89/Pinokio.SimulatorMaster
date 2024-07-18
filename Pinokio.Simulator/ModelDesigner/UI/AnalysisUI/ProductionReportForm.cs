@@ -459,7 +459,7 @@ namespace Pinokio.Designer
                             Dictionary<PartStep, bool> dicEqpPlans = new Dictionary<PartStep, bool>();
                             foreach (PartStep eqpPlan in partSteps.Keys.ToList())
                             {
-                                if (fromTime <= eqpPlan.WipStartDateTime && eqpPlan.WipStartDateTime < endTime)
+                                if (fromTime <= eqpPlan.StepStartDateTime && eqpPlan.StepEndDateTime < endTime)
                                 {
                                     dicEqpPlans.Add(eqpPlan, true);
                                     partSteps.Remove(eqpPlan);

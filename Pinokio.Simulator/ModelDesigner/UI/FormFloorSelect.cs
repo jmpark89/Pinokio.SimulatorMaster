@@ -125,7 +125,9 @@ namespace Pinokio.Designer
                     Bitmap bmp = new Bitmap(pathValue);
 
                     //사진 로드했을 시 디폴트 값 100
-                    LstFloorPlan[e.RowHandle].ZoomRatio = 100;
+                    #region cho 추가 *100->25
+                    LstFloorPlan[e.RowHandle].ZoomRatio = 25; 
+                    #endregion
 
                     bmp.Save(LstFloorPlan[e.RowHandle].FloorNum.ToString() + ".jpg");
                     LstFloorPlan[e.RowHandle].FloorPlanPath = pathValue;

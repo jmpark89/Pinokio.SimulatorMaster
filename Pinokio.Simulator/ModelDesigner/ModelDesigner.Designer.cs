@@ -107,6 +107,8 @@ namespace Pinokio.Designer
             this.BeiDays = new DevExpress.XtraBars.BarEditItem();
             this.repositoryItemComboBox4 = new DevExpress.XtraEditors.Repository.RepositoryItemComboBox();
             this.BliWarmUpPeriod = new DevExpress.XtraBars.BarLinkContainerItem();
+            this.bbiSaveSnapShot = new DevExpress.XtraBars.BarButtonItem();
+            this.bbiLoadSnapShot = new DevExpress.XtraBars.BarButtonItem();
             this.RB_FIRST = new DevExpress.XtraBars.Ribbon.RibbonPage();
             this.RB_PG_FILES = new DevExpress.XtraBars.Ribbon.RibbonPageGroup();
             this.RB_PG_SETTINGS = new DevExpress.XtraBars.Ribbon.RibbonPageGroup();
@@ -118,6 +120,7 @@ namespace Pinokio.Designer
             this.rpgSimulationExecution = new DevExpress.XtraBars.Ribbon.RibbonPageGroup();
             this.bbiSimRun = new DevExpress.XtraBars.BarButtonItem();
             this.rpgTimeCondition = new DevExpress.XtraBars.Ribbon.RibbonPageGroup();
+            this.rpgSnapShot = new DevExpress.XtraBars.Ribbon.RibbonPageGroup();
             this.rpAnalysis = new DevExpress.XtraBars.Ribbon.RibbonPage();
             this.rpgReport = new DevExpress.XtraBars.Ribbon.RibbonPageGroup();
             this.rpWindow = new DevExpress.XtraBars.Ribbon.RibbonPage();
@@ -467,9 +470,11 @@ namespace Pinokio.Designer
             this.BeiHours,
             this.BeiMinutes,
             this.BeiDays,
-            this.BliWarmUpPeriod});
+            this.BliWarmUpPeriod,
+            this.bbiSaveSnapShot,
+            this.bbiLoadSnapShot});
             this.ribbonControl1.Location = new System.Drawing.Point(0, 0);
-            this.ribbonControl1.MaxItemId = 114;
+            this.ribbonControl1.MaxItemId = 118;
             this.ribbonControl1.Name = "ribbonControl1";
             this.ribbonControl1.Pages.AddRange(new DevExpress.XtraBars.Ribbon.RibbonPage[] {
             this.RB_FIRST,
@@ -982,6 +987,20 @@ namespace Pinokio.Designer
             this.BliWarmUpPeriod.Name = "BliWarmUpPeriod";
             this.BliWarmUpPeriod.CloseUp += new System.EventHandler(this.BliWarmUpPeriod_CloseUp);
             // 
+            // bbiSaveSnapShot
+            // 
+            this.bbiSaveSnapShot.Caption = "Save SnapShot";
+            this.bbiSaveSnapShot.Id = 114;
+            this.bbiSaveSnapShot.Name = "bbiSaveSnapShot";
+            this.bbiSaveSnapShot.ItemClick += new DevExpress.XtraBars.ItemClickEventHandler(this.bbiSaveSnapShot_ItemClick);
+            // 
+            // bbiLoadSnapShot
+            // 
+            this.bbiLoadSnapShot.Caption = "Load SnapShot";
+            this.bbiLoadSnapShot.Id = 115;
+            this.bbiLoadSnapShot.Name = "bbiLoadSnapShot";
+            this.bbiLoadSnapShot.ItemClick += new DevExpress.XtraBars.ItemClickEventHandler(this.bbiLoadSnapShot_ItemClick);
+            // 
             // RB_FIRST
             // 
             this.RB_FIRST.Groups.AddRange(new DevExpress.XtraBars.Ribbon.RibbonPageGroup[] {
@@ -1036,7 +1055,8 @@ namespace Pinokio.Designer
             this.ribbonPageSimulation.Groups.AddRange(new DevExpress.XtraBars.Ribbon.RibbonPageGroup[] {
             this.rpgAnimation,
             this.rpgSimulationExecution,
-            this.rpgTimeCondition});
+            this.rpgTimeCondition,
+            this.rpgSnapShot});
             this.ribbonPageSimulation.Name = "ribbonPageSimulation";
             this.ribbonPageSimulation.Text = "Simulation";
             // 
@@ -1079,6 +1099,13 @@ namespace Pinokio.Designer
             this.rpgTimeCondition.ItemLinks.Add(this.BliWarmUpPeriod);
             this.rpgTimeCondition.Name = "rpgTimeCondition";
             this.rpgTimeCondition.Text = "Time Condition";
+            // 
+            // rpgSnapShot
+            // 
+            this.rpgSnapShot.ItemLinks.Add(this.bbiSaveSnapShot);
+            this.rpgSnapShot.ItemLinks.Add(this.bbiLoadSnapShot);
+            this.rpgSnapShot.Name = "rpgSnapShot";
+            this.rpgSnapShot.Text = "SnapShot";
             // 
             // rpAnalysis
             // 
@@ -2112,5 +2139,8 @@ namespace Pinokio.Designer
         private DevExpress.XtraEditors.Repository.RepositoryItemComboBox repositoryItemComboBox4;
         private DevExpress.XtraBars.BarLinkContainerItem BliWarmUpPeriod;
         private DevExpress.XtraEditors.Repository.RepositoryItemTextEdit repositoryItemTextEdit3;
+        private DevExpress.XtraBars.BarButtonItem bbiSaveSnapShot;
+        private DevExpress.XtraBars.Ribbon.RibbonPageGroup rpgSnapShot;
+        private DevExpress.XtraBars.BarButtonItem bbiLoadSnapShot;
     }
 }

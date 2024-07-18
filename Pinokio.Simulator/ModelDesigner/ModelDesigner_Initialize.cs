@@ -22,6 +22,7 @@ using System.Reflection;
 using Pinokio.Animation;
 using Pinokio.Animation.User;
 using Pinokio.Model.Base;
+using Pinokio.Model.User;
 using Pinokio.Designer.DataClass;
 using DevExpress.XtraTreeList;
 using DevExpress.XtraTreeList.Columns;
@@ -69,7 +70,7 @@ namespace Pinokio.Designer
             {
                 pinokio3DModel1.Grids[i].Plane = new Plane(new Point3D(0D, 0D, floorPlans[i].FloorBottom), new devDept.Geometry.Vector3D(0D, 0D, 1D));
 
-                Picture pic = lstPic.Find(x => Convert.ToInt32((x as Picture).LayerName) == i) as Picture;
+                Picture pic = lstPic.Find(x => (x as Picture).LayerName == pinokio3DModel1.Layers[i].Name) as Picture;
                 if (pic != null)
                 {
                     pic.Translate(0, 0, -pic.Plane.Origin.Z);
@@ -829,8 +830,13 @@ namespace Pinokio.Designer
 
                 foreach (NodeReference nr in this.pinokio3DModel1.NodeReferenceByID.Values.ToArray())
                 {
-                    if(nr is RefVehicle)
+                    if (nr is RefVehicle)
+                    {
                         nr.Move_MouseUp(this.pinokio3DModel1, nr.CurrentPoint, nr.CurrentPoint);
+                        Vehicle vehicle = (Vehicle)ModelManager.Instance.SimNodes.Values.FirstOrDefault(x => x.Name == nr.Name);
+                        vehicle.Destination = null;
+                        ((Vehicle)vehicle).IsStoped = false;
+                    }
                 }
 
 

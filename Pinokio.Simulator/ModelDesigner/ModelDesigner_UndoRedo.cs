@@ -221,6 +221,8 @@ namespace Pinokio.Designer
                             ((TransportLine)node.Core).StartPoint.OutNodes.Add(node.Core);
                             ((TransportLine)node.Core).EndPoint.InLines.Add((TransportLine)node.Core);
                             ((TransportLine)node.Core).EndPoint.InNodes.Add(node.Core);
+                            ((RefTransportLine)node).StartStation = (RefTransportPoint)undoRedoClass.NodeReferences[((TransportLine)node.Core).StartPoint.ID];
+                            ((RefTransportLine)node).EndStation = (RefTransportPoint)undoRedoClass.NodeReferences[((TransportLine)node.Core).EndPoint.ID];
                             ((RefTransportLine)node).StartStation.OutLines.Add((RefTransportLine)node);
                             ((RefTransportLine)node).EndStation.InLines.Add((RefTransportLine)node);
                         }   // RefTransPortLine connection recovery + block modify
@@ -229,6 +231,7 @@ namespace Pinokio.Designer
                             RefLink refLink = (RefLink)node;
                             string BlockID = node.Name;
                             bool hasLinked = false;
+                            refLink.FromNode = pinokio3DModel1.NodeReferenceByID[refLink.FromNode.ID];
                             foreach (RefLink tempNode in refLink.FromNode.ToLinked)
                             {
                                 if (refLink.ID == tempNode.ID)
@@ -242,6 +245,7 @@ namespace Pinokio.Designer
 
                             hasLinked = false;
 
+                            refLink.ToNode = pinokio3DModel1.NodeReferenceByID[refLink.ToNode.ID];
                             foreach (RefLink tempNode in refLink.ToNode.FromLinked)
                             {
                                 if (refLink.ID == tempNode.ID)

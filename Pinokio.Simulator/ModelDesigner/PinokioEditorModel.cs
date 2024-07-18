@@ -9,7 +9,6 @@ using devDept.Geometry;
 using devDept.Eyeshot.Entities;
 using System.Windows.Forms;
 using System.Drawing;
-
 using Logger;
 using Pinokio.Animation;
 using System.Data;
@@ -17,9 +16,11 @@ using System.Reflection;
 using Pinokio.Model.Base;
 using Pinokio.Database;
 using Simulation.Engine;
+using System.Diagnostics;
 
 namespace Pinokio.Designer
 {
+    [Serializable]
     public partial class PinokioEditorModel : PinokioBaseModel
     {
         private Point3D _mouseLocationSnapToCorrdinate = new Point3D();
@@ -166,25 +167,25 @@ namespace Pinokio.Designer
         {
             foreach (NodeReference DeleteEntity in nodeReferences)
             {
-                //if (RefTypeDefine.IsNodeReferenceType(DeleteEntity.Name) is false && this.Blocks.Contains(DeleteEntity.Name))
-                //    this.Blocks.Remove(DeleteEntity.BlockName);
-
-                this.Entities.Remove(DeleteEntity);
+                #region cho 추가 * bool removed로 불필요한 계산 방지
+                bool removed = this.Entities.Remove(DeleteEntity);
                 NodeReferenceByID.Remove(DeleteEntity.ID);
+                if (!removed)
+                    Debugger.Break();
+                //Entity findEn = this.Entities.Where(en => ((NodeReference)en).ID == DeleteEntity.ID).FirstOrDefault() as Entity;
+                //if (findEn != null)
+                //{
+                //    List<Entity> enList = new List<Entity>();
+                //    foreach (Entity en in this.Entities)
+                //    {
+                //        enList.Add(en);
+                //    }
 
-                Entity findEn = this.Entities.Where(en => ((NodeReference)en).ID == DeleteEntity.ID).FirstOrDefault() as Entity;
-                if (findEn != null)
-                {
-                    List<Entity> enList = new List<Entity>();
-                    foreach (Entity en in this.Entities)
-                    {
-                        enList.Add(en);
-                    }
+                //    int newidx = enList.IndexOf(findEn);
 
-                    int newidx = enList.IndexOf(findEn);
-
-                    this.Entities.RemoveAt(newidx);
-                }
+                //    this.Entities.RemoveAt(newidx);
+                //} 
+                #endregion
             }
             this.Entities.Regen();
             this.Invalidate();
