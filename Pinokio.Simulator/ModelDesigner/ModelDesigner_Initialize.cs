@@ -484,9 +484,7 @@ namespace Pinokio.Designer
                         Type simNodeType = ts[i];
                         List<string> simNodeRefTypes = refTypes[simNodeType.Name];
                         Type refNodeType;
-                        if (simNodeType.Name == "LineStation")
-                            ;
-                        if(simNodeRefTypes.Contains(simNodeType.Name))
+                        if (simNodeRefTypes.Contains(simNodeType.Name))
                             refNodeType = RefTypeDefine.GetTypebyRefTypeName("Ref" + simNodeType.Name);
                         else
                             refNodeType = RefTypeDefine.GetTypebyRefTypeName("Ref" + simNodeRefTypes.First());
@@ -861,12 +859,6 @@ namespace Pinokio.Designer
             List<string> refNodeTypeNames = dicNode2RefTypes[nodeTypeName];
 
             string categoryName = ((InserteNodeTreeData)(this.gridViewInsertRefNode.GetRow(rowHandle))).Category;
-            if (categoryName == "Node")
-            {
-                Dictionary<string, List<string>> dicCategoryNames = RefTypeDefine.GetCategories();
-                List<string> nodeCategory = dicCategoryNames[categoryName];
-                refNodeTypeNames.AddRange(nodeCategory.Where(item => !refNodeTypeNames.Contains(item)));
-            } 
             
             RepositoryItemComboBox comboBox = new RepositoryItemComboBox();
             comboBox.Items.AddRange(refNodeTypeNames.ToArray());
