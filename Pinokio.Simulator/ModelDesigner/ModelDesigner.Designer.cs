@@ -43,7 +43,8 @@ namespace Pinokio.Designer
             this.dockPanelParts = new DevExpress.XtraBars.Docking.DockPanel();
             this.dockPanelParts_Container = new DevExpress.XtraBars.Docking.ControlContainer();
             this.layoutControlParts = new DevExpress.XtraLayout.LayoutControl();
-            this.partTreeList = new Pinokio.Animation.PartTreeList();
+            this.gridControlPart = new DevExpress.XtraGrid.GridControl();
+            this.gridViewPart = new DevExpress.XtraGrid.Views.Grid.GridView();
             this.layoutControlGroupParts = new DevExpress.XtraLayout.LayoutControlGroup();
             this.layoutControlItemParts = new DevExpress.XtraLayout.LayoutControlItem();
             this.dockPanelLineStatus = new DevExpress.XtraBars.Docking.DockPanel();
@@ -109,6 +110,16 @@ namespace Pinokio.Designer
             this.BliWarmUpPeriod = new DevExpress.XtraBars.BarLinkContainerItem();
             this.bbiSaveSnapShot = new DevExpress.XtraBars.BarButtonItem();
             this.bbiLoadSnapShot = new DevExpress.XtraBars.BarButtonItem();
+            this.State_Based_Vehicle_Tog_Switch = new DevExpress.XtraBars.BarToggleSwitchItem();
+            this.State_Based_Equipment_Tog_Switch = new DevExpress.XtraBars.BarToggleSwitchItem();
+            this.State_Based_TransportLine_Tog_Switch = new DevExpress.XtraBars.BarToggleSwitchItem();
+            this.barSubItem1 = new DevExpress.XtraBars.BarSubItem();
+            this.bbiAlignLeft = new DevExpress.XtraBars.BarButtonItem();
+            this.bbiAlignCenter = new DevExpress.XtraBars.BarButtonItem();
+            this.bbiAlignRight = new DevExpress.XtraBars.BarButtonItem();
+            this.bbiTopAlign = new DevExpress.XtraBars.BarButtonItem();
+            this.bbiMiddleAlign = new DevExpress.XtraBars.BarButtonItem();
+            this.bbiBottomAlign = new DevExpress.XtraBars.BarButtonItem();
             this.RB_FIRST = new DevExpress.XtraBars.Ribbon.RibbonPage();
             this.RB_PG_FILES = new DevExpress.XtraBars.Ribbon.RibbonPageGroup();
             this.RB_PG_SETTINGS = new DevExpress.XtraBars.Ribbon.RibbonPageGroup();
@@ -121,6 +132,7 @@ namespace Pinokio.Designer
             this.bbiSimRun = new DevExpress.XtraBars.BarButtonItem();
             this.rpgTimeCondition = new DevExpress.XtraBars.Ribbon.RibbonPageGroup();
             this.rpgSnapShot = new DevExpress.XtraBars.Ribbon.RibbonPageGroup();
+            this.rpgStateBasedColors = new DevExpress.XtraBars.Ribbon.RibbonPageGroup();
             this.rpAnalysis = new DevExpress.XtraBars.Ribbon.RibbonPage();
             this.rpgReport = new DevExpress.XtraBars.Ribbon.RibbonPageGroup();
             this.rpWindow = new DevExpress.XtraBars.Ribbon.RibbonPage();
@@ -210,7 +222,6 @@ namespace Pinokio.Designer
             this.dockPanelParts_Container.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.layoutControlParts)).BeginInit();
             this.layoutControlParts.SuspendLayout();
-            ((System.ComponentModel.ISupportInitialize)(this.partTreeList)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.layoutControlGroupParts)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.layoutControlItemParts)).BeginInit();
             this.dockPanelLineStatus.SuspendLayout();
@@ -239,6 +250,8 @@ namespace Pinokio.Designer
             ((System.ComponentModel.ISupportInitialize)(this.cbTree_Interval.Properties)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.gridControlLineStatusDetail)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.gridViewLineStatusDetail)).BeginInit();
+            ((System.ComponentModel.ISupportInitialize)(this.gridControlPart)).BeginInit();
+            ((System.ComponentModel.ISupportInitialize)(this.gridViewPart)).BeginInit();
             this.dockPanelSimNodeProperties.SuspendLayout();
             this.controlContainerSimNode.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.propertyGridControlSimObject)).BeginInit();
@@ -346,7 +359,7 @@ namespace Pinokio.Designer
             // 
             // layoutControlParts
             // 
-            this.layoutControlParts.Controls.Add(this.partTreeList);
+            this.layoutControlParts.Controls.Add(this.gridControlPart);
             this.layoutControlParts.Dock = System.Windows.Forms.DockStyle.Fill;
             this.layoutControlParts.Location = new System.Drawing.Point(0, 0);
             this.layoutControlParts.Name = "layoutControlParts";
@@ -354,16 +367,6 @@ namespace Pinokio.Designer
             this.layoutControlParts.Size = new System.Drawing.Size(218, 616);
             this.layoutControlParts.TabIndex = 1;
             this.layoutControlParts.Text = "Parts";
-            // 
-            // partTreeList
-            // 
-            this.partTreeList.Location = new System.Drawing.Point(12, 12);
-            this.partTreeList.Model = null;
-            this.partTreeList.Name = "partTreeList";
-            this.partTreeList.OptionsBehavior.Editable = false;
-            this.partTreeList.OptionsView.CheckBoxStyle = DevExpress.XtraTreeList.DefaultNodeCheckBoxStyle.Check;
-            this.partTreeList.Size = new System.Drawing.Size(194, 592);
-            this.partTreeList.TabIndex = 2;
             // 
             // layoutControlGroupParts
             // 
@@ -377,7 +380,7 @@ namespace Pinokio.Designer
             // 
             // layoutControlItemParts
             // 
-            this.layoutControlItemParts.Control = this.partTreeList;
+            this.layoutControlItemParts.Control = this.gridControlPart;
             this.layoutControlItemParts.Location = new System.Drawing.Point(0, 0);
             this.layoutControlItemParts.Name = "layoutControlItemParts";
             this.layoutControlItemParts.Size = new System.Drawing.Size(198, 596);
@@ -419,6 +422,7 @@ namespace Pinokio.Designer
             // 
             // ribbonControl1
             // 
+            this.ribbonControl1.AutoSizeItems = true;
             this.ribbonControl1.ColorScheme = DevExpress.XtraBars.Ribbon.RibbonControlColorScheme.DarkBlue;
             this.ribbonControl1.ExpandCollapseItem.Id = 0;
             this.ribbonControl1.Items.AddRange(new DevExpress.XtraBars.BarItem[] {
@@ -472,9 +476,19 @@ namespace Pinokio.Designer
             this.BeiDays,
             this.BliWarmUpPeriod,
             this.bbiSaveSnapShot,
-            this.bbiLoadSnapShot});
+            this.bbiLoadSnapShot,
+            this.State_Based_Vehicle_Tog_Switch,
+            this.State_Based_Equipment_Tog_Switch,
+            this.State_Based_TransportLine_Tog_Switch,
+            this.barSubItem1,
+            this.bbiAlignLeft,
+            this.bbiAlignCenter,
+            this.bbiTopAlign,
+            this.bbiBottomAlign,
+            this.bbiAlignRight,
+            this.bbiMiddleAlign});
             this.ribbonControl1.Location = new System.Drawing.Point(0, 0);
-            this.ribbonControl1.MaxItemId = 118;
+            this.ribbonControl1.MaxItemId = 130;
             this.ribbonControl1.Name = "ribbonControl1";
             this.ribbonControl1.Pages.AddRange(new DevExpress.XtraBars.Ribbon.RibbonPage[] {
             this.RB_FIRST,
@@ -1001,6 +1015,96 @@ namespace Pinokio.Designer
             this.bbiLoadSnapShot.Name = "bbiLoadSnapShot";
             this.bbiLoadSnapShot.ItemClick += new DevExpress.XtraBars.ItemClickEventHandler(this.bbiLoadSnapShot_ItemClick);
             // 
+            // State_Based_Vehicle_Tog_Switch
+            // 
+            this.State_Based_Vehicle_Tog_Switch.Caption = "Vehicle";
+            this.State_Based_Vehicle_Tog_Switch.Id = 118;
+            this.State_Based_Vehicle_Tog_Switch.Name = "State_Based_Vehicle_Tog_Switch";
+            this.State_Based_Vehicle_Tog_Switch.CheckedChanged += new DevExpress.XtraBars.ItemClickEventHandler(this.State_Based_Vehicle_Tog_Switch_CheckedChanged);
+            // 
+            // State_Based_Equipment_Tog_Switch
+            // 
+            this.State_Based_Equipment_Tog_Switch.Caption = "Equipment";
+            this.State_Based_Equipment_Tog_Switch.Id = 119;
+            this.State_Based_Equipment_Tog_Switch.Name = "State_Based_Equipment_Tog_Switch";
+            this.State_Based_Equipment_Tog_Switch.CheckedChanged += new DevExpress.XtraBars.ItemClickEventHandler(this.State_Based_Equipment_Tog_Switch_CheckedChanged);
+            // 
+            // State_Based_TransportLine_Tog_Switch
+            // 
+            this.State_Based_TransportLine_Tog_Switch.Caption = "TransportLine";
+            this.State_Based_TransportLine_Tog_Switch.Id = 120;
+            this.State_Based_TransportLine_Tog_Switch.Name = "State_Based_TransportLine_Tog_Switch";
+            this.State_Based_TransportLine_Tog_Switch.CheckedChanged += new DevExpress.XtraBars.ItemClickEventHandler(this.State_Based_TransportLine_Tog_Switch_CheckedChanged);
+            // 
+            // barSubItem1
+            // 
+            this.barSubItem1.Caption = "Alignment";
+            this.barSubItem1.Id = 121;
+            this.barSubItem1.ImageOptions.Image = ((System.Drawing.Image)(resources.GetObject("barSubItem1.ImageOptions.Image")));
+            this.barSubItem1.ImageOptions.LargeImage = ((System.Drawing.Image)(resources.GetObject("barSubItem1.ImageOptions.LargeImage")));
+            this.barSubItem1.LinksPersistInfo.AddRange(new DevExpress.XtraBars.LinkPersistInfo[] {
+            new DevExpress.XtraBars.LinkPersistInfo(this.bbiAlignLeft),
+            new DevExpress.XtraBars.LinkPersistInfo(this.bbiAlignCenter),
+            new DevExpress.XtraBars.LinkPersistInfo(this.bbiAlignRight),
+            new DevExpress.XtraBars.LinkPersistInfo(this.bbiTopAlign, true),
+            new DevExpress.XtraBars.LinkPersistInfo(this.bbiMiddleAlign),
+            new DevExpress.XtraBars.LinkPersistInfo(this.bbiBottomAlign)});
+            this.barSubItem1.Name = "barSubItem1";
+            // 
+            // bbiAlignLeft
+            // 
+            this.bbiAlignLeft.Caption = "Align Left";
+            this.bbiAlignLeft.Id = 122;
+            this.bbiAlignLeft.ImageOptions.Image = ((System.Drawing.Image)(resources.GetObject("bbiAlignLeft.ImageOptions.Image")));
+            this.bbiAlignLeft.ImageOptions.LargeImage = ((System.Drawing.Image)(resources.GetObject("bbiAlignLeft.ImageOptions.LargeImage")));
+            this.bbiAlignLeft.Name = "bbiAlignLeft";
+            this.bbiAlignLeft.ItemClick += new DevExpress.XtraBars.ItemClickEventHandler(this.bbiAlignLeft_ItemClick);
+            // 
+            // bbiAlignCenter
+            // 
+            this.bbiAlignCenter.Caption = "Center";
+            this.bbiAlignCenter.Id = 124;
+            this.bbiAlignCenter.ImageOptions.Image = ((System.Drawing.Image)(resources.GetObject("bbiAlignCenter.ImageOptions.Image")));
+            this.bbiAlignCenter.ImageOptions.LargeImage = ((System.Drawing.Image)(resources.GetObject("bbiAlignCenter.ImageOptions.LargeImage")));
+            this.bbiAlignCenter.Name = "bbiAlignCenter";
+            this.bbiAlignCenter.ItemClick += new DevExpress.XtraBars.ItemClickEventHandler(this.bbiAlignCenter_ItemClick);
+            // 
+            // bbiAlignRight
+            // 
+            this.bbiAlignRight.Caption = "Align Right";
+            this.bbiAlignRight.Id = 129;
+            this.bbiAlignRight.ImageOptions.Image = ((System.Drawing.Image)(resources.GetObject("bbiAlignRight.ImageOptions.Image")));
+            this.bbiAlignRight.ImageOptions.LargeImage = ((System.Drawing.Image)(resources.GetObject("bbiAlignRight.ImageOptions.LargeImage")));
+            this.bbiAlignRight.Name = "bbiAlignRight";
+            this.bbiAlignRight.ItemClick += new DevExpress.XtraBars.ItemClickEventHandler(this.bbiAlignRight_ItemClick);
+            // 
+            // bbiTopAlign
+            // 
+            this.bbiTopAlign.Caption = "Top Align";
+            this.bbiTopAlign.Id = 126;
+            this.bbiTopAlign.ImageOptions.Image = ((System.Drawing.Image)(resources.GetObject("bbiTopAlign.ImageOptions.Image")));
+            this.bbiTopAlign.ImageOptions.LargeImage = ((System.Drawing.Image)(resources.GetObject("bbiTopAlign.ImageOptions.LargeImage")));
+            this.bbiTopAlign.Name = "bbiTopAlign";
+            this.bbiTopAlign.ItemClick += new DevExpress.XtraBars.ItemClickEventHandler(this.bbiTopAlign_ItemClick);
+            // 
+            // bbiMiddleAlign
+            // 
+            this.bbiMiddleAlign.Caption = "Middle Align";
+            this.bbiMiddleAlign.Id = 130;
+            this.bbiMiddleAlign.ImageOptions.Image = ((System.Drawing.Image)(resources.GetObject("bbiMiddleAlign.ImageOptions.Image")));
+            this.bbiMiddleAlign.ImageOptions.LargeImage = ((System.Drawing.Image)(resources.GetObject("bbiMiddleAlign.ImageOptions.LargeImage")));
+            this.bbiMiddleAlign.Name = "bbiMiddleAlign";
+            this.bbiMiddleAlign.ItemClick += new DevExpress.XtraBars.ItemClickEventHandler(this.bbiMiddleAlign_ItemClick);
+            // 
+            // bbiBottomAlign
+            // 
+            this.bbiBottomAlign.Caption = "Bottom Align";
+            this.bbiBottomAlign.Id = 128;
+            this.bbiBottomAlign.ImageOptions.Image = ((System.Drawing.Image)(resources.GetObject("bbiBottomAlign.ImageOptions.Image")));
+            this.bbiBottomAlign.ImageOptions.LargeImage = ((System.Drawing.Image)(resources.GetObject("bbiBottomAlign.ImageOptions.LargeImage")));
+            this.bbiBottomAlign.Name = "bbiBottomAlign";
+            this.bbiBottomAlign.ItemClick += new DevExpress.XtraBars.ItemClickEventHandler(this.bbiBottomAlign_ItemClick);
+            // 
             // RB_FIRST
             // 
             this.RB_FIRST.Groups.AddRange(new DevExpress.XtraBars.Ribbon.RibbonPageGroup[] {
@@ -1047,6 +1151,7 @@ namespace Pinokio.Designer
             this.rpgConvert.ItemLinks.Add(this.barButtonItemImPortModel);
             this.rpgConvert.ItemLinks.Add(this.bbiEditNodes);
             this.rpgConvert.ItemLinks.Add(this.bbiEditVisible);
+            this.rpgConvert.ItemLinks.Add(this.barSubItem1);
             this.rpgConvert.Name = "rpgConvert";
             this.rpgConvert.Text = "Model";
             // 
@@ -1056,7 +1161,8 @@ namespace Pinokio.Designer
             this.rpgAnimation,
             this.rpgSimulationExecution,
             this.rpgTimeCondition,
-            this.rpgSnapShot});
+            this.rpgSnapShot,
+            this.rpgStateBasedColors});
             this.ribbonPageSimulation.Name = "ribbonPageSimulation";
             this.ribbonPageSimulation.Text = "Simulation";
             // 
@@ -1106,6 +1212,14 @@ namespace Pinokio.Designer
             this.rpgSnapShot.ItemLinks.Add(this.bbiLoadSnapShot);
             this.rpgSnapShot.Name = "rpgSnapShot";
             this.rpgSnapShot.Text = "SnapShot";
+            // 
+            // rpgStateBasedColors
+            // 
+            this.rpgStateBasedColors.ItemLinks.Add(this.State_Based_Vehicle_Tog_Switch);
+            this.rpgStateBasedColors.ItemLinks.Add(this.State_Based_Equipment_Tog_Switch);
+            this.rpgStateBasedColors.ItemLinks.Add(this.State_Based_TransportLine_Tog_Switch);
+            this.rpgStateBasedColors.Name = "rpgStateBasedColors";
+            this.rpgStateBasedColors.Text = "State-Based Colors";
             // 
             // rpAnalysis
             // 
@@ -1254,6 +1368,32 @@ namespace Pinokio.Designer
             this.cbTree_Interval.Size = new System.Drawing.Size(101, 20);
             this.cbTree_Interval.TabIndex = 2;
             this.cbTree_Interval.SelectedIndexChanged += new System.EventHandler(this.cbTree_Interval_SelectedIndexChanged);
+
+            // 
+            // gridControlPart
+            // 
+            this.gridControlPart.Dock = System.Windows.Forms.DockStyle.Fill;
+            this.gridControlPart.Location = new System.Drawing.Point(0, 0);
+            this.gridControlPart.MainView = this.gridViewPart;
+            this.gridControlPart.MenuManager = this.ribbonControl1;
+            this.gridControlPart.Name = "gridControlPart";
+            this.gridControlPart.Size = new System.Drawing.Size(879, 171);
+            this.gridControlPart.TabIndex = 0;
+            this.gridControlPart.ViewCollection.AddRange(new DevExpress.XtraGrid.Views.Base.BaseView[] {
+            this.gridViewPart});
+            // 
+            // gridViewPart
+            // 
+            this.gridViewPart.GridControl = this.gridControlPart;
+            this.gridViewPart.HorzScrollVisibility = DevExpress.XtraGrid.Views.Base.ScrollVisibility.Always;
+            this.gridViewPart.Name = "gridViewPart";
+            this.gridViewPart.OptionsBehavior.Editable = false;
+            this.gridViewPart.OptionsView.ColumnAutoWidth = false;
+            this.gridViewPart.OptionsView.ShowGroupPanel = false;
+            this.gridViewPart.ScrollStyle = DevExpress.XtraGrid.Views.Grid.ScrollStyleFlags.None;
+            this.gridViewPart.VertScrollVisibility = DevExpress.XtraGrid.Views.Base.ScrollVisibility.Always;
+            this.gridViewPart.FocusedRowChanged += new DevExpress.XtraGrid.Views.Base.FocusedRowChangedEventHandler(this.GridViewPart_FocusedRowChanged);
+            this.gridViewPart.MouseUp += gridViewPart_MouseClick;
             // 
             // gridControlLineStatusDetail
             // 
@@ -1337,7 +1477,7 @@ namespace Pinokio.Designer
             this.dockPanelInsertedSimNodes.ID = new System.Guid("d1e012a0-1d47-49ab-a898-17c1e8bf03ce");
             this.dockPanelInsertedSimNodes.Location = new System.Drawing.Point(0, 43);
             this.dockPanelInsertedSimNodes.Name = "dockPanelInsertedSimNodes";
-            this.dockPanelInsertedSimNodes.OriginalSize = new System.Drawing.Size(398, 542);
+            this.dockPanelInsertedSimNodes.OriginalSize = new System.Drawing.Size(398, 564);
             this.dockPanelInsertedSimNodes.Size = new System.Drawing.Size(398, 542);
             this.dockPanelInsertedSimNodes.Text = "Nodes";
             this.dockPanelInsertedSimNodes.ClosingPanel += new DevExpress.XtraBars.Docking.DockPanelCancelEventHandler(this.dockPanelInsertedSimNodes_ClosingPanel);
@@ -1423,7 +1563,7 @@ namespace Pinokio.Designer
             this.dockPanelInsertRefNode.ID = new System.Guid("0c7163d4-c74f-4fe5-8565-dbca7688fdc7");
             this.dockPanelInsertRefNode.Location = new System.Drawing.Point(0, 43);
             this.dockPanelInsertRefNode.Name = "dockPanelInsertRefNode";
-            this.dockPanelInsertRefNode.OriginalSize = new System.Drawing.Size(398, 542);
+            this.dockPanelInsertRefNode.OriginalSize = new System.Drawing.Size(398, 564);
             this.dockPanelInsertRefNode.Size = new System.Drawing.Size(398, 542);
             this.dockPanelInsertRefNode.Text = "Insert Node";
             this.dockPanelInsertRefNode.ClosingPanel += new DevExpress.XtraBars.Docking.DockPanelCancelEventHandler(this.dockPanelInsertRefNode_ClosingPanel);
@@ -1466,6 +1606,7 @@ namespace Pinokio.Designer
             this.gridViewInsertRefNode.RowClick += new DevExpress.XtraGrid.Views.Grid.RowClickEventHandler(this.gridViewInsertNode_RowClick);
             this.gridViewInsertRefNode.FocusedRowChanged += new DevExpress.XtraGrid.Views.Base.FocusedRowChangedEventHandler(this.gridViewInsertRefNode_FocusedRowChanged);
             this.gridViewInsertRefNode.CellValueChanged += new DevExpress.XtraGrid.Views.Base.CellValueChangedEventHandler(this.gridViewInsertRefNode_CellValueChanged);
+            this.gridViewInsertRefNode.CellValueChanging += new DevExpress.XtraGrid.Views.Base.CellValueChangedEventHandler(this.gridViewInsertRefNode_CellValueChanging); 
             this.gridViewInsertRefNode.Click += new System.EventHandler(this.gridViewInsertRefNode_Click);
             // 
             // layoutControlGroupInsertNode
@@ -1495,7 +1636,7 @@ namespace Pinokio.Designer
             this.dockPanelInsertCoupledModel.ID = new System.Guid("0c7163d4-c74f-4fe5-8565-dbca7688fdc7");
             this.dockPanelInsertCoupledModel.Location = new System.Drawing.Point(0, 43);
             this.dockPanelInsertCoupledModel.Name = "dockPanelInsertCoupledModel";
-            this.dockPanelInsertCoupledModel.OriginalSize = new System.Drawing.Size(398, 542);
+            this.dockPanelInsertCoupledModel.OriginalSize = new System.Drawing.Size(398, 564);
             this.dockPanelInsertCoupledModel.Size = new System.Drawing.Size(398, 542);
             this.dockPanelInsertCoupledModel.Text = "Insert Coupled Model";
             this.dockPanelInsertCoupledModel.ClosingPanel += new DevExpress.XtraBars.Docking.DockPanelCancelEventHandler(this.dockPanelInsertCoupledModel_ClosingPanel);
@@ -1883,7 +2024,6 @@ namespace Pinokio.Designer
             this.dockPanelParts_Container.ResumeLayout(false);
             ((System.ComponentModel.ISupportInitialize)(this.layoutControlParts)).EndInit();
             this.layoutControlParts.ResumeLayout(false);
-            ((System.ComponentModel.ISupportInitialize)(this.partTreeList)).EndInit();
             ((System.ComponentModel.ISupportInitialize)(this.layoutControlGroupParts)).EndInit();
             ((System.ComponentModel.ISupportInitialize)(this.layoutControlItemParts)).EndInit();
             this.dockPanelLineStatus.ResumeLayout(false);
@@ -1912,6 +2052,8 @@ namespace Pinokio.Designer
             ((System.ComponentModel.ISupportInitialize)(this.cbTree_Interval.Properties)).EndInit();
             ((System.ComponentModel.ISupportInitialize)(this.gridControlLineStatusDetail)).EndInit();
             ((System.ComponentModel.ISupportInitialize)(this.gridViewLineStatusDetail)).EndInit();
+            ((System.ComponentModel.ISupportInitialize)(this.gridControlPart)).EndInit();
+            ((System.ComponentModel.ISupportInitialize)(this.gridViewPart)).EndInit();
             this.dockPanelSimNodeProperties.ResumeLayout(false);
             this.controlContainerSimNode.ResumeLayout(false);
             ((System.ComponentModel.ISupportInitialize)(this.propertyGridControlSimObject)).EndInit();
@@ -2001,7 +2143,6 @@ namespace Pinokio.Designer
         private DevExpress.XtraBars.BarButtonItem barButtonItem11;
         private DevExpress.XtraBars.BarButtonItem RB_BTN_LINK;
         private SimNodeTreeList simNodeTreeList;
-        private PartTreeList partTreeList;
         private DevExpress.XtraBars.Docking.DockPanel dockPanelInsertRefNode;
         private DevExpress.XtraBars.Docking.DockPanel dockPanelInsertCoupledModel;
         private DevExpress.XtraBars.Docking.ControlContainer dockPanelInsertRefNode_Container;
@@ -2082,6 +2223,8 @@ namespace Pinokio.Designer
         private DevExpress.XtraBars.Docking.ControlContainer controlContainerLineStatus;
         private GridControl gridControlLineStatusDetail;
         private GridView gridViewLineStatusDetail;
+        private GridControl gridControlPart;
+        private GridView gridViewPart;
         private TreeList treeListLineStatus;
         private System.Windows.Forms.ComboBox cbTree_Interval2;
         private System.Windows.Forms.Label lbCount;
@@ -2142,5 +2285,17 @@ namespace Pinokio.Designer
         private DevExpress.XtraBars.BarButtonItem bbiSaveSnapShot;
         private DevExpress.XtraBars.Ribbon.RibbonPageGroup rpgSnapShot;
         private DevExpress.XtraBars.BarButtonItem bbiLoadSnapShot;
+        private DevExpress.XtraBars.BarToggleSwitchItem State_Based_Vehicle_Tog_Switch;
+        private DevExpress.XtraBars.BarToggleSwitchItem State_Based_Equipment_Tog_Switch;
+        private DevExpress.XtraBars.BarToggleSwitchItem State_Based_TransportLine_Tog_Switch;
+        private DevExpress.XtraBars.Ribbon.RibbonPageGroup rpgStateBasedColors;
+        private DevExpress.XtraBars.BarSubItem barSubItem1;
+        private DevExpress.XtraBars.BarButtonItem bbiAlignLeft;
+        private DevExpress.XtraBars.BarButtonItem bbiAlignCenter;
+        private DevExpress.XtraBars.BarButtonItem bbiAlignRight;
+        private DevExpress.XtraBars.BarButtonItem bbiTopAlign;
+        private DevExpress.XtraBars.BarButtonItem bbiBottomAlign;
+        private DevExpress.XtraBars.BarButtonItem bbiMiddleAlign;
+
     }
 }

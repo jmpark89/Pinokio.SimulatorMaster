@@ -14,6 +14,7 @@ namespace Pinokio.Model.User
     /// Stop도 다르고 Reset도 다르면 후발 AGV도 같이 지나갈 수 있다.
     /// Stop은 다르고 Reset은 같으면 후발 AGV가 Stop Point에서 기다렸다가 선발 AGV가 나가면 들어감.
     /// </summary>
+    [Serializable]
     public class AGVZCU
     {
         private string _name;
@@ -152,7 +153,7 @@ namespace Pinokio.Model.User
                     Lines.Add(nextLine);
                     nextLine.Zcu = this;
 
-                    foreach (OHTLineStation railPort in nextLine.LineStations)
+                    foreach (AGVLineStation railPort in nextLine.LineStations)
                     {
                         if (railPort.WaitAllowed)
                         {
@@ -203,7 +204,7 @@ namespace Pinokio.Model.User
 
                             foreach (AGVLine line in zoneOutLines)
                             {
-                                foreach (OHTLineStation railPort in line.LineStations)
+                                foreach (AGVLineStation railPort in line.LineStations)
                                 {
                                     if (railPort.WaitAllowed)
                                     {

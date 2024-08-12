@@ -9,6 +9,7 @@ using System.Threading.Tasks;
 
 namespace Pinokio.Model.User
 {
+    [Serializable]
     public class Battery : Part
     {
         public Battery(uint id, string name) : base(id, name)

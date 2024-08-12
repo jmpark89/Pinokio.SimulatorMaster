@@ -14,9 +14,11 @@ namespace Pinokio.Designer.DataClass
         private string refType = string.Empty;
         private string nodeType = string.Empty;
         private double height = 0;
-        public string RefType { get => refType; set => refType = value; }
 
         public string NodeType { get => nodeType; set => nodeType = value; }
+        public string RefType { get => refType; set => refType = value; }
+
+        
 
         public double Height { get => height; set => height = value; }
     }

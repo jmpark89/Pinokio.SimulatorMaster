@@ -38,6 +38,32 @@ namespace Pinokio.Designer
                     _dataSource.Add(ad);
                 }
                 this.gridControlEqp.DataSource = _dataSource;
+                gridViewEqp.Columns["NodeID"].VisibleIndex = 1;
+                gridViewEqp.Columns["NodeID"].Caption = "ID";
+                gridViewEqp.Columns["Name"].VisibleIndex = 2;
+                gridViewEqp.Columns["Name"].Caption = "Name";
+                gridViewEqp.Columns["ParentNodeName"].VisibleIndex = 3;
+                gridViewEqp.Columns["ParentNodeName"].Caption = "Parent Name";
+                gridViewEqp.Columns["StepType"].Caption = "Step Type";
+                gridViewEqp.Columns["StepGroupName"].Caption = "Step Group";
+                gridViewEqp.Columns["EqpGroupName"].Caption = "Eqp Group";
+                gridViewEqp.Columns["DispatchingCapa"].Caption = "Dispatching Capa";
+                gridViewEqp.Columns["ProcessingCapa"].Caption = "Processing Capa";
+                gridViewEqp.Columns["DispatchingType"].Caption = "Dispatching Type";
+                gridViewEqp.Columns["Bay"].Caption = "Bay Name";
+                gridViewEqp.Columns["Direction"].Visible = false;
+                gridViewEqp.Columns["Size"].Visible = false;
+                gridViewEqp.Columns["Quantity"].Visible = false;
+                gridViewEqp.Columns["AngleInRadians"].Visible = false;
+                gridViewEqp.Columns["RotateAxis"].Visible = false;
+                gridViewEqp.Columns["LoadLevel"].Visible = false;
+                gridViewEqp.Columns["WayPointDistance"].Visible = false;
+                gridViewEqp.Columns["ReadyQuantities"].Visible = false;
+                gridViewEqp.Columns["Floor"].Visible = false;
+                gridViewEqp.Columns["InLinkCount"].Visible = false;
+                gridViewEqp.Columns["OutLinkCount"].Visible = false;
+                gridViewEqp.Columns["PosVec3"].Visible = false;
+                gridViewEqp.Columns["Height"].Visible = false;
                 this.gridControlEqp.RefreshDataSource();
 
                 for(int i = 0; i < gridViewEqp.RowCount; i++)
@@ -94,7 +120,7 @@ namespace Pinokio.Designer
         }
         private void SelectEqpModel_FormClosed(object sender, FormClosedEventArgs e)
         {
-            if (MyFormClosed != null)
+            if (MyFormClosed != null && this.DialogResult == DialogResult.Cancel)
             {
                 MyFormClosed(this, e);
             }

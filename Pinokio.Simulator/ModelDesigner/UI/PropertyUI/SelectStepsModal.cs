@@ -150,7 +150,7 @@ namespace Pinokio.Designer
         }
         private void ProductionStepsModel_FormClosed(object sender, FormClosedEventArgs e)
         {
-            if (MyFormClosed != null)
+            if (MyFormClosed != null && this.DialogResult == DialogResult.Cancel)
             {
                 MyFormClosed(this, e);
             }

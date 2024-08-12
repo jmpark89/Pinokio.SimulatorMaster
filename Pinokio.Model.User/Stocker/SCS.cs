@@ -13,6 +13,7 @@ namespace Pinokio.Model.User
     /// <summary>
     /// StockerCrane을 운용하는 SubCS
     /// </summary>
+    [Serializable]
     public class SCS : VSubCS
     {
         private Dictionary<string, CraneLine> _dicRailLine;

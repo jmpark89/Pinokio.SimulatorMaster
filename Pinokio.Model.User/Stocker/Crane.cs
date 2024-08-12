@@ -12,10 +12,11 @@ using static Pinokio.Model.Base.SimResultDBManager;
 
 namespace Pinokio.Model.User
 {
+    [Serializable]
     public class Crane : Vehicle
     {
         private Time _delay;
-        private int _heightSpeed;
+        private double _heightSpeed;
         private List<PosData> _lstHeightPD;
         private List<PosData> _lstAnglePD;
         private double _accSpeed;
@@ -55,6 +56,12 @@ namespace Pinokio.Model.User
 
         public double StartAngle
         { get; set; }
+
+        [StorableAttribute(true)]
+        public double AngleSpeed { get => _angleSpeed; set => _angleSpeed = value; }
+        [StorableAttribute(true)]
+        public double HeightSpeed { get => _heightSpeed; set => _heightSpeed = value; }
+
 
         public Crane()
             : base()
@@ -145,13 +152,27 @@ namespace Pinokio.Model.User
             PosVec3 = GetPosition(SimEngine.Instance.TimeNow);
             PosVec3 = new PVector3(PosVec3.X, PosVec3.Y, curHei);
 
-            double radian = GetRadianAtTime(SimEngine.Instance.TimeNow);
-            SetRotate(radian, PVector3.UnitZ);
+            _angleInRadians = GetRadianAtTime(SimEngine.Instance.TimeNow);
+            SetRotate(_angleInRadians, PVector3.UnitZ);
 
+            SetEnteredObjectsPosNAngle();
+        }
+
+        protected void SetEnteredObjectsPosNAngle()
+        {
             foreach (SimObj obj in EnteredObjects)
             {
-                obj.PosVec3 = new PVector3(PosVec3.X, PosVec3.Y, PosVec3.Z + 800);
-                obj.SetRotate(radian, PVector3.UnitZ);
+                if (obj is Part)
+                {
+                    Part part = obj as Part;
+                    part.PosVec3 = PosVec3 + new PVector3(0, 0, 800);
+                    part.AngleInRadians = _angleInRadians;
+                }
+                else
+                {
+                    obj.PosVec3 = PosVec3 + new PVector3(0, 0, Size.Z);
+                    obj.SetRotate(_angleInRadians, PVector3.UnitZ);
+                }
             }
         }
 
@@ -478,6 +499,13 @@ namespace Pinokio.Model.User
 
             return fromToRad;
         }
+
+        protected override void Leave(Time simTime, SimPort port)
+        {
+            SetEnteredObjectsPosNAngle();
+            base.Leave(simTime, port);
+        }
+
         #endregion
     }
 }

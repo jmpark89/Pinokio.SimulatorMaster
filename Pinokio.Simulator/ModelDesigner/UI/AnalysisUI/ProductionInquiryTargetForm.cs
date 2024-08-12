@@ -187,19 +187,23 @@ namespace Pinokio.Designer
                     }
                     else
                     {
-                        if (selectedStepGroupByNames.Count >0)
+                        if (selectedStepGroupByNames.Count > 0)
                         {
                             for (int i = 0; selectedStepGroupByNames.Count > i; i++)
                             {
                                 if (!selectedStepGroupByNames[i].Contains("ALL"))
                                 {
-                                    for (int j = 0; ModelManager.Instance.SimResultDBManager.StepGroupNames.Count > j; j++)
+                                    for (int j = 0; FactoryManager.Instance.Eqps.Count > j; j++)
                                     {
-                                        if (selectedStepGroupByNames[i].Contains(ModelManager.Instance.SimResultDBManager.StepGroupNames[j]))
+                                        if (selectedStepGroupByNames[i].Contains(FactoryManager.Instance.Eqps.ElementAt(j).Value.StepGroupName)
+                                            && selectedStepGroupNames.Contains(FactoryManager.Instance.Eqps.ElementAt(j).Value.Name))
                                         {
-                                            
-                                            checkedListBox.Items.Add(ModelManager.Instance.SimResultDBManager.EqpNames[j].ToString(), true);
+                                            checkedListBox.Items.Add(FactoryManager.Instance.Eqps.ElementAt(j).Value.Name, true);
                                             checkOk = true;
+                                        }
+                                        else if (selectedStepGroupByNames[i].Contains(FactoryManager.Instance.Eqps.ElementAt(j).Value.StepGroupName))
+                                        {
+                                            checkedListBox.Items.Add(FactoryManager.Instance.Eqps.ElementAt(j).Value.Name, false);
                                         }
                                     }
                                 }
@@ -212,7 +216,7 @@ namespace Pinokio.Designer
                                 }
                             }
                         }
-                        else if(selectedEqpGroupByNames .Count>0)
+                        else if(selectedEqpGroupByNames.Count> 0)
                         {
                             for(int i = 0; selectedEqpGroupByNames.Count > i; i++)
                             {
@@ -220,10 +224,15 @@ namespace Pinokio.Designer
                                 {
                                     for (int j = 0; FactoryManager.Instance.Eqps.Count > j; j++)
                                     {
-                                        if (selectedEqpGroupByNames[i].Contains(FactoryManager.Instance.Eqps.ElementAt(j).Value.EqpGroupName))
+                                        if (selectedEqpGroupByNames[i].Contains(FactoryManager.Instance.Eqps.ElementAt(j).Value.EqpGroupName)
+                                            && selectedEqpGroupNames.Contains(FactoryManager.Instance.Eqps.ElementAt(j).Value.Name))
                                         {                                            
                                             checkedListBox.Items.Add(FactoryManager.Instance.Eqps.ElementAt(j).Value.Name, true);
                                             checkOk = true;
+                                        }
+                                        else if(selectedEqpGroupByNames[i].Contains(FactoryManager.Instance.Eqps.ElementAt(j).Value.EqpGroupName))
+                                        {
+                                            checkedListBox.Items.Add(FactoryManager.Instance.Eqps.ElementAt(j).Value.Name, false);
                                         }
                                     }
                                 }

@@ -9,6 +9,7 @@ using System.Threading.Tasks;
 
 namespace Pinokio.Model.User
 {
+    [Serializable]
     public class ElevatorLineStation : LineStation, IPlaybackSave
     {
         private int _bufferDepth = 0;

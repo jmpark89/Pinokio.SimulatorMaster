@@ -13,6 +13,7 @@ namespace Pinokio.Model.User
     using System.Text;
     using System.Threading.Tasks;
 
+    [Serializable]
     public class RobotArm : Diverter
     {
 

@@ -7,6 +7,7 @@ using System.Threading.Tasks;
 
 namespace Pinokio.Model.User
 {
+    [Serializable]
     public class JMMES : MES
     {
         public JMMES()

@@ -31,7 +31,7 @@ namespace Pinokio.Animation.User
             get
             {
                 if (_usableSimNodeTypes == null)
-                    _usableSimNodeTypes = BaseUtill.GetUsableSimNodeTypes(UsableBaseSimNodeType);
+                    _usableSimNodeTypes = BaseUtill.GetUsableSimNodeTypes(UsableBaseSimNodeType, InterfaceConstraints);
 
                 return _usableSimNodeTypes;
             }
@@ -208,9 +208,6 @@ namespace Pinokio.Animation.User
             }
             else
             {
-
-                Dictionary<string, object> datas = new Dictionary<string, object>();
-
                 ModifyUserNodeValueForm valueForm = new ModifyUserNodeValueForm();
                 valueForm.SetUserData(nameof(_bufferX), _bufferX);
                 valueForm.SetUserData(nameof(_bufferY), _bufferY);
@@ -224,8 +221,6 @@ namespace Pinokio.Animation.User
                     _bufferInterval = Convert.ToDouble(valueForm.gridView1.GetRowCellValue(2, "Value").ToString());
                 }
 
-                List<NodeReference> node = new List<NodeReference>();
-
                 if (model.Blocks.Contains(CreatedLineBlock))
                     model.Blocks.Remove(CreatedLineBlock);
 
@@ -234,7 +229,6 @@ namespace Pinokio.Animation.User
 
                 Vector3D direction = new Vector3D(_start, moveTo);
                 double distance = RefBuffer.Size * _bufferX + _bufferInterval * (_bufferX + 1);
-                Vector3D Direction = new Vector3D(direction.X, direction.Y);
                 Vector3D normalDirection = new Vector3D(direction.X, direction.Y);
                 normalDirection.Normalize();
                 Direction = normalDirection * distance;
@@ -247,7 +241,7 @@ namespace Pinokio.Animation.User
 
         }
 
-        public void CreateObject(PinokioBaseModel model, Point3D startPoint, Point3D endPoint, Vector3D normalDirection, int bufferXcount, int bufferYcount, double bufferInterval, out List<NodeReference> returnValues)
+        public virtual void CreateObject(PinokioBaseModel model, Point3D startPoint, Point3D endPoint, Vector3D normalDirection, int bufferXcount, int bufferYcount, double bufferInterval, out List<NodeReference> returnValues)
         {
             returnValues = new List<NodeReference>();
 
@@ -325,7 +319,7 @@ namespace Pinokio.Animation.User
             returnValues.AddRange(subNodeReturnValues);
         }
 
-        private void AddNodeReference(PinokioBaseModel model, NodeReference nodeReference)
+        protected void AddNodeReference(PinokioBaseModel model, NodeReference nodeReference)
         {
             model.AddNodeReference(nodeReference);
             if (model.Entities.Contains(nodeReference) is false)

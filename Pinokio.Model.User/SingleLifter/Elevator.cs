@@ -11,6 +11,7 @@ using static DevExpress.Utils.Drawing.Helpers.NativeMethods;
 
 namespace Pinokio.Model.User
 {
+    [Serializable]
     public class Elevator : Vehicle
     {
         

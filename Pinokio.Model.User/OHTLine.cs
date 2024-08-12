@@ -10,6 +10,7 @@ using Simulation.Engine;
 
 namespace Pinokio.Model.User
 {
+    [Serializable]
     public class OHTLine : GuidedLine
     {
         //---------------------충돌 방지 위한 변수-----------------------
@@ -30,9 +31,6 @@ namespace Pinokio.Model.User
         //--------------------------------------------------------------
         [StorableAttribute(true)]
         private string _bay = string.Empty;
-
-        public bool IsCurve
-        { get; set; }
 
         public double MinimumDistance
         { get; set; }
@@ -95,7 +93,6 @@ namespace Pinokio.Model.User
             maximumScheduleDistance = dispatchDistance - 4252;
             MinimumDistance = 300;
             _lstWaitingRailPort = new List<OHTLineStation>();
-            IsCurve = false;
             _bay = string.Empty;
         }
 

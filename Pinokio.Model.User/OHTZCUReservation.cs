@@ -8,6 +8,7 @@ using Pinokio.Model.Base;
 
 namespace Pinokio.Model.User
 {
+    [Serializable]
     public class OHTZCUReservation
     {
         private Time _reservationTime;

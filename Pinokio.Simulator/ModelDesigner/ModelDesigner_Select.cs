@@ -20,6 +20,7 @@ using DevExpress.XtraVerticalGrid;
 using Logger;
 using Simulation.Engine;
 using System.Diagnostics;
+using Pinokio.Geometry;
 
 namespace Pinokio.Designer
 {
@@ -121,6 +122,8 @@ namespace Pinokio.Designer
                 if (SelectedNodeReferences.Count == 0 && SelectedEntityReferences.Count == 0)
                     return;
 
+                SelectedNodeReferences = SelectedNodeReferences.OrderBy(x => x.Core.LoadLevel).ToList();
+
                 UpdateTreeListBySelectedReferences();
 
                 if(SelectedNodeReferences.Count == 1 && SelectedEntityReferences.Count == 0)
@@ -146,14 +149,6 @@ namespace Pinokio.Designer
                 simNodeTreeList.Invoke(new Action(() => simNodeTreeList.SelectNode(node)));
             }
             simNodeTreeList.Update();
-
-            foreach (PartReference entityReference in SelectedEntityReferences)
-            {
-                PartTreeListNode entity = (PartTreeListNode)partTreeList.FindNodeByKeyID(entityReference.ID);
-                simNodeTreeList.Invoke(new Action(() => partTreeList.SelectNode(entity)));
-            }
-
-            partTreeList.Update();
         }
 
         public void ClearPropertyGrid()
@@ -178,11 +173,112 @@ namespace Pinokio.Designer
             simNodeTreeList.ClearSelection();
             simNodeTreeList.FocusedNode = null;
             simNodeTreeList.EndUpdate();
+        }
+        private void bbiAlignLeft_ItemClick(object sender, DevExpress.XtraBars.ItemClickEventArgs e)
+        {
+            bbiAlign_ItemClick(sender, e, "Left");
+        }
 
-            partTreeList.BeginUpdate();
-            partTreeList.ClearSelection();
-            partTreeList.FocusedNode = null;
-            partTreeList.EndUpdate();
+        private void bbiAlignCenter_ItemClick(object sender, DevExpress.XtraBars.ItemClickEventArgs e)
+        {
+            bbiAlign_ItemClick(sender, e, "Center");
+        }
+
+        private void bbiAlignRight_ItemClick(object sender, DevExpress.XtraBars.ItemClickEventArgs e)
+        {
+            bbiAlign_ItemClick(sender, e, "Right");
+        }
+
+        private void bbiTopAlign_ItemClick(object sender, DevExpress.XtraBars.ItemClickEventArgs e)
+        {
+            bbiAlign_ItemClick(sender, e, "Top");
+        }
+
+        private void bbiMiddleAlign_ItemClick(object sender, DevExpress.XtraBars.ItemClickEventArgs e)
+        {
+            bbiAlign_ItemClick(sender, e, "Middle");
+        }
+
+        private void bbiBottomAlign_ItemClick(object sender, DevExpress.XtraBars.ItemClickEventArgs e)
+        {
+            bbiAlign_ItemClick(sender, e, "Bottom");
+        }
+
+
+        private void bbiAlign_ItemClick(object sender, DevExpress.XtraBars.ItemClickEventArgs e, string alignType)
+        {
+            List<NodeReference> nodeReferences = new List<NodeReference>();
+            List<int> nodeIndex = new List<int>();
+            List<Point3D> priorValues = new List<Point3D>();
+            List<Point3D> transferValues = new List<Point3D>();
+
+            double alignPoint = GetAlignPoint(alignType);
+
+            foreach (NodeReference node in SelectedNodeReferences)
+            {
+                Point3D moveFrom = new Point3D(node.CurrentPoint.X, node.CurrentPoint.Y, 0);
+                Point3D moveTo = GetMoveToPoint(node, alignPoint, alignType);
+
+                priorValues.Add(moveFrom);
+                transferValues.Add(moveTo);
+
+                if (SelectedNodeReferences.Count == 1 ||
+                    (SelectedNodeReferences.Count > 1 && !(node is RefVehicle) && !(node is RefLineComponent)))
+                {
+                    node.CurrentPoint = moveTo;
+                    node.Move_MouseUp(pinokio3DModel1, moveTo, moveFrom);
+                }
+
+                ModifyTreeViewByText(pinokio3DModel1.NodeReferenceByID[node.ID]);
+                nodeReferences.Add(pinokio3DModel1.NodeReferenceByID[node.ID]);
+            }
+
+            if (SelectedNodeReferences.Count > 0)
+            {
+                AddUndo(eUndoRedoActionType.Move, SelectedNodeReferences, null, priorValues, transferValues);
+            }
+
+            SelectedNodeReferences.RemoveAll(node => !node.Selected);
+
+            pinokio3DModel1.Entities.Regen();
+            pinokio3DModel1.Invalidate();
+        }
+        private double GetAlignPoint(string alignType)
+        {
+            switch (alignType)
+            {
+                case "Top":
+                    return SelectedNodeReferences.OrderByDescending(n => n.CurrentPoint.Y).FirstOrDefault().CurrentPoint.Y;
+                case "Middle":
+                    return (SelectedNodeReferences.Max(n => n.CurrentPoint.Y) + SelectedNodeReferences.Min(n => n.CurrentPoint.Y)) / 2;
+                case "Bottom":
+                    return SelectedNodeReferences.OrderBy(n => n.CurrentPoint.Y).FirstOrDefault().CurrentPoint.Y;
+                case "Left":
+                    return SelectedNodeReferences.OrderBy(n => n.CurrentPoint.X).FirstOrDefault().CurrentPoint.X;
+                case "Center":
+                    return (SelectedNodeReferences.Max(n => n.CurrentPoint.X) + SelectedNodeReferences.Min(n => n.CurrentPoint.X)) / 2;
+                case "Right":
+                    return SelectedNodeReferences.OrderByDescending(n => n.CurrentPoint.X).FirstOrDefault().CurrentPoint.X;
+                default:
+                    throw new ArgumentException("Invalid alignment type");
+            }
+        }
+
+        private Point3D GetMoveToPoint(NodeReference node, double alignPoint, string alignType)
+        {
+            switch (alignType)
+            {
+                case "Top":
+                case "Middle":
+                case "Bottom":
+                    return new Point3D(node.CurrentPoint.X, alignPoint, 0);
+                case "Left":
+                case "Center":
+                case "Right":
+                    return new Point3D(alignPoint, node.CurrentPoint.Y, 0);
+                default:
+                    throw new ArgumentException("Invalid alignment type");
+            }
         }
     }
 }

@@ -10,6 +10,7 @@ using System.Linq;
 
 namespace Pinokio.Model.User
 {
+    [Serializable]
     public class CraneLineStation : LineStation, IPlaybackSave
     {
         private int _bufferDepth = 0;

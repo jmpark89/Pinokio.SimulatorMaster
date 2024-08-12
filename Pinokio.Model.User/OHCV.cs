@@ -11,6 +11,7 @@ using Pinokio.Model.Base;
 using Simulation.Engine;
 namespace Pinokio.Model.User
 {
+    [Serializable]
     public class OHCV : Vehicle, IPlaybackSave
     {
         public bool IsRightDirection { get; set; }
@@ -67,8 +68,6 @@ namespace Pinokio.Model.User
 
         protected override void ArriveToIdle(Time simTime, SimPort port)
         {
-            if (Line.ArrivedPorts.Count > 0) 
-                ;
             if (Line.ArrivedPorts.Count > 0 && GetDistanceAtTime(simTime) == 0)
             {
                 ArriveToLoad(simTime, Line.ArrivedPorts.First());

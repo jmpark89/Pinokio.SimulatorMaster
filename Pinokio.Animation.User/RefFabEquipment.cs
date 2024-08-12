@@ -17,31 +17,9 @@ using Pinokio.Geometry;
 namespace Pinokio.Animation.User
 {
     [Serializable]
-    public class RefFabEquipment : NodeReference
+    public class RefFabEquipment : RefEquipment
     {
         public static bool IsInserted = true;
-
-        [Browsable(false), StorableAttribute(false)]
-        public new static string[] UsableBaseSimNodeType =
-            {
-            typeof(Pinokio.Model.Base.Equipment).Name,
-            typeof(Pinokio.Model.User.Stay).Name
-        };
-
-        [Browsable(false), StorableAttribute(false)]
-        private static List<string> _usableSimNodeTypes;
-
-        [Browsable(false), StorableAttribute(false)]
-        public new static List<string> UsableSimNodeTypes
-        {
-            get
-            {
-                if (_usableSimNodeTypes == null)
-                    _usableSimNodeTypes = BaseUtill.GetUsableSimNodeTypes(UsableBaseSimNodeType);
-
-                return _usableSimNodeTypes;
-            }
-        }
 
         public RefFabEquipment(string blockName) : base(blockName)
         {
@@ -99,13 +77,13 @@ namespace Pinokio.Animation.User
                 {
                     tr = new Transformation(_core.RotateMatrix);
                     rotationAxis = Vector3D.AxisZ; // Z축을 중심으로 회전하는 예시
-                    angle = -Math.PI / 2; // 회전 각도 (도 단위)
+                    angle = Math.PI / 2; // 회전 각도 (도 단위)
                 }
                 else if (line.Direction.Y == -1)
                 {
                     tr = new Transformation(_core.RotateMatrix);
                     rotationAxis = Vector3D.AxisZ; // Z축을 중심으로 회전하는 예시
-                    angle = Math.PI / 2; // 회전 각도 (도 단위)
+                    angle = -Math.PI / 2; // 회전 각도 (도 단위)
                 }
                 // 회전 변환 생성
                 Transformation rotation = new Rotation(angle, rotationAxis);

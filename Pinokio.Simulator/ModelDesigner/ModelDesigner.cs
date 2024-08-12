@@ -44,6 +44,7 @@ using Pinokio.Model.User;
 using DevExpress.XtraSplashScreen;
 using Simulation;
 using Pinokio.Simulation;
+using devDept.Eyeshot.Labels;
 
 namespace Pinokio.Designer
 {
@@ -67,7 +68,7 @@ namespace Pinokio.Designer
         [NonSerialized]
         private Dictionary<string, List<SimNodeTreeListNode>> dicSimNodeType = new Dictionary<string, List<SimNodeTreeListNode>>();
         [NonSerialized]
-        private Dictionary<string, bool> dicVisibleNodeTypeInfo = new Dictionary<string, bool>();
+        private Dictionary<string, Tuple<bool,bool>> dicVisibleNodeTypeInfo = new Dictionary<string, Tuple<bool, bool>>();
         private Plane _plane;
         public Plane Plane { get => _plane; set => _plane = value; }
         public int EntityIndex { get => _entityIndex; set => _entityIndex = value; }
@@ -89,7 +90,7 @@ namespace Pinokio.Designer
             pinokio3DModel1 = new PinokioEditorModel();
             pinokio3DModel1.Unlock("US2-RMKUX-N12YW-WAMY-S738");
             this.simNodeTreeList.Model = pinokio3DModel1;
-            this.partTreeList.Model = pinokio3DModel1;
+            //this.partTreeList.Model = pinokio3DModel1;
             //if (!PinokioLincense.isAuth())
             //{
             //    MessageBox.Show("NotLicense");
@@ -109,8 +110,6 @@ namespace Pinokio.Designer
                 ModelManager.Instance.SimulationEnd += new deleSimulationEnd(SimulationEnd);
                 ModelManager.Instance.FailSimulation += new deleFaliSimulation(FaliSimulation);
                 ModelManager.Instance.SimResultDBManager = new UserSimResultDBManager();
-                Pinokio3Dmodel.DelegateAddPartReference += new deleAlarmAddPartReference(ModifyEntityTreeList);
-                Pinokio3Dmodel.DelegateRemovePartReference += new deleAlarmRemovePartReference(DeletePartReference);
                 (new Simulator()).OnStartSimulation += Simulator_OnStartSimulation;
 
                 Initialize3DModel();
@@ -119,10 +118,10 @@ namespace Pinokio.Designer
                 InitializeDB();
                 InitializeTreeAction();
                 InitializeInsertNodes();
-                InitializeInsertTreeNodes();
+                //InitializeInsertTreeNodes();
                 InitializeInsertCoupledModels();
                 InitializeInsertedSimNodesTreeList(simNodeTreeList);
-                InitializeSimEntityTreeList(partTreeList);
+                //InitializeSimEntityTreeList(partTreeList);
                 InitializeSimTimeSetting();
                 InitialzieObjectManipulator();
 
@@ -393,21 +392,7 @@ namespace Pinokio.Designer
             }
             else if (_modelActionType == ModelActionType.Insert && CurrentRef != null)
             {
-                //if (CurrentRef.GetType().Name.Contains("Equipment") && CurrentRef.GetType().Name.Contains("Fab"))
-                //    AutoZCUSetting();
-                //AutoEQPSetting();
-                //else if (CurrentRef.GetType().Name.Contains("Stationss"))
-                //    AutoStationForSTB();
-                ////else if (CurrentRef.GetType().Name.Contains("UTB"))
-                ////    AutoUTBSetting();
-                //else if (CurrentRef.GetType().Name.Contains("STB"))
-                //    AutoSTBSetting();
-                //else if (CurrentRef.GetType().Name.Contains("Link"))
-                //    AutoLinkSetting();
-                //else if (CurrentRef.GetType().Name.Contains("OHT"))
-                //    AutoOHTSetting();
-                //else
-                    InsertingNode(false);
+                InsertingNode(false);
 
                 pinokio3DModel1.Entities.Regen();
                 pinokio3DModel1.Invalidate();
@@ -433,7 +418,9 @@ namespace Pinokio.Designer
             {
                 List<NodeReference> nodeReferences;
                 if (pinokio3DModel1.MouseLocationSnapToCorrdinate != MouseSnapPointBeforeMouseDown)
+                {
                     Move_MouseUpMulti(pinokio3DModel1, pinokio3DModel1.MouseLocationSnapToCorrdinate, MouseSnapPointBeforeMouseDown, out nodeReferences);
+                }
 
                 if (SelectedNodeReferences.Count > 0)
                     OpenObjectManipulator();
@@ -484,9 +471,15 @@ namespace Pinokio.Designer
                         FactoryManager.Instance.Eqps.Add(nodeReference.Core.ID, nodeReference.Core as Equipment);
                 }
                 ModifyNodeTreeList(insertedSimNodes);
-                AddUndo(eUndoRedoActionType.Add, insertedRefNodes, null, null);
-                RefreshEntities();
-                if (insertedRefNodes.Count <= 3)
+                if(insertedRefNodes.Count > 0 && insertedRefNodes.Where(x => x is RefTransportLine).ToList().Count >= 2)
+                    AddUndo(eUndoRedoActionType.LineSeparate, insertedRefNodes, null, null);
+                else
+                    AddUndo(eUndoRedoActionType.Add, insertedRefNodes, null, null);
+
+                if (insertedRefNodes.Count > 0 && insertedRefNodes.Where(x => x is RefTransportLine).ToList().Count < 2)
+                    RefreshEntities();
+
+                if (insertedRefNodes.Count <= 3 && insertedRefNodes.Where(x => x is RefTransportLine).ToList().Count < 2)
                     PrepareInsertingRefNode(insertedNodeType, insertedNodeMatchType, insertedNodeHeight, pinokio3DModel1.MouseLocationSnapToCorrdinate);
             }
             else if (success is false)
@@ -600,15 +593,6 @@ namespace Pinokio.Designer
                 int entityIndexInMousePos;
                 if (objectManipulatorEditing == ObjectManipulator.actionType.None)
                 {
-
-                    ///int entityIndexInMousePos;
-                    /// if (ExistSelectedEntity(e, out entityIndexInMousePos)
-                    ///     && SimEngine.Instance.EngineState != ENGINE_STATE.RUNNING
-                    ///     && SimEngine.Instance.EngineState != ENGINE_STATE.PAUSE)
-                    /// {
-                    ///     _modelActionType = ModelActionType.Moving;
-                    ///     AddUndo(eUndoRedoActionType.Move, SelectedNodeReferences, null, GetNodeReferenceCurrentPoints(SelectedNodeReferences));
-
                     if (ExistSelectedEntity(e, out entityIndexInMousePos))
                     {
                         if (SimEngine.Instance.EngineState != ENGINE_STATE.RUNNING
@@ -623,6 +607,62 @@ namespace Pinokio.Designer
                                 SelectedNodeReferences.Add(refLine.EndStation);
                                 refLine.EndStation.Selected = true;
                             }
+                            else if (SelectedNodeReferences.Count > 0)
+                            {
+                                foreach(NodeReference refnode in SelectedNodeReferences.ToArray())
+                                {
+                                    if(refnode is RefTransportPoint)
+                                    {
+                                        RefTransportPoint refPoint = refnode as RefTransportPoint;
+                                        foreach (RefTransportLine inLine in refPoint.InLines)
+                                        {
+                                            if (inLine is RefCurvedTransportLine)
+                                            {
+                                                if (!SelectedNodeReferences.Contains(inLine))
+                                                {
+                                                    SelectedNodeReferences.Add(inLine);
+                                                    inLine.Selected = true;
+                                                }
+
+                                                if (!SelectedNodeReferences.Contains(inLine.StartStation))
+                                                {
+                                                    SelectedNodeReferences.Add(inLine.StartStation);
+                                                    inLine.StartStation.Selected = true;
+                                                }
+                                                if (!SelectedNodeReferences.Contains(inLine.EndStation))
+                                                {
+                                                    SelectedNodeReferences.Add(inLine.EndStation);
+                                                    inLine.EndStation.Selected = true;
+                                                }
+                                            }
+                                        }
+
+                                        foreach (RefTransportLine outLine in refPoint.OutLines)
+                                        {
+                                            if (outLine is RefCurvedTransportLine)
+                                            {
+                                                if (!SelectedNodeReferences.Contains(outLine))
+                                                {
+                                                    SelectedNodeReferences.Add(outLine);
+                                                    outLine.Selected = true;
+                                                }
+
+                                                if (!SelectedNodeReferences.Contains(outLine.StartStation))
+                                                {
+                                                    SelectedNodeReferences.Add(outLine.StartStation);
+                                                    outLine.StartStation.Selected = true;
+                                                }
+
+                                                if (!SelectedNodeReferences.Contains(outLine.EndStation))
+                                                {
+                                                    SelectedNodeReferences.Add(outLine.EndStation);
+                                                    outLine.EndStation.Selected = true;
+                                                }
+                                            }
+                                        }
+                                    }
+                                }
+                            }
                         }
                         else
                             _modelActionType = ModelActionType.None;
@@ -630,7 +670,6 @@ namespace Pinokio.Designer
                     }
                     else
                     {
-                        //                        ClearSelection();
                         if (SimEngine.Instance.EngineState != ENGINE_STATE.RUNNING
                             && SimEngine.Instance.EngineState != ENGINE_STATE.PAUSE)
                             _modelActionType = ModelActionType.Selecting;
@@ -656,8 +695,6 @@ namespace Pinokio.Designer
                 }
                 else
                 {
-                    //if (indexs.Count() == 1)
-                    //{
                     if ((SelectedNodeReferences.Count <= 1
                     || (SelectedNodeReferences.Count == 3 && (SelectedNodeReferences[0] is RefTransportLine || SelectedNodeReferences[1] is RefTransportLine || SelectedNodeReferences[2] is RefTransportLine)))
                     && SelectedEntityReferences.Count <= 1)
@@ -670,12 +707,8 @@ namespace Pinokio.Designer
                         Selection(entityIndex);
                         MouseUpMultiSelection();
                     }
-                    return true;
-                    //}
-                    //else
-                    //{
 
-                    //}
+                    return true;
                 }
             }
             catch (Exception ex)
@@ -711,6 +744,46 @@ namespace Pinokio.Designer
             pinokio3DModel1.Entities.Regen();
             pinokio3DModel1.Invalidate();
         }
+        private bool checkPosibilityMoveLine(NodeReference node)
+        {
+            foreach (RefVehicle vehicle in ((RefTransportLine)node).Vehicles)
+            {
+                if (((TransportLine)node.Core).Length < ((Vehicle)vehicle.Core).StartPos)
+                    return false;
+            }
+
+            foreach (RefLineComponent lineComponent in ((RefTransportLine)node).LineComponents)
+            {
+                if (lineComponent is RefLineStation)
+                {
+                    if (((TransportLine)node.Core).Length < ((LineStation)lineComponent.Core).Length)
+                        return false;
+                }
+            }
+            return true;
+        }
+
+        private bool checkPossibilityMove()
+        {
+            foreach (NodeReference node in SelectedNodeReferences)
+            {
+                if (node is RefTransportPoint)
+                {
+                    foreach (TransportLine inLine in ((TransportPoint)node.Core).InLines)
+                    {
+                        if (!checkPosibilityMoveLine(pinokio3DModel1.NodeReferenceByID[inLine.ID]))
+                            return false;
+                    }
+                    foreach (TransportLine outLine in ((TransportPoint)node.Core).OutLines)
+                    {
+                        if (!checkPosibilityMoveLine(pinokio3DModel1.NodeReferenceByID[outLine.ID]))
+                            return false;
+                    }
+                }
+            }
+
+            return true;
+        }
         private void Move_MouseUpMulti(PinokioBaseModel model, Point3D moveTo, Point3D moveFrom, out List<NodeReference> nodeReferences)
         {
             nodeReferences = new List<NodeReference>();
@@ -719,24 +792,41 @@ namespace Pinokio.Designer
             List<Point3D> transferValues = new List<Point3D>();
             try
             {
+                bool isMerged = false;
                 foreach (NodeReference node in SelectedNodeReferences)
                 {
-                    ///  node.Move_MouseUp(model, moveTo, moveFrom);
-                    ///  node.Height = node.CurrentPoint.Z - (ModelManager.Instance.DicCoupledModel[Convert.ToUInt16(node.LayerName)] as Floor).FloorBottom;
                     priorValues.Add(moveFrom);
                     transferValues.Add(moveTo);
 
                     if (SelectedNodeReferences.Count == 1
                         || (SelectedNodeReferences.Count > 1 && !(node is RefVehicle) && !(node is RefLineComponent)))
-                        node.Move_MouseUp(model, moveTo, moveFrom);
+                    {
+                        var convertToGridLoaction = model.WorldToScreen(new Point3D(Convert.ToInt32(node.CurrentPoint.X), Convert.ToInt32(node.CurrentPoint.Y)));
+                        var underNode = model.NodeReferenceByID.Values.ToList().FirstOrDefault(x => Math.Abs(x.Core.PosVec3.X - node.CurrentPoint.X) < 100 && Math.Abs(x.Core.PosVec3.Y - node.CurrentPoint.Y) < 100 && x.Name != node.Name && x is RefTransportPoint);
+
+                        if (SelectedNodeReferences.Count == 1 && node is RefTransportPoint && underNode != null && underNode is RefTransportPoint)
+                        {
+                            List<NodeReference> mergedNodes = new List<NodeReference>();
+                            mergedNodes.Add(node);
+                            mergedNodes.Add(underNode);
+                            AddUndo(eUndoRedoActionType.PointMerge, mergedNodes, null, priorValues, transferValues);
+                            RefTransportPoint refMergingPoint = node as RefTransportPoint;
+                            refMergingPoint.Move_MouseMove(this.pinokio3DModel1, priorValues[0], transferValues[0]);
+                            refMergingPoint.Move_MouseUp(this.pinokio3DModel1, refMergingPoint.CurrentPoint, refMergingPoint.CurrentPoint);
+                            MergeLinePoints(model, refMergingPoint, underNode as RefTransportPoint);
+                            isMerged = true;
+                            break;
+                        }
+                        else
+                            node.Move_MouseUp(model, moveTo, moveFrom);
+                    }
 
                     ModifyTreeViewByText(pinokio3DModel1.NodeReferenceByID[node.ID]);
 
-                    //pinokio3DModel1.NodeReferenceByID[node.ID].Selected = true;
                     nodeReferences.Add(pinokio3DModel1.NodeReferenceByID[node.ID]);
                 }
 
-                if (SelectedNodeReferences.Count > 0)
+                if (isMerged == false && SelectedNodeReferences.Count > 0)
                 {
                     AddUndo(eUndoRedoActionType.Move, SelectedNodeReferences, null, priorValues, transferValues);
                 }
@@ -746,24 +836,138 @@ namespace Pinokio.Designer
                     if (node.Selected is false)
                         SelectedNodeReferences.Remove(node);
                 }
+
+                if (!checkPossibilityMove())
+                {
+                    MessageBox.Show("수정된 Line의 길이가 LineComponent 위치보다 짧습니다.");
+                    Undo();
+                }
             }
             catch (Exception ex)
             {
                 ErrorLogger.SaveLog(ex);
             }
         }
+
+        private bool MergeLinePoints(PinokioBaseModel model, RefTransportPoint refMergingPoint, RefTransportPoint refUnderPoint)
+        {
+            if (refUnderPoint != null)
+            {
+                TransportPoint mergingPoint = (TransportPoint)refMergingPoint.Core;
+                RefTransportPoint currentRefUnderPoint = (RefTransportPoint)model.NodeReferenceByID[refUnderPoint.ID];
+                foreach (TransportLine inLine in ((TransportPoint)refMergingPoint.Core).InLines)
+                {
+                    if(inLine.EndPoint == mergingPoint)
+                        ((RefTransportLine)model.NodeReferenceByID[inLine.ID]).ModifyConveyor(model, (RefTransportPoint)model.NodeReferenceByID[inLine.StartPoint.ID], currentRefUnderPoint);
+                }
+                foreach (TransportLine outLine in ((TransportPoint)refMergingPoint.Core).OutLines)
+                {
+                    if (outLine.StartPoint == mergingPoint)
+                        ((RefTransportLine)model.NodeReferenceByID[outLine.ID]).ModifyConveyor(model, currentRefUnderPoint, (RefTransportPoint)model.NodeReferenceByID[outLine.EndPoint.ID]);
+                }
+
+                List<NodeReference> node2Delete = new List<NodeReference>();
+                node2Delete.Add(refMergingPoint);
+                for (int j = 0; j < refMergingPoint.ToLinked.Count; j++)
+                {
+                    node2Delete.Add(refMergingPoint.ToLinked[j]);
+                    refMergingPoint.ToLinked[j].ToNode.FromLinked.Remove(refMergingPoint.ToLinked[j]);
+                    refMergingPoint.ToLinked.Remove(refMergingPoint.ToLinked[j]);
+                }
+
+                for (int j = 0; j < refMergingPoint.FromLinked.Count; j++)
+                {
+                    node2Delete.Add(refMergingPoint.FromLinked[j]);
+                    refMergingPoint.FromLinked[j].FromNode.ToLinked.Remove(refMergingPoint.FromLinked[j]);
+                    refMergingPoint.FromLinked.Remove(refMergingPoint.FromLinked[j]);
+                }
+
+                List<uint> tempIDs = new List<uint>();
+                foreach (NodeReference delNode in node2Delete)
+                {
+                    if (tempIDs.Contains(delNode.ID))
+                        continue;
+                    else
+                        tempIDs.Add(delNode.ID);
+                }
+
+                node2Delete.Clear();
+                foreach (uint ID in tempIDs)
+                {
+                    if (pinokio3DModel1.NodeReferenceByID.Keys.Contains(ID))
+                        node2Delete.Add(pinokio3DModel1.NodeReferenceByID[ID]);
+                }
+
+                node2Delete = node2Delete.OrderBy(x => x.LoadLevel).ToList();
+
+                DeleteNodeReference(node2Delete);    // Use Delete Function already exiest
+
+                if (SelectedFloorClear())
+                    CloseObjectManipulator();
+
+                ClearSelection();
+                FinishAddNode();
+                CloseObjectManipulator();
+                pinokio3DModel1.Entities.Regen();
+                pinokio3DModel1.Invalidate();
+
+                return true;
+            }
+            return false;
+        }
+
+        private bool SplitLinePoints(PinokioBaseModel model, RefTransportPoint refMergingPoint, RefTransportPoint refUnderPoint)
+        {
+            if (refUnderPoint != null)
+            {
+                TransportPoint mergingPoint = (TransportPoint)refMergingPoint.Core;
+
+                RefTransportLine[] inLines = refMergingPoint.InLines.ToArray();
+                RefTransportLine[] outLines = refMergingPoint.OutLines.ToArray();
+
+                refMergingPoint.InLines.Clear();
+                foreach (RefTransportLine refInLine in inLines)
+                {
+                    ((RefTransportLine)model.NodeReferenceByID[refInLine.ID]).ModifyConveyor(model, (RefTransportPoint)model.NodeReferenceByID[refInLine.StartStation.ID], refMergingPoint);
+                }
+                refMergingPoint.OutLines.Clear();
+                foreach (RefTransportLine refOutLine in outLines)
+                {
+                    ((RefTransportLine)model.NodeReferenceByID[refOutLine.ID]).ModifyConveyor(model, refMergingPoint, (RefTransportPoint)model.NodeReferenceByID[refOutLine.EndStation.ID]);
+                }
+
+                if (SelectedFloorClear())
+                    CloseObjectManipulator();
+
+                ClearSelection();
+                FinishAddNode();
+                CloseObjectManipulator();
+                pinokio3DModel1.Entities.Regen();
+                pinokio3DModel1.Invalidate();
+
+                return true;
+            }
+            return false;
+        }
+
         private void Rotate_MouseUpMulti()
         {
             try
             {
                 foreach (NodeReference node in SelectedNodeReferences)
                 {
-                    // node.Move_MouseUp(model, moveTo);
                     if (node.Core != null)
                     {
                         Transformation rT = node.Transformation.GetTransformationForNormals();
                         node.Core.RotateMatrix = rT.Matrix;
+                        double radian = PVector2.AngleRadian(new PVector2(0, 1), new PVector2(rT[1, 0], rT[1, 1]));
+                        node.Core.AngleInRadians = radian;
                         node.Core.PosVec3 = new Geometry.PVector3(node.Transformation[0, 3], node.Transformation[1, 3], node.Transformation[2, 3]);
+
+                        if (node.Core is TransportLine)
+                            ((TransportLine)node.Core).Direction = PVector3.Direction(((TransportLine)node.Core).StartPoint.PosVec3, ((TransportLine)node.Core).EndPoint.PosVec3);
+                        if (node.Core is ICurvedLine)
+                            ((ICurvedLine)node.Core).StartDegree = radian * 180 / Math.PI;
                     }
                 }
             }
@@ -786,7 +990,7 @@ namespace Pinokio.Designer
 
             CurrentRef = pinokio3DModel1.Entities[EntityIndex] as NodeReference;
 
-            CurrentRef.Move_MouseDown(pinokio3DModel1.MouseLocationSnapToCorrdinate);
+            CurrentRef.Move_MouseDown(pinokio3DModel1, pinokio3DModel1.MouseLocationSnapToCorrdinate);
 
             if (SelectedNodeReferences.Count > 0)
             {
@@ -825,7 +1029,7 @@ namespace Pinokio.Designer
                             parentNodesDic[Convert.ToUInt32(simNode.ParentNodeID)] = parentTreeNode;
                         }
                     }
-                    //parentTreeNode = simNodeTreeList.FindNodeByKeyID(Convert.ToUInt32(simNode.ParentNodeID)) as SimNodeTreeListNode;
+
                     if (parentTreeNode == null)
                     {
                         if (ModelManager.Instance.SimNodes.ContainsKey(simNode.ParentNodeID))
@@ -854,11 +1058,15 @@ namespace Pinokio.Designer
 
                     NodeReference refNode = null;
                     SimNodeTreeListNode addedSimTreeNode;
+
                     if (pinokio3DModel1.NodeReferenceByID.ContainsKey(simNode.ID))
                     {
                         refNode = pinokio3DModel1.NodeReferenceByID[simNode.ID];
                         refNode.LayerName = floorTreeNode.SimNode.ID.ToString();
-                        addedSimTreeNode = (SimNodeTreeListNode)simNodeTreeList.AppendNode(new object[] { simNode.ID, simNode.Name, simNode.GetType().Name, refNode.GetType().Name.Remove(0, 3) }, parentTreeNode);
+
+                        addedSimTreeNode = (SimNodeTreeListNode)simNodeTreeList.FindNodeByKeyID(refNode.ID);
+                        if (addedSimTreeNode == null)
+                            addedSimTreeNode = (SimNodeTreeListNode)simNodeTreeList.AppendNode(new object[] { simNode.ID, simNode.Name, simNode.GetType().Name, refNode.GetType().Name.Remove(0, 3) }, parentTreeNode);
                     }
                     else
                         addedSimTreeNode = (SimNodeTreeListNode)simNodeTreeList.AppendNode(new object[] { simNode.ID, simNode.Name, simNode.GetType().Name, null }, parentTreeNode);
@@ -883,23 +1091,6 @@ namespace Pinokio.Designer
             {
                 //UI 업데이트
                 simNodeTreeList.EndUpdate();
-            }
-        }
-
-        private void ModifyEntityTreeList(PartReference refEntity)
-        {
-            try
-            {
-                if (ModelManager.Instance.AnimationNode != null && ModelManager.Instance.AnimationNode.IsUse)
-                    partTreeList.BeginInvoke(new Action(() =>
-                    {
-                        PartTreeListNode addedSimTreeNode = (PartTreeListNode)partTreeList.AppendNode(new object[] { refEntity.Core.ID, refEntity.Core.Name, refEntity.Core.GetType().Name, refEntity.GetType().Name.Remove(0, 3) }, null);
-                        addedSimTreeNode.Checked = true;
-                    }));
-            }
-            catch (Exception ex)
-            {
-                ErrorLogger.SaveLog(ex);
             }
         }
 
@@ -971,34 +1162,6 @@ namespace Pinokio.Designer
             return false;
         }
 
-        private bool IsOverArrow(MouseEventArgs e)
-        {
-            try
-            {
-
-            }
-            catch (Exception ex)
-            {
-                ErrorLogger.SaveLog(ex);
-            }
-            return false;
-        }
-
-        private bool IsOverOutLine(MouseEventArgs e)
-        {
-
-            try
-            {
-
-
-            }
-            catch (Exception ex)
-            {
-                ErrorLogger.SaveLog(ex);
-            }
-            return false;
-        }
-
         #endregion
 
         #region RIBBON BUTTON Click EVENTS
@@ -1020,8 +1183,6 @@ namespace Pinokio.Designer
                 bbiAMHSReport.Enabled = false;
                 bbiLoadAMHSReport.Enabled = false;
                 bbiLoadProductionReport.Enabled = false;
-                dicVisibleNodeTypeInfo.Clear();
-                dicSimNodeType.Clear();
             }
         }
 
@@ -1062,7 +1223,7 @@ namespace Pinokio.Designer
                     List<SimNodeIntegrityLog> simNodeLogList = ModelManager.Instance.CheckIntegrities();
                     List<FactoryIntegrityLog> factoryLogList = FactoryManager.Instance.CheckIntegrities();
 
-                    if(simNodeLogList.Count > 0 || factoryLogList.Count > 0)
+                    if (simNodeLogList.Count > 0 || factoryLogList.Count > 0)
                     {
                         IntegrityTestForm integrityForm = new IntegrityTestForm(this);
                         integrityForm.SetSimNodeLogData(simNodeLogList);
@@ -1093,11 +1254,8 @@ namespace Pinokio.Designer
         {
             SaveFileDialog dlg = new SaveFileDialog();
             dlg.Filter = "Access File (*.accdb)|*.accdb|Xml File (*.xml)|*.xml";
-            //xtraSaveFileDialog1.Filter = "Access File (*.accdb)|*.accdb|All files (*.*)|*.*";
             if (dlg.ShowDialog() == DialogResult.OK)
-            //if (xtraSaveFileDialog1.ShowDialog() == DialogResult.OK)
             {
-                //string filePath = xtraSaveFileDialog1.FileName;
                 string filePath = dlg.FileName;
                 SplashScreenManager.ShowForm(typeof(WaitFormSplash));
                 List<SimNodeIntegrityLog> simNodeLogList = ModelManager.Instance.CheckIntegrities();
@@ -1191,7 +1349,7 @@ namespace Pinokio.Designer
                     FloorSetup();
                     return;
                 }
-                string coupledModelName = gridViewInsertCoupledModel.GetFocusedRowCellValue(gridViewInsertCoupledModel.Columns.ElementAt(2)).ToString();
+                string coupledModelName = gridViewInsertCoupledModel.GetFocusedRowCellValue(gridViewInsertCoupledModel.Columns.ElementAt(1)).ToString();
 
                 Type nodeType = GetSimulationType(coupledModelName);
 
@@ -1283,10 +1441,21 @@ namespace Pinokio.Designer
                             }
                             else
                             {
+                                if (pinokio3DModel1.NodeReferenceByID[node.ID].Label != null)
+                                {
+                                    pinokio3DModel1.NodeReferenceByID[node.ID].Label.Text = (string)value;
+                                    pinokio3DModel1.Labels.Regen();
+                                }
+
                                 SimNodeTreeListNode treeNode = (SimNodeTreeListNode)simNodeTreeList.FindNodeByKeyID(node.ID);
                                 treeNode[simNodeTreeList.ColumnName4NodeName] = node.Name;
                                 AddUndo(eUndoRedoActionType.SimParameterModify, new List<uint>() { node.ID, }, propertyInfo.Name, oldValue, value);
                             }
+                        }
+                        else if (propertyGridControlSimObject.SelectedObject is TransportLine && fieldName == "IsTwoWay")
+                        {
+                            AddUndo(eUndoRedoActionType.SimParameterModify, new List<uint>() { node.ID, }, propertyInfo.Name, oldValue, value);
+                            pinokio3DModel1.NodeReferenceByID[node.ID].Regen(0.1);
                         }
                         else
                         {
@@ -1410,7 +1579,6 @@ namespace Pinokio.Designer
             _floorForm.RefreshGridView1();
             propertyGridControlSimObject.Refresh();
             simNodeTreeList.ClearSelection();
-
             if (_floorForm.LstFloorPlan.Count == 0)
                 return;
 
@@ -1425,8 +1593,8 @@ namespace Pinokio.Designer
             simNodeTreeList.BeforeDropNode += SimNodesTreeList_BeforeDropNode;
             simNodeTreeList.BeforeDragNode += SimNodesTreeList_BeforeDragNode;
             simNodeTreeList.AfterCheckNode += SimNodesTreeList_AfterCheckNode;
-            partTreeList.MouseClick += SimEntityTreeList_MouseClick;
-            partTreeList.AfterCheckNode += SimEntityTreeList_AfterCheckNode;
+            //partTreeList.MouseClick += SimEntityTreeList_MouseClick;
+            //partTreeList.AfterCheckNode += SimEntityTreeList_AfterCheckNode;
         }
 
         private void RemoveEventBeforeSimulation()
@@ -1472,6 +1640,8 @@ namespace Pinokio.Designer
                     bool shouldContinue = false;
 
                     SimNodeTreeListNode selectedNode = simNodeTreeList.FindNodeByKeyID(SelectedNodeReferences[i].ID) as SimNodeTreeListNode;
+                    if (selectedNode is null)
+                        return;
 
                     if (selectedNode.RefNode is RefTransportLine)      // 1. TransPortLine + Its End / Start Station Delete
                     {
@@ -1497,16 +1667,22 @@ namespace Pinokio.Designer
                             if (SelectedNodeReferences.Any(n => n.ID == (((TransportPoint)selectedNode.SimNode).InLines[j].ID)))
                             {
                                 if (((TransportPoint)selectedNode.SimNode).OutLines.Count == 0 && ((TransportPoint)selectedNode.SimNode).InLines.Count == 1)
+                                {
                                     node2Delete.Add(selectedNode.RefNode);
+                                    shouldContinue = true;
+                                    break;
+                                }
                                 else if (((TransportPoint)selectedNode.SimNode).OutLines.Count == 1 && ((TransportPoint)selectedNode.SimNode).InLines.Count == 1)
                                 {
                                     if (((TransportPoint)selectedNode.SimNode).OutLines[0] is CraneLine)
+                                    {
                                         node2Delete.Add(selectedNode.RefNode);
+                                        shouldContinue = true;
+                                        break;
+                                    }
                                 }
-                                shouldContinue = true;
-                                break;
-                            }
 
+                            }
                             //if (!(((TransportPoint)selectedNode.SimNode).InLines[j].StartPoint.InLines.Count > 0 || ((TransportPoint)selectedNode.SimNode).InLines[j].StartPoint.OutLines.Count > 1))
                             //    node2Delete.Add(pinokio3DModel1.NodeReferenceByID[((TransportPoint)selectedNode.SimNode).InLines[j].StartPoint.ID]);
 
@@ -1519,15 +1695,32 @@ namespace Pinokio.Designer
                             if (SelectedNodeReferences.Any(n => n.ID == (((TransportPoint)selectedNode.SimNode).OutLines[j].ID)))
                             {
                                 if (((TransportPoint)selectedNode.SimNode).InLines.Count == 0 && ((TransportPoint)selectedNode.SimNode).OutLines.Count == 1)
+                                {
                                     node2Delete.Add(selectedNode.RefNode);
-
-                                shouldContinue = true;
-                                break;
+                                    shouldContinue = true;
+                                    break;
+                                }
                             }
                             //if (!(((TransportPoint)selectedNode.SimNode).OutLines[j].EndPoint.InLines.Count > 1 || ((TransportPoint)selectedNode.SimNode).OutLines[j].EndPoint.OutLines.Count > 0))
                             //    node2Delete.Add(pinokio3DModel1.NodeReferenceByID[((TransportPoint)selectedNode.SimNode).OutLines[j].EndPoint.ID]);
 
                             //node2Delete.Add(pinokio3DModel1.NodeReferenceByID[((TransportPoint)selectedNode.SimNode).OutLines[j].ID]);
+                        }
+                        for (int j = 0; j < ((TransportPoint)selectedNode.SimNode).OutLines.Count; j++)
+                        {
+                            if (!SelectedNodeReferences.Any(n => n.ID == (((TransportPoint)selectedNode.SimNode).OutLines[j].ID)))
+                            {
+                                shouldContinue = true;
+                                break;
+                            }
+                        }
+                        for (int j = 0; j < ((TransportPoint)selectedNode.SimNode).InLines.Count; j++)
+                        {
+                            if (!SelectedNodeReferences.Any(n => n.ID == (((TransportPoint)selectedNode.SimNode).InLines[j].ID)))
+                            {
+                                shouldContinue = true;
+                                break;
+                            }
                         }
                         if (shouldContinue)
                             continue;
@@ -1821,7 +2014,7 @@ namespace Pinokio.Designer
             foreach (SimNode node in nodeList)
             {
                 SimNodeTreeListNode nodeHasLink = ((SimNodeTreeListNode)simNodeTreeList.FindNodeByKeyID(node.ID));
-                if (nodeHasLink.RefNode != null)
+                if (nodeHasLink != null && nodeHasLink.RefNode != null)
                 {
                     SimNode floor = node;
                     while (!(floor is Floor))
@@ -1860,7 +2053,7 @@ namespace Pinokio.Designer
                         Point3D fromPoint = new Point3D();
                         fromPoint = (refLink.FromNode.BoxMax + refLink.FromNode.BoxMin) / 2;
                         toPoint = (refLink.ToNode.BoxMax + refLink.ToNode.BoxMin) / 2;
-                        RefLink newLink = RefLink.CreateRefLink(pinokio3DModel1, refLink.LINK3DType, fromPoint, toPoint, refLink.FromNode, refLink.ToNode, refLink.Core);
+                        RefLink newLink = ((RefLink)refLink).CreateRefLink(pinokio3DModel1, fromPoint, toPoint, refLink.FromNode, refLink.ToNode, refLink.Core);
                         newLink.LayerName = refLink.FromNode.LayerName;
                         newLink.ToWay = refLink.ToWay;
                         newLink.CurrentPoint = fromPoint;
@@ -1908,9 +2101,9 @@ namespace Pinokio.Designer
         private void NewItem(bool isSnapShot)
         {
             ClearSelection();
-            if(!isSnapShot)
+            if (!isSnapShot)
                 ModelManager.Instance.init();
-            
+
             simNodeTreeList.Nodes.Clear();
             _floorForm.LstFloorPlan.Clear();
             UndoRedoData.Clear();
@@ -1920,6 +2113,9 @@ namespace Pinokio.Designer
             pinokio3DModel1.NodeReferenceByID.Clear();
             pinokio3DModel1.IDByNames.Clear();
             pinokio3DModel1.Entities.Regen();
+            dicVisibleNodeTypeInfo.Clear();
+            dicSimNodeType.Clear();
+            ChangedRefTypes.Clear();
 
             List<Block> blockList = pinokio3DModel1.Blocks.ToList();
             for (int i = blockList.Count - 1; i >= 0; i--)
@@ -1931,7 +2127,7 @@ namespace Pinokio.Designer
                 }
             }
 
-            pinokio3DModel1.Labels.Clear(); 
+            pinokio3DModel1.Labels.Clear();
             pinokio3DModel1.Invalidate();
         }
 
@@ -2111,50 +2307,72 @@ namespace Pinokio.Designer
 
             TraverseTreeListNodes(null);
 
-            bool isVisible;
+            bool isIconVisible;
+            bool isTextVisible;
+
             if (pinokio3DModel1.Entities.ToList().FirstOrDefault(x => x.GetType().Name.Contains("Picture")) != null)
             {
-                isVisible = pinokio3DModel1.Entities.ToList().Find(x => x.GetType().Name.Contains("Picture")).Visible;
+                isIconVisible = pinokio3DModel1.Entities.ToList().Find(x => x.GetType().Name.Contains("Picture")).Visible;
+
                 if (!dicVisibleNodeTypeInfo.ContainsKey("Blueprint"))
-                    dicVisibleNodeTypeInfo.Add("Blueprint", isVisible);
+                    dicVisibleNodeTypeInfo.Add("Blueprint", new Tuple<bool, bool>(isIconVisible, false));
                 else
-                    dicVisibleNodeTypeInfo["Blueprint"] = isVisible;
-            }
-            if (pinokio3DModel1.Labels.Count != 0)
-            {
-                isVisible = pinokio3DModel1.Labels[0].Visible;
-                if (!dicVisibleNodeTypeInfo.ContainsKey("Label"))
-                    dicVisibleNodeTypeInfo.Add("Label", isVisible);
-                else
-                    dicVisibleNodeTypeInfo["Label"] = isVisible;
+                    dicVisibleNodeTypeInfo["Blueprint"] = new Tuple<bool, bool>(isIconVisible, false);
             }
 
-            EditVisibleForm form = new EditVisibleForm(dicSimNodeType, dicVisibleNodeTypeInfo);
+            foreach(var kvp in dicSimNodeType)
+            {
+                NodeReference nodeReference = null;
+                uint key = kvp.Value.First().SimNode.ID;
+
+                if (pinokio3DModel1.NodeReferenceByID.TryGetValue(key, out NodeReference foundNodeReference))
+                {
+                    nodeReference = foundNodeReference;
+                }
+                
+                isIconVisible = !kvp.Value.Any(n => n.Checked == false);
+                isTextVisible = (nodeReference?.Label != null && nodeReference.Label.Visible);
+                
+
+                if (!dicVisibleNodeTypeInfo.ContainsKey(kvp.Key))
+                    dicVisibleNodeTypeInfo.Add(kvp.Key, new Tuple<bool, bool>(isIconVisible, isTextVisible));
+                else
+                    dicVisibleNodeTypeInfo[kvp.Key] = new Tuple<bool, bool>(isIconVisible, isTextVisible);
+            }
+
+            EditVisibleForm form = new EditVisibleForm(dicVisibleNodeTypeInfo);
 
             if (form.ShowDialog() == DialogResult.OK)
             {
                 dicVisibleNodeTypeInfo = form._visibleCheckedInfo;
-                #region cho 추가
+
                 if (pinokio3DModel1.Entities.ToList().FirstOrDefault(x => x.GetType().Name.Contains("Picture")) != null)
                 {
                     List<Entity> picList = pinokio3DModel1.Entities.ToList().FindAll(x => x.GetType().Name.Contains("Picture"));
                     foreach (Entity pic in picList)
                     {
-                        pic.Visible = form._visibleCheckedInfo["Blueprint"];
+                        pic.Visible = form._visibleCheckedInfo["Blueprint"].Item1;
                     }
-
                 }
-                foreach (var label in pinokio3DModel1.Labels)
-                {
-                    label.Visible = form._visibleCheckedInfo["Label"];
-                } 
-                #endregion
 
-                foreach (var visibility in form.visibilityNodes)
+                foreach (var kvp in dicVisibleNodeTypeInfo)
                 {
-                    foreach (SimNodeTreeListNode node in visibility.Value)
+                    if (kvp.Key == "Blueprint")
+                        continue;
+                    foreach (SimNodeTreeListNode node in dicSimNodeType[kvp.Key])
                     {
-                        if (node.Checked == visibility.Key)
+                        NodeReference nodeReference = null;
+                        uint key = node.SimNode.ID;
+
+                        if (pinokio3DModel1.NodeReferenceByID.TryGetValue(key, out NodeReference foundNodeReference))
+                        {
+                            nodeReference = foundNodeReference;
+                        }
+                        if (nodeReference?.Label != null)
+                        {
+                            nodeReference.Label.Visible = kvp.Value.Item2;
+                        }
+                        if (node.Checked == kvp.Value.Item1)
                             continue;
                         if (node.SimNode != null)
                         {
@@ -2166,16 +2384,16 @@ namespace Pinokio.Designer
                                 {
                                     if (pinokio3DModel1.Layers[i].Name == node.SimNode.ID.ToString())
                                     {
-                                        pinokio3DModel1.Grids[i].Visible = visibility.Key;
-                                        pinokio3DModel1.Layers[i].Visible = visibility.Key;
-                                        node.Checked = visibility.Key;
+                                        pinokio3DModel1.Grids[i].Visible = kvp.Value.Item1;
+                                        pinokio3DModel1.Layers[i].Visible = kvp.Value.Item1;
+                                        node.Checked = kvp.Value.Item1;
                                         break;
                                     }
                                 }
                             }
                         }
-                        ChildCheckIfParentCheckforVisibility(node, visibility.Key);
-                        node.Checked = visibility.Key;
+                        ChildCheckIfParentCheckforVisibility(node, kvp.Value.Item1);
+                        node.Checked = kvp.Value.Item1;
                     }
                 }
                 pinokio3DModel1.Invalidate();
@@ -2206,9 +2424,27 @@ namespace Pinokio.Designer
                     }
                     dicSimNodeType[childNode["NodeType"].ToString()].Add(childNode as SimNodeTreeListNode);
 
+                    //Node Label 추가
+                    if (pinokio3DModel1.NodeReferenceByID.TryGetValue(((SimNodeTreeListNode)childNode).SimNode.ID, out NodeReference foundNodeReference))
+                        AddToNodeLabel(foundNodeReference);
+
                     // childNode의 자식 노드들을 재귀적으로 순회합니다.
                     TraverseTreeListNodes(childNode);
                 }
+            }
+        }
+
+        public void AddToNodeLabel(NodeReference node)
+        {
+            if (node.Label == null)
+            {
+                Point3D point = node.CurrentPoint;
+
+                pinokio3DModel1.NodeReferenceByID[node.ID].Label = new LeaderAndText(point.X, point.Y, point.Z, node.Core.Name,
+                                new Font("Tahoma", 8f, FontStyle.Bold), Color.FromArgb(100, Color.Yellow), new Vector2D(10, 10));
+
+                node.Label.Visible = false;
+                pinokio3DModel1.Labels.Add(node.Label);
             }
         }
 
@@ -2230,13 +2466,13 @@ namespace Pinokio.Designer
                 foreach (var vehicle in vehicleList)
                     vehicle.UpdateVehicleInfo();
             }
-            return vehicleList;            
+            return vehicleList;
         }
 
         private void BeiDays_ShownEditor(object sender, DevExpress.XtraBars.ItemClickEventArgs e)
         {
             BeiDays.Manager.ActiveEditor.KeyPress += new KeyPressEventHandler(ActiveEditor_KeyPress);
-        }      
+        }
 
         private void BeiHours_ShownEditor(object sender, DevExpress.XtraBars.ItemClickEventArgs e)
         {
@@ -2244,7 +2480,7 @@ namespace Pinokio.Designer
         }
 
         private void BeiMinutes_ShownEditor(object sender, DevExpress.XtraBars.ItemClickEventArgs e)
-        {           
+        {
             BeiMinutes.Manager.ActiveEditor.KeyPress += new KeyPressEventHandler(ActiveEditor_KeyPress);
         }
 
@@ -2346,7 +2582,7 @@ namespace Pinokio.Designer
 
                     if (currentStation.UTB != null)
                     {
-                        for (int j = i+1; j < lineStations.Count; j++)
+                        for (int j = i + 1; j < lineStations.Count; j++)
                         {
                             if (lineStations[j].UTB == null)
                             {
@@ -2369,21 +2605,21 @@ namespace Pinokio.Designer
                         else
                         {
                             int idx = i;
-                            for (int k = idx + 1; k < lineStations.Count; k ++)
+                            for (int k = idx + 1; k < lineStations.Count; k++)
                             {
                                 if (lineStations[k].UTB == null)
-                                { 
-                                    nextStation = lineStations[k]; 
-                                    break; 
+                                {
+                                    nextStation = lineStations[k];
+                                    break;
                                 }
                                 else
                                     ;
                             }
                             bay.BumpingStations.Add(currentStation, nextStation);
                         }
-                    }                    
+                    }
                 }
-                
+
                 bay.NeighborBay = tempBaysForInLines;
                 bay.ToLines = ToLines;
                 bay.FromLines = FromLines;
@@ -2448,7 +2684,7 @@ namespace Pinokio.Designer
             if (depth == 0)
                 path = new List<OHTLine>();
 
-            
+
 
             if (depth >= 4)
             {
@@ -2462,7 +2698,7 @@ namespace Pinokio.Designer
                 }
                 return;
             }
-               
+
             if (isInLines)
             {
                 foreach (OHTLine deeperInLine in searchLine.StartPoint.InLines)
@@ -2530,17 +2766,12 @@ namespace Pinokio.Designer
                 ModelManager.Instance.SimulationEnd -= new deleSimulationEnd(SimulationEnd);
                 ModelManager.Instance.FailSimulation -= new deleFaliSimulation(FaliSimulation);
                 ModelManager.Instance.AnimationNode.AnimationEvent -= this.AnimationEvent;
-                ModelManager.Instance.TimeNode.SimTimeGetEvent -= this.SimTimeEvent;
-                Pinokio3Dmodel.DelegateAddPartReference -= new deleAlarmAddPartReference(ModifyEntityTreeList);
-                Pinokio3Dmodel.DelegateRemovePartReference -= new deleAlarmRemovePartReference(DeletePartReference);
                 //(new Simulator()).OnStartSimulation -= Simulator_OnStartSimulation;
                 simNodeTreeList.AfterDropNode -= SimNodesTreeList_AfterDropNode;
                 simNodeTreeList.MouseClick -= SimNodesTreeList_MouseClick;
                 simNodeTreeList.BeforeDropNode -= SimNodesTreeList_BeforeDropNode;
                 simNodeTreeList.BeforeDragNode -= SimNodesTreeList_BeforeDragNode;
                 simNodeTreeList.AfterCheckNode -= SimNodesTreeList_AfterCheckNode;
-                partTreeList.MouseClick -= SimEntityTreeList_MouseClick;
-                partTreeList.AfterCheckNode -= SimEntityTreeList_AfterCheckNode;
 
                 ModelManager.Instance.SnapShotModelDBPath = dlg.FileName.Replace("dat", "accdb");
                 SnapShotManager snapShotManager = new SnapShotManager(ModelManager.Instance, FactoryManager.Instance, SimEngine.Instance, ModelManager.Instance.SnapShotModelDBPath);
@@ -2555,18 +2786,12 @@ namespace Pinokio.Designer
                 ModelManager.Instance.SimulationEnd += new deleSimulationEnd(SimulationEnd);
                 ModelManager.Instance.FailSimulation += new deleFaliSimulation(FaliSimulation);
                 ModelManager.Instance.AnimationNode.AnimationEvent += this.AnimationEvent;
-                ModelManager.Instance.TimeNode.SimTimeGetEvent += this.SimTimeEvent;
-                Pinokio3Dmodel.DelegateAddPartReference += new deleAlarmAddPartReference(ModifyEntityTreeList);
-                Pinokio3Dmodel.DelegateRemovePartReference += new deleAlarmRemovePartReference(DeletePartReference);
                 //(new Simulator()).OnStartSimulation += Simulator_OnStartSimulation;
                 simNodeTreeList.AfterDropNode += SimNodesTreeList_AfterDropNode;
                 simNodeTreeList.MouseClick += SimNodesTreeList_MouseClick;
                 simNodeTreeList.BeforeDropNode += SimNodesTreeList_BeforeDropNode;
                 simNodeTreeList.BeforeDragNode += SimNodesTreeList_BeforeDragNode;
                 simNodeTreeList.AfterCheckNode += SimNodesTreeList_AfterCheckNode;
-                partTreeList.MouseClick += SimEntityTreeList_MouseClick;
-                partTreeList.AfterCheckNode += SimEntityTreeList_AfterCheckNode;
-
 
                 string filePath = ModelManager.Instance.SnapShotModelDBPath;
                 SplashScreenManager.ShowForm(typeof(WaitFormSplash));
@@ -2583,23 +2808,6 @@ namespace Pinokio.Designer
             }
         }
 
-        private void bbiLoadSnapShotLayout_ItemClick(object sender, DevExpress.XtraBars.ItemClickEventArgs e)
-        {
-            Stopwatch stopwatch = new Stopwatch();
-            stopwatch.Start();
-            stopwatch.Stop();
-            Console.WriteLine("Load: " + stopwatch.ElapsedMilliseconds);
-        }
-
-        private void bbiSaveSnapShotLayout_ItemClick(object sender, DevExpress.XtraBars.ItemClickEventArgs e)
-        {
-            SaveFileDialog dlg = new SaveFileDialog();
-            dlg.Filter = "Access File (*.accdb)|*.accdb|Xml File (*.xml)|*.xml";
-            if (dlg.ShowDialog() == DialogResult.OK)
-            {
-
-            }
-        }
         //private void AutoZCUSetting()
         //{
         //    try

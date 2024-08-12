@@ -118,6 +118,7 @@ namespace Pinokio.Designer
             this.gridViewSelectedNodeList.Name = "gridViewSelectedNodeList";
             this.gridViewSelectedNodeList.OptionsSelection.MultiSelect = true;
             this.gridViewSelectedNodeList.OptionsSelection.MultiSelectMode = DevExpress.XtraGrid.Views.Grid.GridMultiSelectMode.CheckBoxRowSelect;
+            this.gridViewSelectedNodeList.CustomRowCellEdit += new DevExpress.XtraGrid.Views.Grid.CustomRowCellEditEventHandler(this.gridViewSelectedNodeList_CustomRowCellEdit);
             // 
             // sbCancel
             // 
@@ -155,6 +156,7 @@ namespace Pinokio.Designer
             this.gridViewNodeTypeList.GridControl = this.gridControlNodeTypeList;
             this.gridViewNodeTypeList.Name = "gridViewNodeTypeList";
             this.gridViewNodeTypeList.OptionsBehavior.AllowAddRows = DevExpress.Utils.DefaultBoolean.True;
+            this.gridViewNodeTypeList.CellValueChanging += new DevExpress.XtraGrid.Views.Base.CellValueChangedEventHandler(this.gridViewNodeTypeList_CellValueChanging);
             // 
             // Root
             // 

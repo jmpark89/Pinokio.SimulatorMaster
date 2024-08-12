@@ -514,6 +514,7 @@
       <DependentUpon>IntegrityTestForm.cs</DependentUpon>
     </Compile>
     <Compile Include="UI\PropertyEditor\AddPoductEditor.cs" />
+    <Compile Include="UI\PropertyEditor\ProcessingTimeEditor.cs" />
     <Compile Include="UI\PropertyEditor\SelectBreakDownEqpEditor.cs" />
     <Compile Include="UI\PropertyEditor\StepInOutProductsEditor.cs" />
     <Compile Include="UI\PropertyEditor\EqpsEditor.cs" />
@@ -539,6 +540,12 @@
     </Compile>
     <Compile Include="UI\PropertyUI\EditNodesDlg.Designer.cs">
       <DependentUpon>EditNodesDlg.cs</DependentUpon>
+    </Compile>
+    <Compile Include="UI\PropertyUI\EditProcessingTimeDlg.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="UI\PropertyUI\EditProcessingTimeDlg.Designer.cs">
+      <DependentUpon>EditProcessingTimeDlg.cs</DependentUpon>
     </Compile>
     <Compile Include="UI\PropertyUI\EditProductDlg.cs">
       <SubType>Form</SubType>
@@ -705,6 +712,9 @@
     </EmbeddedResource>
     <EmbeddedResource Include="UI\PropertyUI\EditNodesDlg.resx">
       <DependentUpon>EditNodesDlg.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="UI\PropertyUI\EditProcessingTimeDlg.resx">
+      <DependentUpon>EditProcessingTimeDlg.cs</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="UI\PropertyUI\EditProductDlg.resx">
       <DependentUpon>EditProductDlg.cs</DependentUpon>

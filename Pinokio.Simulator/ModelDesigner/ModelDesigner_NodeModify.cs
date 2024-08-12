@@ -90,16 +90,6 @@ namespace Pinokio.Designer
             }
         }
 
-        private void DeletePartReference(PartReference EntityReference)
-        {
-            if (ModelManager.Instance.AnimationNode != null && ModelManager.Instance.AnimationNode.IsUse)
-                partTreeList.BeginInvoke(new Action(() =>
-                {
-                    PartTreeListNode treeNode = (PartTreeListNode)partTreeList.FindNodeByKeyID(EntityReference.ID);
-                    partTreeList.DeleteNode(treeNode);
-                }));
-        }
-
         private void CutNode()
         {
             if (SelectedNodeReferences.Count == 0)  // if no node selected, function does not work

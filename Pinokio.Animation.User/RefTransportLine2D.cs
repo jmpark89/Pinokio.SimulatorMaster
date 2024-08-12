@@ -43,8 +43,8 @@ namespace Pinokio.Animation.User
         {
             try
             {
-                AnimationModelManager.CreateCylinder(_blockName, model, 1, 10, System.Drawing.Color.DodgerBlue);
-                AnimationModelManager.CreateCylinder(InnerBlockName, model, 1, 10, System.Drawing.Color.DodgerBlue);
+                AnimationModelManager.CreateCylinder(_blockName, model, 1, 15, System.Drawing.Color.DodgerBlue);
+                AnimationModelManager.CreateCylinder(InnerBlockName, model, 1, 15, System.Drawing.Color.DodgerBlue);
             }
             catch (Exception ex)
             {
@@ -63,10 +63,13 @@ namespace Pinokio.Animation.User
             start = new Point3D(0, 0, 0);
             Point3D registrationPoint = ((start + end) / 2);
 
-            Mesh mes = Mesh.CreateArrow(start, new Vector3D(start, end), 10, Point3D.Distance(start, end), 10, 10, 32, Mesh.natureType.ColorPlain, Mesh.edgeStyleType.None);
+            Mesh mes = Mesh.CreateArrow(start, new Vector3D(start, end), 15, Point3D.Distance(start, end), 10, 10, 32, Mesh.natureType.ColorPlain, Mesh.edgeStyleType.None);
             mes.Translate(-registrationPoint.X, -registrationPoint.Y, -registrationPoint.Z);
             mes.ApplyMaterial("RealWhite", textureMappingType.Cubic, 1, 1);
             mes.Color = System.Drawing.Color.Red;
+
+            //Mesh arrow = Mesh.Create
+
             linkBlock.Entities.Add(mes);
 
             return linkBlock;

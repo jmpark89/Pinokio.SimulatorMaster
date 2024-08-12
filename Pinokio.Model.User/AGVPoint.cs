@@ -8,6 +8,7 @@ using Pinokio.Model.Base;
 
 namespace Pinokio.Model.User
 {
+    [Serializable]
     public class AGVPoint : TransportPoint
     {
         private string _zcuName = string.Empty;
@@ -173,9 +174,11 @@ namespace Pinokio.Model.User
 
         public override void InitializeNode(EventCalendar evtCal)
         {
+            _lstStopEvent = new List<SimPort>();
+            zcuStopNResetLines = new List<AGVLine>();
             base.InitializeNode(evtCal);
 
-            if(Zcu != null)
+            if (Zcu != null)
                 Zcu.SetLines();
         }
 

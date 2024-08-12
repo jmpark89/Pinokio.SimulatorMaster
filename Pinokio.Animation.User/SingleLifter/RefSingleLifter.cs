@@ -38,7 +38,7 @@ namespace Pinokio.Animation.User
             get
             {
                 if (_usableSimNodeTypes == null)
-                    _usableSimNodeTypes = BaseUtill.GetUsableSimNodeTypes(UsableBaseSimNodeType);
+                    _usableSimNodeTypes = BaseUtill.GetUsableSimNodeTypes(UsableBaseSimNodeType, InterfaceConstraints);
 
                 return _usableSimNodeTypes;
             }

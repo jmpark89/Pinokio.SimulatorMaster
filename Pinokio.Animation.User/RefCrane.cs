@@ -27,6 +27,23 @@ namespace Pinokio.Animation.User
     {
         public new static bool IsInserted = true;
 
+        [Browsable(false), StorableAttribute(false)]
+        public new static string[] UsableBaseSimNodeType = {typeof(Crane).Name};
+
+        [Browsable(false), StorableAttribute(false)]
+        private static List<string> _usableSimNodeTypes;
+
+        public new static List<string> UsableSimNodeTypes
+        {
+            get
+            {
+                if (_usableSimNodeTypes == null)
+                    _usableSimNodeTypes = BaseUtill.GetUsableSimNodeTypes(UsableBaseSimNodeType, InterfaceConstraints);
+
+                return _usableSimNodeTypes;
+            }
+        }
+
         public new static double InitialHeight = 0;
 
         public RefCrane() : base(nameof(RefCrane))
@@ -155,7 +172,7 @@ namespace Pinokio.Animation.User
                 if (entityIndex >= 0)
                     refNode = (NodeReference)model.Entities[entityIndex];
 
-                if (refNode == null && LineID != 0)
+                if ((refNode == null || refNode is RefTransportPoint) && LineID != 0)
                     refNode = model.NodeReferenceByID[LineID];
 
                 if (refNode is RefTransportLine && refNode.Core is GuidedLine)
@@ -238,7 +255,8 @@ namespace Pinokio.Animation.User
 
         public override void UpdatePos()
         {
-            if (StockerCrane != null)
+            if (StockerCrane != null && SimEngine.Instance.EngineState is ENGINE_STATE.STOP
+                || (ModelManager.Instance.AnimationNode != null && ModelManager.Instance.AnimationNode.IsUse))
             {
                 PVector3 pos = new PVector3(0, 0, 0);
                 double[,] rotateMatrix = StockerCrane.RotateMatrix;

@@ -23,7 +23,30 @@ namespace Pinokio.Animation.User
         
         // Is this object Inserted ?
         public static bool IsInserted = true;
-        
+
+        [Browsable(false), StorableAttribute(false)]
+        public new static string[] UsableBaseSimNodeType =
+    {
+            typeof(Equipment).Name,
+            typeof(Stay).Name,
+            typeof(Diverter).Name
+        };
+
+        [Browsable(false), StorableAttribute(false)]
+        private static List<string> _usableSimNodeTypes;
+
+        [Browsable(false), StorableAttribute(false)]
+        public new static List<string> UsableSimNodeTypes
+        {
+            get
+            {
+                if (_usableSimNodeTypes == null)
+                    _usableSimNodeTypes = BaseUtill.GetUsableSimNodeTypes(UsableBaseSimNodeType, InterfaceConstraints);
+
+                return _usableSimNodeTypes;
+            }
+        }
+
         public RefRobotArm(string blockName) : 
                 base(blockName)
         {

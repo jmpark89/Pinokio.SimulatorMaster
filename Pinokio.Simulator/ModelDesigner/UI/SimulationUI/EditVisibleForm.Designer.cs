@@ -30,15 +30,16 @@ namespace Pinokio.Designer
         private void InitializeComponent()
         {
             this.layoutControl1 = new DevExpress.XtraLayout.LayoutControl();
+            this.simpleButton2 = new DevExpress.XtraEditors.SimpleButton();
+            this.simpleButton1 = new DevExpress.XtraEditors.SimpleButton();
             this.gridControlEditVisible = new DevExpress.XtraGrid.GridControl();
             this.gridViewEditVisible = new DevExpress.XtraGrid.Views.Grid.GridView();
             this.gridColumnVisible = new DevExpress.XtraGrid.Columns.GridColumn();
+            this.gridColumnText = new DevExpress.XtraGrid.Columns.GridColumn();
             this.gridColumnNodeType = new DevExpress.XtraGrid.Columns.GridColumn();
             this.Root = new DevExpress.XtraLayout.LayoutControlGroup();
             this.layoutControlItem1 = new DevExpress.XtraLayout.LayoutControlItem();
-            this.simpleButton1 = new DevExpress.XtraEditors.SimpleButton();
             this.layoutControlItem2 = new DevExpress.XtraLayout.LayoutControlItem();
-            this.simpleButton2 = new DevExpress.XtraEditors.SimpleButton();
             this.layoutControlItem3 = new DevExpress.XtraLayout.LayoutControlItem();
             ((System.ComponentModel.ISupportInitialize)(this.layoutControl1)).BeginInit();
             this.layoutControl1.SuspendLayout();
@@ -63,6 +64,26 @@ namespace Pinokio.Designer
             this.layoutControl1.TabIndex = 0;
             this.layoutControl1.Text = "layoutControl1";
             // 
+            // simpleButton2
+            // 
+            this.simpleButton2.Location = new System.Drawing.Point(161, 447);
+            this.simpleButton2.Name = "simpleButton2";
+            this.simpleButton2.Size = new System.Drawing.Size(147, 22);
+            this.simpleButton2.StyleController = this.layoutControl1;
+            this.simpleButton2.TabIndex = 6;
+            this.simpleButton2.Text = "Cancel";
+            this.simpleButton2.Click += new System.EventHandler(this.simpleButton2_Click);
+            // 
+            // simpleButton1
+            // 
+            this.simpleButton1.Location = new System.Drawing.Point(12, 447);
+            this.simpleButton1.Name = "simpleButton1";
+            this.simpleButton1.Size = new System.Drawing.Size(145, 22);
+            this.simpleButton1.StyleController = this.layoutControl1;
+            this.simpleButton1.TabIndex = 5;
+            this.simpleButton1.Text = "OK";
+            this.simpleButton1.Click += new System.EventHandler(this.simpleButton1_Click);
+            // 
             // gridControlEditVisible
             // 
             this.gridControlEditVisible.Location = new System.Drawing.Point(12, 12);
@@ -77,9 +98,11 @@ namespace Pinokio.Designer
             // 
             this.gridViewEditVisible.Columns.AddRange(new DevExpress.XtraGrid.Columns.GridColumn[] {
             this.gridColumnVisible,
+            this.gridColumnText,
             this.gridColumnNodeType});
             this.gridViewEditVisible.GridControl = this.gridControlEditVisible;
             this.gridViewEditVisible.Name = "gridViewEditVisible";
+            this.gridViewEditVisible.CellValueChanging += new DevExpress.XtraGrid.Views.Base.CellValueChangedEventHandler(this.gridViewEditVisible_CellValueChanging);
             // 
             // gridColumnVisible
             // 
@@ -88,7 +111,16 @@ namespace Pinokio.Designer
             this.gridColumnVisible.Name = "gridColumnVisible";
             this.gridColumnVisible.Visible = true;
             this.gridColumnVisible.VisibleIndex = 0;
-            this.gridColumnVisible.Width = 61;
+            this.gridColumnVisible.Width = 47;
+            // 
+            // gridColumnText
+            // 
+            this.gridColumnText.Caption = "Text";
+            this.gridColumnText.FieldName = "Text";
+            this.gridColumnText.Name = "gridColumnText";
+            this.gridColumnText.Visible = true;
+            this.gridColumnText.VisibleIndex = 1;
+            this.gridColumnText.Width = 48;
             // 
             // gridColumnNodeType
             // 
@@ -96,8 +128,8 @@ namespace Pinokio.Designer
             this.gridColumnNodeType.FieldName = "NodeType";
             this.gridColumnNodeType.Name = "gridColumnNodeType";
             this.gridColumnNodeType.Visible = true;
-            this.gridColumnNodeType.VisibleIndex = 1;
-            this.gridColumnNodeType.Width = 210;
+            this.gridColumnNodeType.VisibleIndex = 2;
+            this.gridColumnNodeType.Width = 176;
             // 
             // Root
             // 
@@ -120,16 +152,6 @@ namespace Pinokio.Designer
             this.layoutControlItem1.TextSize = new System.Drawing.Size(0, 0);
             this.layoutControlItem1.TextVisible = false;
             // 
-            // simpleButton1
-            // 
-            this.simpleButton1.Location = new System.Drawing.Point(12, 447);
-            this.simpleButton1.Name = "simpleButton1";
-            this.simpleButton1.Size = new System.Drawing.Size(145, 22);
-            this.simpleButton1.StyleController = this.layoutControl1;
-            this.simpleButton1.TabIndex = 5;
-            this.simpleButton1.Text = "OK";
-            this.simpleButton1.Click += new System.EventHandler(this.simpleButton1_Click);
-            // 
             // layoutControlItem2
             // 
             this.layoutControlItem2.Control = this.simpleButton1;
@@ -138,16 +160,6 @@ namespace Pinokio.Designer
             this.layoutControlItem2.Size = new System.Drawing.Size(149, 26);
             this.layoutControlItem2.TextSize = new System.Drawing.Size(0, 0);
             this.layoutControlItem2.TextVisible = false;
-            // 
-            // simpleButton2
-            // 
-            this.simpleButton2.Location = new System.Drawing.Point(161, 447);
-            this.simpleButton2.Name = "simpleButton2";
-            this.simpleButton2.Size = new System.Drawing.Size(147, 22);
-            this.simpleButton2.StyleController = this.layoutControl1;
-            this.simpleButton2.TabIndex = 6;
-            this.simpleButton2.Text = "Cancel";
-            this.simpleButton2.Click += new System.EventHandler(this.simpleButton2_Click);
             // 
             // layoutControlItem3
             // 
@@ -191,5 +203,6 @@ namespace Pinokio.Designer
         private DevExpress.XtraEditors.SimpleButton simpleButton1;
         private DevExpress.XtraLayout.LayoutControlItem layoutControlItem2;
         private DevExpress.XtraLayout.LayoutControlItem layoutControlItem3;
+        private DevExpress.XtraGrid.Columns.GridColumn gridColumnText;
     }
 }

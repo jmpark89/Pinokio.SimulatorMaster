@@ -10,6 +10,7 @@ using System.Linq;
 
 namespace Pinokio.Model.User
 {
+    [Serializable]
     public class CraneLine : GuidedLine, IPlaybackSave
     {
         [Browsable(true), StorableAttribute(true)]

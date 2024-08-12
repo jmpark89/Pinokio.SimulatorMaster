@@ -9,6 +9,7 @@ using System.Threading.Tasks;
 
 namespace Pinokio.Model.User
 {
+    [Serializable]
     public class Stocker : CoupledModel
     {
         [Browsable(false), StorableAttribute(false)]

@@ -45,15 +45,13 @@ namespace Pinokio.Animation.User
 
         public static void CreateBlock(PinokioBaseModel model, params object[] objects)
         {
-
-            Block block = NodeReference.LoadModelFile("C:\\Carlo\\Pinokio\\Pinokio.Asset\\ohs.obj", nameof(RefCSC), model);
+            Block block = LoadModelFile("C:\\Carlo\\Pinokio\\Pinokio.Asset\\ohs.obj", nameof(RefCSC), model);
 
             foreach (Entity ent in block.Entities)
             {
                 ent.Rotate(Math.PI / 2, new Vector3D(0, 0, 1));
                 ent.Scale(0.65);
                 ent.Translate(0, 0, ent.BoxSize.Z / 2 - 1500);
-                ent.ColorMethod = colorMethodType.byParent;
             }
 
             model.Blocks.Add(block);

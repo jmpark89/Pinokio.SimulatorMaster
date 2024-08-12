@@ -13,6 +13,7 @@ using Pinokio.Model.Base;
 
 namespace Pinokio.Model.User
 {
+    [Serializable]
     public class UserSimResultDBManager : SimResultDBManager
     {       
         public UserSimResultDBManager()

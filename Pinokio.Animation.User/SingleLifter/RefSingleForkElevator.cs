@@ -27,6 +27,22 @@ namespace Pinokio.Animation.User
     {
         public new static bool IsInserted = true;
 
+        [Browsable(false), StorableAttribute(false)]
+        public new static string[] UsableBaseSimNodeType = { typeof(Elevator).Name };
+
+        [Browsable(false), StorableAttribute(false)]
+        private static List<string> _usableSimNodeTypes;
+
+        public new static List<string> UsableSimNodeTypes
+        {
+            get
+            {
+                if (_usableSimNodeTypes == null)
+                    _usableSimNodeTypes = BaseUtill.GetUsableSimNodeTypes(UsableBaseSimNodeType, InterfaceConstraints);
+
+                return _usableSimNodeTypes;
+            }
+        }
         public new static double InitialHeight = 0;
 
         private double _lifterDirection = 0;

@@ -11,6 +11,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Forms;
+using Pinokio.Model.Base;
 
 namespace Pinokio.Designer
 {
@@ -34,18 +35,20 @@ namespace Pinokio.Designer
             this.FormClosed += new FormClosedEventHandler(StepInOutProductsModal_FormClosed);
         }
 
-        public void InitializeProductDatas(Dictionary<uint, uint> productCounts, List<ProductData> products)
+        public void InitializeProductDatas(Dictionary<uint, Tuple<uint, UNIT_TYPE>> productCounts, List<ProductData> products)
         {
             try
             {
                 InOutProductDatas = new BindingList<InOutProductData>();
                 CandidatedProductDatas = new BindingList<InOutProductData>();
-                foreach (ProductData pd  in products)
+                foreach (ProductData pd in products)
                 {
                     InOutProductData newPD = new InOutProductData(pd);
                     if (productCounts.ContainsKey(newPD.ProductID))
                     {
-                        newPD.Count = productCounts[newPD.ProductID];
+                        newPD.Value = productCounts[newPD.ProductID].Item1;
+                        newPD.UnitType = productCounts[newPD.ProductID].Item2;
+
                         InOutProductDatas.Add(newPD);
                     }
                     else
@@ -152,7 +155,7 @@ namespace Pinokio.Designer
         }
         private void StepInOutProductsModal_FormClosed(object sender, FormClosedEventArgs e)
         {
-            if (MyFormClosed != null)
+            if (MyFormClosed != null && this.DialogResult != DialogResult.Cancel)
             {
                 MyFormClosed(this, e);
             }

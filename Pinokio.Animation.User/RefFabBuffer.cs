@@ -37,7 +37,7 @@ namespace Pinokio.Animation.User
             get
             {
                 if (_usableSimNodeTypes == null)
-                    _usableSimNodeTypes = BaseUtill.GetUsableSimNodeTypes(UsableBaseSimNodeType);
+                    _usableSimNodeTypes = BaseUtill.GetUsableSimNodeTypes(UsableBaseSimNodeType, InterfaceConstraints);
 
                 return _usableSimNodeTypes;
             }
@@ -51,13 +51,12 @@ namespace Pinokio.Animation.User
             try
             {
                 Block bl = new Block(System.Reflection.MethodBase.GetCurrentMethod().DeclaringType.Name);
-                double l = 1000;
-                double hegith = 1000;
+                double l = 200;
+                double hegith = 200;
                 Entity buffer = Mesh.CreateBox(l, l, hegith);
                 buffer.Translate(-buffer.BoxSize.X / 2, -buffer.BoxSize.Y / 2, 0);
                 buffer.ColorMethod = colorMethodType.byParent;
                 buffer.Color = System.Drawing.Color.LightGray;
-                buffer.Scale(0.2);
                 bl.Entities.Add(buffer);
                 model.Blocks.Add(bl);
             }

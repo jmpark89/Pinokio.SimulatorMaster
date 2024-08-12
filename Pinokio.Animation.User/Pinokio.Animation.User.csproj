@@ -120,6 +120,7 @@
     <Compile Include="RefPalette.cs" />
     <Compile Include="RefRobotArm.cs" />
     <Compile Include="RefSingleStocker.cs" />
+    <Compile Include="RefTrain.cs" />
     <Compile Include="RefTransportLine2D.cs" />
     <Compile Include="RefContainer_v2_L2.cs" />
     <Compile Include="Reffence2.cs" />

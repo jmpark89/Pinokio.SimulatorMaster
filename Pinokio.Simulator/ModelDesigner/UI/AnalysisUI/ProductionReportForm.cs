@@ -23,6 +23,7 @@ using Pinokio.Model.Base;
 using Pinokio.Animation;
 using Link = DevExpress.XtraPrinting.Link;
 using Pinokio.UI.Base;
+using Logger;
 
 namespace Pinokio.Designer
 {
@@ -99,6 +100,24 @@ namespace Pinokio.Designer
             ModelManager.Instance.SimResultDBManager.SelectNodeNameInout(isLoad);
             ModelManager.Instance.SimResultDBManager.SelectGroupNameInEqpPlans(isLoad);
 
+
+            if(_selectedStepEqpNames.Count == 0)
+                _selectedStepEqpNames.AddRange(ModelManager.Instance.SimResultDBManager.EqpNames);
+            if (_selectedStepNames.Count == 0)
+                _selectedStepNames.AddRange(ModelManager.Instance.SimResultDBManager.EqpStepNames);
+            if (_selectedProductNames.Count == 0)
+                _selectedProductNames.AddRange(ModelManager.Instance.SimResultDBManager.ProductNames);
+            if (_selectedStepGroupByNames.Count == 0)
+                _selectedStepGroupByNames.AddRange(ModelManager.Instance.SimResultDBManager.StepGroupNames);
+            if (_selectedEqpGroupNames.Count == 0)
+                _selectedEqpGroupNames.AddRange(ModelManager.Instance.SimResultDBManager.EqpGroupNames);
+            if (_selectedStepGroupNames.Count == 0)
+                _selectedStepGroupNames.AddRange(ModelManager.Instance.SimResultDBManager.EqpNames);
+            if (_selectedProductInoutNames.Count == 0)
+                _selectedProductInoutNames.AddRange(ModelManager.Instance.SimResultDBManager.ProductNames);
+            if (_selectedNodeInoutNames.Count == 0)
+                _selectedNodeInoutNames.AddRange(ModelManager.Instance.SimResultDBManager.NodeInoutNames);
+
             if (isLoad)
             {
                 _simStartTime = ModelManager.Instance.SimResultDBManager.LoadedSimulationStartTime;
@@ -135,15 +154,6 @@ namespace Pinokio.Designer
 
             pinokio3DModel1 = pinokio3DModel;
             _modelDesigner = modelDesigner;
-
-            foreach (string eqpName in ModelManager.Instance.SimResultDBManager.EqpNames)
-            {
-                _selectedStepEqpNames.Add(eqpName);
-            }
-            foreach (string nodeName in ModelManager.Instance.SimResultDBManager.NodeInoutNames)
-            {
-                _selectedNodeInoutNames.Add(nodeName);
-            }
         }
 
         private void btnSearch_Click(object sender, EventArgs e)
@@ -188,14 +198,16 @@ namespace Pinokio.Designer
 
         private void btnInquiryTarget_Click(object sender, EventArgs e)
         {
-            _selectedStepNames.Clear();
-            _selectedProductNames.Clear();
-            _selectedStepEqpNames.Clear();
-            _selectedStepGroupNames.Clear();
-            _selectedEqpGroupNames.Clear();
-            _selectedNodeInoutNames.Clear();
-            _selectedProductInoutNames.Clear();
-            _isGroupCheck = false;
+            try
+            {
+                //_selectedStepNames.Clear();
+                //_selectedProductNames.Clear();
+                //_selectedStepEqpNames.Clear();
+                //_selectedStepGroupNames.Clear();
+                //_selectedEqpGroupNames.Clear();
+                //_selectedNodeInoutNames.Clear();
+                //_selectedProductInoutNames.Clear();
+                _isGroupCheck = false;
 
             ProductionInquiryTargetForm targetForm = new ProductionInquiryTargetForm(this);
             targetForm.StartPosition = FormStartPosition.Manual;
@@ -209,16 +221,19 @@ namespace Pinokio.Designer
                 {
                     case 0:
                         if (_isStep) {
+                            _selectedStepNames.Clear();
                             foreach (var item in targetForm.checkedListBox.CheckedItems)
                                 _selectedStepNames.Add(item.ToString()); 
                         }
                         else if (_isProduct)
                         {
+                            _selectedProductNames.Clear();
                             foreach (var item in targetForm.checkedListBox.CheckedItems)
                                 _selectedProductNames.Add(item.ToString());
                         }
                         else
                         {
+                            _selectedStepEqpNames.Clear();
                             foreach (var item in targetForm.checkedListBox.CheckedItems)
                                 _selectedStepEqpNames.Add(item.ToString());
                         }
@@ -245,11 +260,13 @@ namespace Pinokio.Designer
                     case 2:
                         if (_isNode)
                         {
+                            _selectedNodeInoutNames.Clear();
                             foreach (var item in targetForm.checkedListBox.CheckedItems)
                                 _selectedNodeInoutNames.Add(item.ToString());
                         }
                         else
                         {
+                            _selectedProductInoutNames.Clear();
                             foreach (var item in targetForm.checkedListBox.CheckedItems)
                                 _selectedProductInoutNames.Add(item.ToString());
                         }
@@ -258,37 +275,50 @@ namespace Pinokio.Designer
                         break;
                 }
             }
+            }
+            catch (Exception ex)
+            {
+                throw;
+            }
         }
+
         private void btnGroupInquiryTarget_Click(object sender, EventArgs e)
         {
-            _selectedEqpGroupNames.Clear();
-            _selectedStepGroupNames.Clear();
-            _isGroupCheck = true;
-            ProductionInquiryTargetForm targetForm = new ProductionInquiryTargetForm(this);
-            targetForm.StartPosition = FormStartPosition.Manual;
-            Point p = GetInquiryTargetForm().PointToScreen(new Point(GetInquiryTargetForm().Width, 0));
-            targetForm.SetDesktopLocation(p.X, p.Y);
-            
-
-            if (targetForm.ShowDialog() == DialogResult.OK)
+            try
             {
-                if (_isGroupCheck)
+                _isGroupCheck = true;
+                ProductionInquiryTargetForm targetForm = new ProductionInquiryTargetForm(this);
+                targetForm.StartPosition = FormStartPosition.Manual;
+                Point p = GetInquiryTargetForm().PointToScreen(new Point(GetInquiryTargetForm().Width, 0));
+                targetForm.SetDesktopLocation(p.X, p.Y);
+
+
+                if (targetForm.ShowDialog() == DialogResult.OK)
                 {
-                    if (_isEqpGroup && _selectedEqpGroupByNames.Count >= 1)
+                    if (_isGroupCheck)
                     {
-                        foreach (var item in targetForm.checkedListBox.CheckedItems)
+                        if (_isEqpGroup && _selectedEqpGroupByNames.Count >= 1)
                         {
-                            _selectedStepGroupNames.Add(item.ToString());
+                            _selectedEqpGroupNames.Clear();
+                            foreach (var item in targetForm.checkedListBox.CheckedItems)
+                            {
+                                _selectedEqpGroupNames.Add(item.ToString());
+                            }
                         }
-                    }
-                    else if (!_isEqpGroup && _selectedStepGroupByNames.Count >= 1)
-                    {
-                        foreach (var item in targetForm.checkedListBox.CheckedItems)
+                        else if (!_isEqpGroup && _selectedStepGroupByNames.Count >= 1)
                         {
-                            _selectedEqpGroupNames.Add(item.ToString());
+                            _selectedStepGroupNames.Clear();
+                            foreach (var item in targetForm.checkedListBox.CheckedItems)
+                            {
+                                _selectedStepGroupNames.Add(item.ToString());
+                            }
                         }
                     }
                 }
+            }
+            catch (Exception ex)
+            {
+                ErrorLogger.SaveLog(ex);
             }
         }
 
@@ -399,7 +429,7 @@ namespace Pinokio.Designer
                         }
                         else if (_isGroupCheck &&!_isEqpGroup)
                         {
-                            eqpSteps = ModelManager.Instance.SimResultDBManager.SelectEqpStepLog(fromTime, toTime, _selectedStepGroupByNames, _selectedEqpGroupNames, _loadReport, _isEqpGroup, _isGroupCheck);
+                            eqpSteps = ModelManager.Instance.SimResultDBManager.SelectEqpStepLog(fromTime, toTime, _selectedStepGroupByNames, _selectedStepGroupNames, _loadReport, _isEqpGroup, _isGroupCheck);
                             eqpSteps = eqpSteps.OrderBy(x => x.Key.ActivatedDateTime).ToDictionary(pair => pair.Key, pair => pair.Value);
                             foreach (EqpStep eqpPlan in eqpSteps.Keys)
                             {
@@ -579,9 +609,12 @@ namespace Pinokio.Designer
                                         {
                                             inputTimeData = inputDatas.FirstOrDefault(kv => kv.Value == "Input" && kv.Key.PartID == nodeId);
                                         }
-                                        var inputTime = inputTimeData.Key.InoutTime;
 
-                                        return (outputTime - inputTime).TotalSeconds;
+                                        DateTime inputTime = DateTime.MinValue;
+                                        if(inputTimeData.Key != null)
+                                            inputTime = inputTimeData.Key.InoutTime;
+
+                                        return outputTime > inputTime? (outputTime - inputTime).TotalSeconds : 0;
                                     })
                                     .ToList();
 
@@ -627,7 +660,7 @@ namespace Pinokio.Designer
             }
             catch (Exception ex)
             {
-
+                Console.WriteLine(ex.Message);
             }
         }
 
@@ -1166,23 +1199,26 @@ namespace Pinokio.Designer
 
         private void cboxEditStepGroupBy_SelectedIndexChanged(object sender, EventArgs e)
         {
-            _selectedStepEqpNames.Clear();
-            _selectedProductNames.Clear();
-            _selectedStepNames.Clear();
             if (cboxEditStepGroupBy.SelectedItem.ToString() == "Equipment")
             {
+                _selectedStepEqpNames.Clear();
                 _isProduct = false;
                 _isStep = false;
+                _selectedStepEqpNames.AddRange(ModelManager.Instance.SimResultDBManager.EqpNames);
             }
             else if(cboxEditStepGroupBy.SelectedItem.ToString() == "Step")
             {
+                _selectedStepNames.Clear();
                 _isProduct = false;
                 _isStep = true;
+                _selectedStepNames.AddRange(ModelManager.Instance.SimResultDBManager.EqpStepNames);
             }
             else if (cboxEditStepGroupBy.SelectedItem.ToString() == "Product")
             {
+                _selectedProductNames.Clear();
                 _isProduct = true;
                 _isStep = false;
+                _selectedProductNames.AddRange(ModelManager.Instance.SimResultDBManager.ProductNames);
             }
             GetFromTime().Time = _simStartTime;
             GetToTime().Time = _simEndTime;
@@ -1199,10 +1235,14 @@ namespace Pinokio.Designer
             if (cboxEditEqpPlanOperationRate.SelectedItem.ToString() == "EQP_GROUP")
             {
                 _isEqpGroup = true;
+                _selectedEqpGroupByNames.AddRange(ModelManager.Instance.SimResultDBManager.EqpGroupNames);
+                _selectedEqpGroupNames.AddRange(ModelManager.Instance.SimResultDBManager.EqpNames);
             }
            else if (cboxEditEqpPlanOperationRate.SelectedItem.ToString() == "STEP_GROUP")
             {
                 _isEqpGroup = false;
+                _selectedStepGroupByNames.AddRange(ModelManager.Instance.SimResultDBManager.StepGroupNames);
+                _selectedStepGroupNames.AddRange(ModelManager.Instance.SimResultDBManager.EqpNames);
             }
             GetFromTime().Time = _simStartTime;
             GetToTime().Time = _simEndTime;
@@ -1210,15 +1250,17 @@ namespace Pinokio.Designer
         private void cboxEditInout_SelectedIndexChanged(object sender, EventArgs e)
         {
 
-            _selectedNodeInoutNames.Clear();
-            _selectedProductInoutNames.Clear();
             if (cboxEditInoutBy.SelectedItem.ToString() == "Node")
             {
+                _selectedNodeInoutNames.Clear();
                 _isNode = true;
+                _selectedNodeInoutNames.AddRange(ModelManager.Instance.SimResultDBManager.NodeInoutNames);
             }
             else if (cboxEditInoutBy.SelectedItem.ToString() == "Product")
             {
+                _selectedProductInoutNames.Clear();
                 _isNode = false;
+                _selectedProductInoutNames.AddRange(ModelManager.Instance.SimResultDBManager.ProductNames);
             }
             GetFromTime().Time = _simStartTime;
             GetToTime().Time = _simEndTime;

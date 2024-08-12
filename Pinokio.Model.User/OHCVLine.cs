@@ -12,6 +12,7 @@ using Pinokio.Object;
 using Simulation.Engine;
 namespace Pinokio.Model.User
 {
+    [Serializable]
     public class OHCVLine : GuidedLine
     {
         public OHCV Ohcv

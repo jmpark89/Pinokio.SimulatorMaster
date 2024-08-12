@@ -8,6 +8,7 @@ using System.Threading.Tasks;
 
 namespace Pinokio.Model.User
 {
+    [Serializable]
     public class ConveyorLineStation : LineStation
     {
         public ConveyorLineStation()

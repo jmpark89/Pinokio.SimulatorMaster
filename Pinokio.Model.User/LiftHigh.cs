@@ -24,6 +24,7 @@ namespace Pinokio.Model.User
     using System.Threading.Tasks;
 
 
+    [Serializable]
     public class LiftHigh : TXNode
     {
         SimObj entity = null;

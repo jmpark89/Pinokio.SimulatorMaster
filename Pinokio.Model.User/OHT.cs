@@ -10,6 +10,7 @@ using Pinokio.Geometry;
 
 namespace Pinokio.Model.User
 {
+    [Serializable]
     public class OHT : Vehicle
     {
         private List<double> _lstFollowControlLength;
@@ -101,10 +102,6 @@ namespace Pinokio.Model.User
             }
         }
 
-        public bool IsStoped
-        {
-            get;set;
-        }
 
         public OHTZCU CurZcu
         {
@@ -512,8 +509,8 @@ namespace Pinokio.Model.User
 
         protected override void ArriveToIdle(Time simTime, SimPort port)
         {
-            if (Name == "OHT_94")
-                ;
+            if (this.Command != null)
+                return;
             Ocs.SetIdleDestinationAndRoute(simTime, this);
             SimPort simPort1 = new SimPort(INT_PORT.MOVE, this);
             InternalFunction(simTime, simPort1);
@@ -536,10 +533,21 @@ namespace Pinokio.Model.User
 
         protected override void Move(Time simTime, SimObj obj, ref SimPort port)
         {
-            if (Line.LstObjectIndex.ContainsKey(obj.ID))
+            try
             {
-                int objIndex = Line.LstObjectIndex[obj.ID];
-                UpdateOHTPosition(simTime, objIndex);
+                if (Line.LstObjectIndex.ContainsKey(obj.ID))
+                {
+                    int objIndex = Line.LstObjectIndex[obj.ID];
+                    UpdateOHTPosition(simTime, objIndex);
+                    if (this.Bay != Line.Bay)
+                    {
+                        this.Bay = Line.Bay;
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                ErrorLogger.SaveLog(ex);
             }
         }
 
@@ -579,7 +587,7 @@ namespace Pinokio.Model.User
                     UpdateLateOHTPosition(curTime, (OHT)Line.Vehicles[i]);
                 }
 
-                CheckWaitingOHT(ohtIdx, Ocs.BumpDistance, curTime);
+                CheckWaitingOHT(ohtIdx, 8000, curTime);
             }
             catch (Exception ex)
             {
@@ -620,59 +628,162 @@ namespace Pinokio.Model.User
             try
             {
                 OHT oht = Line.Vehicles[ohtIdx] as OHT;
-                double ohtDistance = oht.Line.GetDistanceAtTime(oht, simTime);
+                if (oht.ID == 20960)
+                    ;
+                OHT postOht = null;
 
-                if (0 < ohtIdx)
+                double ohtDistance = oht.Line.GetDistanceAtTime(oht, simTime); // 라인에서의 현재 OHT 위치
+
+                if (0 < ohtIdx) // 같은 라인에 여러 대의 OHT 존재. 바로 앞 OHT만 확인.
                 {
-                    OHT preOht = Line.Vehicles[ohtIdx - 1] as OHT;
+                    OHT preOht = Line.Vehicles[ohtIdx - 1] as OHT; // 바로 앞 OHT
+
                     double preOhtDistance = preOht.Line.GetDistanceAtTime(preOht, simTime);
                     if (preOhtDistance - ohtDistance <= standLen)
                     {
-                        if (preOht.IsStoped)
+                        if (preOht.IsStoped) // 정지상태일 경우
                         {
-                            SimPort preOhtPort = new SimPort(INT_PORT.OHT_MOVE_TO_IDLE, this, preOht);
-                            EvtCalendar.AddEvent(simTime, this, preOhtPort);
+                            SimPort preOhtPort = new SimPort(INT_PORT.ARRIVE_TO_IDLE, preOht);
+                            EvtCalendar.AddEvent(simTime, preOht, preOhtPort); // SetIdleDestination으로 움직이게 만듦
 
-                            oht.Destination = preOht.Destination;
-                            double stationLength = 0;
-                            TransportLine line = oht.Destination.GetLineNStationLength(ref stationLength);
-                            oht.SetLstRailLine(Ocs.FindPath(oht.Line, ohtDistance, line, stationLength));
+                            if (oht.IsStoped == true) // 본인도 정지상태였을 경우
+                            {
+                                oht.Destination = preOht.Destination; // 바로 앞 정지상태 OHT 위치로 이동
+                                double stationLength = 0;
+                                TransportLine line = oht.Destination.GetLineNStationLength(ref stationLength);
+                                oht.SetLstRailLine(Ocs.FindPath(oht.Line, ohtDistance, line, stationLength));
+                                return;
+                            }
+                        }
+                    }
+
+                    postOht = Line.Vehicles.ElementAtOrDefault(ohtIdx + 1) as OHT;
+                    if (postOht != null) // 바로 뒤 OHT가 존재할 경우
+                    {
+                        double postOhtDistance = postOht.Line.GetDistanceAtTime(postOht, simTime);
+                        if (ohtDistance - postOhtDistance <= standLen)
+                        {
+                            if (oht.IsStoped == true) // 본인이 정지상태일 경우
+                            {
+                                SimPort ohtPort = new SimPort(INT_PORT.ARRIVE_TO_IDLE, oht);
+                                EvtCalendar.AddEvent(simTime, oht, ohtPort);
+
+                                if (postOht.IsStoped == true) // 바로 뒤 OHT가 정지상태일 경우
+                                {
+                                    postOht.Destination = oht.Destination; // 현재 위치로 옮겨준다
+                                    double stationLength = 0;
+                                    TransportLine line = postOht.Destination.GetLineNStationLength(ref stationLength);
+                                    postOht.SetLstRailLine(Ocs.FindPath(postOht.Line, postOhtDistance, line, stationLength));
+                                }
+                            }
                         }
                     }
                 }
-                else
+                else // 라인에 OHT 본인만 존재.
                 {
                     double len = Line.Length - ohtDistance;
-                    foreach (GuidedLine line in oht.Route)
+                    if (oht.Route.Count > 1) // 라우트가 해당 라인이 끝이 아님
                     {
-                        if (this.Name != line.Name)
+                        foreach (GuidedLine line in oht.Route) // Route 경로 상 앞에 있는 OHT들 확인
+                        {
+                            if (this.Line.Name != line.Name)
+                            {
+                                if (line.Vehicles.Count > 0)
+                                {
+                                    OHT preOht = line.Vehicles[line.Vehicles.Count - 1] as OHT; // 현재 OHT의 바로 앞 OHT
+                                    double preOhtDistance = preOht.Line.GetDistanceAtTime(preOht, simTime);
+                                    len += preOhtDistance;
+                                    if (len <= standLen)
+                                    {
+                                        if (preOht.IsStoped) // 정지상태일 경우
+                                        {
+                                            SimPort preOhtPort = new SimPort(INT_PORT.ARRIVE_TO_IDLE, preOht);
+                                            EvtCalendar.AddEvent(simTime, preOht, preOhtPort); // SetIdleDestination으로 움직이게 만듦
+
+                                            if (oht.IsStoped == true) // 본인도 정지상태일 경우
+                                            {
+                                                oht.Destination = preOht.Destination; // 앞 OHT의 위치로 목적지 변경
+                                                double stationLength = 0;
+                                                TransportLine stationLine = oht.Destination.GetLineNStationLength(ref stationLength);
+                                                oht.SetLstRailLine(Ocs.FindPath(oht.Line, ohtDistance, stationLine, stationLength));
+                                                return;
+                                            }
+                                        }
+                                    }
+                                    else
+                                        break; // 더이상 볼 필요없음.
+                                }
+                                else
+                                {
+                                    len += line.Length;
+                                    if (len > standLen)
+                                        break;
+                                }
+                            }
+                        }
+                    }
+                    else // 마지막 경로가 해당 라인
+                    {
+                        foreach (GuidedLine line in oht.Route[0].EndPoint.OutLines) //라인의 앞 경로의 OHT들 확인
                         {
                             if (line.Vehicles.Count > 0)
                             {
                                 OHT preOht = line.Vehicles[line.Vehicles.Count - 1] as OHT;
+
                                 double preOhtDistance = preOht.Line.GetDistanceAtTime(preOht, simTime);
                                 len += preOhtDistance;
                                 if (len <= standLen)
                                 {
-                                    if (preOht.IsStoped)
+                                    if (preOht.IsStoped) // 정지상태일 경우
                                     {
-                                        SimPort port = new SimPort(INT_PORT.OHT_MOVE_TO_IDLE, line, preOht);
-                                        EvtCalendar.AddEvent(simTime, line, port);
-                                        Station asIsRailPort = preOht.Destination;
-
-                                        oht.Destination = preOht.Destination;
-                                        double stationLength = 0;
-                                        TransportLine stationLine = oht.Destination.GetLineNStationLength(ref stationLength);
-                                        oht.SetLstRailLine(Ocs.FindPath(oht.Line, ohtDistance, stationLine, stationLength));
+                                        SimPort preOhtPort = new SimPort(INT_PORT.ARRIVE_TO_IDLE, preOht);
+                                        EvtCalendar.AddEvent(simTime, preOht, preOhtPort);
+                                        if (oht.IsStoped == true)
+                                        {
+                                            oht.Destination = preOht.Destination;
+                                            double stationLength = 0;
+                                            TransportLine stationLine = oht.Destination.GetLineNStationLength(ref stationLength);
+                                            oht.SetLstRailLine(Ocs.FindPath(oht.Line, ohtDistance, stationLine, stationLength));
+                                            return;
+                                        }
                                     }
                                 }
-                                return;
+                                else
+                                    break;
                             }
                             else
                             {
                                 len += line.Length;
                                 if (len > standLen)
-                                    return;
+                                    break;
+                            }
+                        }
+                    }
+
+                    foreach (GuidedLine postLine in oht.Route[0].StartPoint.InLines)
+                    {
+                        if (postLine.Vehicles.Count > 0 && postLine.Vehicles[0].Route.Contains(oht.Route[0]))
+                        {
+                            postOht = postLine.Vehicles[0] as OHT;
+                            if (postOht != null)
+                            {
+                                double postOhtDistance = postOht.Line.GetDistanceAtTime(postOht, simTime);
+                                if (ohtDistance - postOhtDistance <= standLen)
+                                {
+                                    if (oht.IsStoped)
+                                    {
+                                        SimPort ohtPort = new SimPort(INT_PORT.ARRIVE_TO_IDLE, oht);
+                                        EvtCalendar.AddEvent(simTime, oht, ohtPort);
+                                        if (postOht.IsStoped == true)
+                                        {
+                                            postOht.Destination = oht.Destination;
+                                            double stationLength = 0;
+                                            TransportLine line = postOht.Destination.GetLineNStationLength(ref stationLength);
+                                            postOht.SetLstRailLine(Ocs.FindPath(postOht.Line, postOhtDistance, line, stationLength));
+                                        }
+                                        return;
+                                    }
+                                }
                             }
                         }
                     }
@@ -796,9 +907,6 @@ namespace Pinokio.Model.User
                 }
                 else if (Math.Round(lastScheduledPos, 0) == Math.Round(destPos, 0) && oht.Route.Count > 1)
                 {
-                    if (oht.Name == "OHT_94" && Line.Name == "OHTLine_64")
-                        ;
-
                     SimPort newPort = new SimPort(EXT_PORT.REQUEST_TO_ENTER, oht, this);
                     oht.Route[1].ExternalFunction(curTime, newPort);
                 }
@@ -829,12 +937,13 @@ namespace Pinokio.Model.User
                 curPos = Line.LstPosData[ohtIdx][Line.LstPosData[ohtIdx].Count - 1]._endPos;
                 curSpeed = Line.LstPosData[ohtIdx][Line.LstPosData[ohtIdx].Count - 1]._endSpeed;
             }
-
+            if (station == null)
+                return 0;
             double stationDistance = Line.GetStationLength(station);
             //현재 라인에 목적지 있고 지나치지 않은 경우
             if (oht.Route.Count == 1)
             {
-                if (Math.Round(stationDistance, 0) == Math.Round(curPos, 0) && Math.Round(curSpeed, 1) == 0)
+                if (Math.Round(stationDistance, 0) == Math.Round(curPos, 0) /*&& Math.Round(curSpeed, 1) == 0*/)
                     return stationDistance;
 
                 if (!(oht.State is VEHICLE_STATE.IDLE))
@@ -2267,9 +2376,10 @@ namespace Pinokio.Model.User
             {
                 // 현재 라인의 앞에 누가 있음
 
-                if (Line.LstPosData[index - 1].Count == 0)
+                if (Line.LstPosData[index - 1].Last()._endTime <= simTime)
                 {
-//                    ErrorLogger.SaveLog("앞에 누가있는데 멈춰 있음");
+                    moveLength = Line.LstPosData[index - 1].Last()._endPos - startPos - this.Size.X - _minimumDistance;
+                    //                    ErrorLogger.SaveLog("앞에 누가있는데 멈춰 있음");
                     // 앞에 누가있는데 멈춰 있음
                 }
                 else
@@ -2282,34 +2392,32 @@ namespace Pinokio.Model.User
             {
                 // 현재 라인의 앞에 누가 없을 경우 셋팅. 이후 진행방향 앞쪽 라인 확인
                 moveLength = Line.Length - startPos;
-
+                //진행방향 앞쪽 라인 확인
                 foreach (TransportLine toLine in Line.EndPoint.OutLines)
                 {
                     if (toLine.EnteredObjects.Count > 0)
                     {
+                        int enteredLastObjectIdx = toLine.EnteredObjects.Count - 1; //앞쪽 라인의 제일 후방 OHT. 즉, 본인 바로 앞의 OHT
+                        bool isLastPosDataAvailable = toLine.LstPosData[enteredLastObjectIdx].Count > 0;
+                        double lastEndPos = isLastPosDataAvailable ? toLine.LstPosData[enteredLastObjectIdx].Last()._endPos : toLine.LstStartPos[enteredLastObjectIdx];
                         //진행경로가 아닌데 intervalLength보다 더 가는 계획이 있으면 경로짜는 oht가 지나가면서 충돌에 영향을 주지않는다고 판단하고 고려하지 않음.
                         if (!Route.Contains(toLine)
                             &&
-                            ((toLine.LstPosData[toLine.EnteredObjects.Count - 1].Count > 0 && toLine.LstPosData[toLine.EnteredObjects.Count - 1].Last()._endPos > MinimumDistance)
-                            || (toLine.LstPosData[toLine.EnteredObjects.Count - 1].Count == 0 && toLine.LstStartPos[toLine.EnteredObjects.Count - 1] > MinimumDistance))
+                            ((isLastPosDataAvailable && lastEndPos > MinimumDistance) || (!isLastPosDataAvailable && lastEndPos > MinimumDistance))
                             )
                             continue;
-                        else
-                            ;
-                        PosData frontPosData = toLine.LstPosData[toLine.EnteredObjects.Count - 1].LastOrDefault();
+
+                        PosData frontPosData = toLine.LstPosData[enteredLastObjectIdx].LastOrDefault();
 
                         moveLength = (frontPosData._endPos - this.Size.X - _minimumDistance);
                         if (moveLength <= 0)
-                        {
-                            moveLength = CalPositionAtTime(toLine, startPos, simTime);
-                        }
+                            moveLength = GetMoveLengthAtTime(toLine, startPos, simTime); //moveLength = Line.Length - startPos;
                         else
                             moveLength += (Line.Length - startPos);
                         break;
                     }
                 }
             }
-
             if (moveLength > 0)
             {
                 if (startPos + moveLength > destPos)
@@ -2331,7 +2439,7 @@ namespace Pinokio.Model.User
 
             return new EvtData(isArrive, PosDatas.Last()._endTime);
         }
-        private double CalPositionAtTime(TransportLine toLine, double startPos, Time simTime)
+        private double GetMoveLengthAtTime(TransportLine toLine, double startPos, Time simTime)
         {
             PosData frontPosData = toLine.LstPosData[toLine.EnteredObjects.Count - 1].LastOrDefault();
 
@@ -2340,15 +2448,19 @@ namespace Pinokio.Model.User
 
             double vehiclePosition = frontPosData._startPos;
 
-            if (Math.Round((double)frontPosData._startTime, 2) == Math.Round((double)simTime, 2))
+            double simTimeRounded = Math.Round((double)simTime, 2);
+
+            if (Math.Round((double)frontPosData._startTime, 2) == simTimeRounded)
                 vehiclePosition = frontPosData._startPos;
-            else if (Math.Round((double)frontPosData._endTime, 2) >= Math.Round((double)simTime, 2))
-                vehiclePosition = frontPosData._endPos;
-            else
+            else if (Math.Round((double)frontPosData._endTime, 2) > simTimeRounded)
                 vehiclePosition = frontPosData._startPos + Physics.GetLength_v0_a_t(frontPosData._startSpeed, frontPosData._celerate, (double)(simTime - frontPosData._startTime));
-            
-            vehiclePosition = Math.Min(vehiclePosition, frontPosData._endPos);
-            
+            else
+                vehiclePosition = frontPosData._endPos;
+
+
+            if (vehiclePosition > frontPosData._endPos)
+                vehiclePosition = frontPosData._endPos;
+
             double betweenAandB = vehiclePosition + (Line.Length - startPos);
 
             double moveLength = betweenAandB - this.Size.X - _minimumDistance;

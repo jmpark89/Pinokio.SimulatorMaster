@@ -38,7 +38,7 @@ namespace Pinokio.Animation.User
             get
             {
                 if (_usableSimNodeTypes == null)
-                    _usableSimNodeTypes = BaseUtill.GetUsableSimNodeTypes(UsableBaseSimNodeType);
+                    _usableSimNodeTypes = BaseUtill.GetUsableSimNodeTypes(UsableBaseSimNodeType, InterfaceConstraints);
 
                 return _usableSimNodeTypes;
             }
@@ -70,34 +70,6 @@ namespace Pinokio.Animation.User
         protected override string GetTypeName()
         {
             return nameof(RefFabUTB);
-        }
-
-        protected override void ConnectToLineStation(RefLineStation refLineStation, RefLineStationComponent refUTB)
-        {
-            refUTB.StationID = refLineStation.ID;
-            refUTB.LayerName = refLineStation.LayerName;
-
-            UTB utb = refUTB.Core as UTB;
-
-            refLineStation.UTB = (RefFabUTB)refUTB;
-
-            LineStation stationCore = refLineStation.Core as LineStation;
-            utb.LineStation = stationCore;
-            stationCore.ConnectNode(utb);
-            stationCore.UTB = utb;
-            utb.ConnectNode(stationCore);
-        }
-
-        protected override void UnconnectToLineStation(RefLineStation refLineStation, RefLineStationComponent refUTB)
-        {
-            LineStation stationCore = refLineStation.Core as LineStation;
-            UTB stb = refUTB.Core as UTB;
-            refLineStation.UTB = null;
-            stb.LineStation = null;
-            stationCore.UnconnectNode(stb);
-            stationCore.UTB = null;
-            stb.UnconnectNode(stationCore);
-            stb.Height = -1;
         }
     }
 }

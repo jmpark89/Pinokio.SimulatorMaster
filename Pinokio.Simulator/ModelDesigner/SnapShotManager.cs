@@ -32,8 +32,6 @@ namespace Pinokio.Designer
         private PlayBackSaveNode _playBackSaveNode = null;
 
         [NonSerialized]
-        private SimTimeNode _simTimeNode = null;
-        [NonSerialized]
         private AnimationNode _animationNode = null;
         [NonSerialized]
         private MeasureAccelerationTimeNode _accelerationTimeNode = null;
@@ -59,7 +57,6 @@ namespace Pinokio.Designer
             FailSimulation = modelMngr.FailSimulation;
             _playBackNode = modelMngr.PlayBackNode;
             _playBackSaveNode = modelMngr.PlayBackSaveNode;
-            _simTimeNode = modelMngr.TimeNode;
             _animationNode = modelMngr.AnimationNode;
             _accelerationTimeNode = modelMngr.MeasureAccelerationTimeNode;
             _setAccelerationTimeNode = modelMngr.SetAccelerationTimeNode;
@@ -80,9 +77,6 @@ namespace Pinokio.Designer
             modelMngr.RemoveNode(ModelManager.Instance.PlayBackSaveNode);
             simEngine.SimNodes.Remove(ModelManager.Instance.PlayBackSaveNode);
             modelMngr.PlayBackSaveNode = null;
-            modelMngr.RemoveNode(ModelManager.Instance.TimeNode);
-            simEngine.SimNodes.Remove(ModelManager.Instance.TimeNode);
-            modelMngr.TimeNode = null;
             modelMngr.RemoveNode(ModelManager.Instance.AnimationNode);
             simEngine.SimNodes.Remove(ModelManager.Instance.AnimationNode);
             modelMngr.AnimationNode = null;
@@ -145,13 +139,6 @@ namespace Pinokio.Designer
                 ModelManager.Instance.PlayBackSaveNode = _playBackSaveNode;
                 SimEngine.Instance.SimNodes.Add(_playBackSaveNode);
                 _playBackSaveNode.EvtCalendar = SimEngine.Instance.EventCalender;
-            }
-            if (_simTimeNode != null)
-            {
-                ModelManager.Instance.AddNode(_simTimeNode);
-                ModelManager.Instance.TimeNode = _simTimeNode;
-                SimEngine.Instance.SimNodes.Add(_simTimeNode);
-                _simTimeNode.EvtCalendar = SimEngine.Instance.EventCalender;
             }
             if (_animationNode != null)
             {

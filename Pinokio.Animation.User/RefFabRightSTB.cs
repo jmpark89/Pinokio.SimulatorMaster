@@ -31,7 +31,7 @@ namespace Pinokio.Animation.User
             {
                 Block bl = new Block(System.Reflection.MethodBase.GetCurrentMethod().DeclaringType.Name);
                 double l = 600;
-                double height = 600;
+                double height = 200;
                 Entity buffer = Mesh.CreateBox(l, l, height);
                 buffer.Translate(-buffer.BoxSize.X / 2, -buffer.BoxSize.Y / 2, 0);
                 buffer.ColorMethod = colorMethodType.byParent;
@@ -48,42 +48,6 @@ namespace Pinokio.Animation.User
         protected override string GetTypeName()
         {
             return nameof(RefFabRightSTB);
-        }
-
-        protected override void ConnectToLineStation(RefLineStation refLineStation, RefLineStationComponent refRightSTB)
-        {
-            refRightSTB.StationID = refLineStation.ID;
-            refRightSTB.LayerName = refLineStation.LayerName;
-
-            RightSTB stb = refRightSTB.Core as RightSTB;
-
-            if (stb.Height == -1)
-            {
-                if (refLineStation.RightSTBs.Count == 0)
-                    stb.Height = Height;
-                else
-                    stb.Height = refLineStation.RightSTBHighestHeight - refLineStation.Core.PosVec3.Z;
-            }
-
-            refLineStation.RightSTBs.Add((RefFabRightSTB)refRightSTB);
-
-            LineStation stationCore = refLineStation.Core as LineStation;
-            stb.LineStation = stationCore;
-            stationCore.ConnectNode(stb);
-            stationCore.RightSTBs.Add(stb.Height, stb);
-            stb.ConnectNode(stationCore);
-        }
-
-        protected override void UnconnectToLineStation(RefLineStation refLineStation, RefLineStationComponent refRightSTB)
-        {
-            LineStation stationCore = refLineStation.Core as LineStation;
-            RightSTB stb = refRightSTB.Core as RightSTB;
-            refLineStation.RightSTBs.Remove((RefFabRightSTB)refRightSTB);
-            stb.LineStation = null;
-            stationCore.UnconnectNode(stb);
-            stationCore.RightSTBs.Remove(stb.Height);
-            stb.UnconnectNode(stationCore);
-            stb.Height = -1;
         }
     }
 }

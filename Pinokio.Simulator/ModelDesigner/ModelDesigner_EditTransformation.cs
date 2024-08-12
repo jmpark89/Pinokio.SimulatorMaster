@@ -71,7 +71,11 @@ namespace Pinokio.Designer
                     this.pinokio3DModel1.ObjectManipulator.Apply();
                     if (args.ActionMode == ObjectManipulator.actionType.TranslateOnAxis || args.ActionMode == ObjectManipulator.actionType.TranslateOnView)
                     {
-                        Move_MouseUpMulti(pinokio3DModel1, pinokio3DModel1.MouseLocationSnapToCorrdinate, MouseSnapPointBeforeMouseDown, out nodeReferences);
+                        Point3D newcenter = this.pinokio3DModel1.ObjectManipulator.Position;
+                        Point3D center = new Point3D(newcenter.X, newcenter.Y, newcenter.Z);
+                        newcenter.TransformBy(this.pinokio3DModel1.ObjectManipulator.Transformation);
+                        Move_MouseUpMulti(pinokio3DModel1, newcenter, center, out nodeReferences);
+                        //Move_MouseUpMulti(pinokio3DModel1, pinokio3DModel1.MouseLocationSnapToCorrdinate, MouseSnapPointBeforeMouseDown, out nodeReferences);
                     }
                     else if (args.ActionMode == ObjectManipulator.actionType.Rotate || args.ActionMode == ObjectManipulator.actionType.RotateOnView)
                     {

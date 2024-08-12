@@ -8,6 +8,7 @@ using Pinokio.Model.Base;
 
 namespace Pinokio.Model.User
 {
+    [Serializable]
     public class AGVZCUReservation
     {
         private Time _reservationTime;

@@ -7,6 +7,7 @@ using System.Drawing.Design;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using Pinokio.Model.Base;
 
 namespace Pinokio.Designer
 {
@@ -31,7 +32,10 @@ Description("Production Schedules")]
             get => ProductionSchedules;
         }
 
-        public uint Count { get; set; }
+        public uint Value { get; set; }
+
+        [Browsable(true)]
+        public UNIT_TYPE UnitType { get; set; }
 
         public InOutProductData(ProductData manufacturedGoodsData)
             : base(manufacturedGoodsData)

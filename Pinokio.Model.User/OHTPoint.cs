@@ -8,6 +8,7 @@ using Pinokio.Model.Base;
 
 namespace Pinokio.Model.User
 {
+    [Serializable]
     public class OHTPoint : TransportPoint
     {
         private string _zcuName = string.Empty;
@@ -195,6 +196,8 @@ namespace Pinokio.Model.User
 
         public override void InitializeNode(EventCalendar evtCal)
         {
+            _lstStopEvent = new List<SimPort>();
+            zcuStopNResetLines = new List<OHTLine>();
             base.InitializeNode(evtCal);
 
                 if (Zcu != null && Zcu.FromPoints.First().Value == this)
@@ -308,6 +311,47 @@ namespace Pinokio.Model.User
                 if (oht.FirstReservationZCU == null) //CurZcu가 없다는 것은 예약이 아직 안되어있다는 뜻.
                     Zcu.AddReservation(simTime, oht, this);
             }
+        }
+
+        public override List<SimNodeIntegrityLog> CheckIntegrity()
+        {
+            List<SimNodeIntegrityLog> logs = new List<SimNodeIntegrityLog>();
+
+            if((OutLines.Count > 1 || InLines.Count > 1) && _zcu == null)
+                logs.Add(new SimNodeIntegrityLog
+                {
+                    NodeType = this.GetType().Name,
+                    ID = this.ID,
+                    Name = this.Name,
+                    ParentNodeName = ParentNode != null ? ParentNode.Name : string.Empty,
+                    FloorName = Floor != null? Floor.Name : string.Empty,
+                    ErrorType = IntegrityErrors.Type.NO_ZCU.ToString(),
+                    LogDetail = IntegrityErrors.Details[IntegrityErrors.Type.NO_ZCU.ToString()],
+                });
+            else if(OutLines.Count > 1 && _zcu != null && _zcuType != ZCU_TYPE.STOP)
+                logs.Add(new SimNodeIntegrityLog
+                {
+                    NodeType = this.GetType().Name,
+                    ID = this.ID,
+                    Name = this.Name,
+                    ParentNodeName = ParentNode != null ? ParentNode.Name : string.Empty,
+                    FloorName = Floor != null ? Floor.Name : string.Empty,
+                    ErrorType = IntegrityErrors.Type.INVALID_ZCU_TYPE.ToString(),
+                    LogDetail = IntegrityErrors.Details[IntegrityErrors.Type.INVALID_ZCU_TYPE.ToString()],
+                });
+            else if (InLines.Count > 1 && _zcu != null && _zcuType != ZCU_TYPE.RESET)
+                logs.Add(new SimNodeIntegrityLog
+                {
+                    NodeType = this.GetType().Name,
+                    ID = this.ID,
+                    Name = this.Name,
+                    ParentNodeName = ParentNode != null ? ParentNode.Name : string.Empty,
+                    FloorName = Floor != null ? Floor.Name : string.Empty,
+                    ErrorType = IntegrityErrors.Type.INVALID_ZCU_TYPE.ToString(),
+                    LogDetail = IntegrityErrors.Details[IntegrityErrors.Type.INVALID_ZCU_TYPE.ToString()],
+                });
+
+            return logs;
         }
     }
 }

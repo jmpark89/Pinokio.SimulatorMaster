@@ -27,7 +27,7 @@ namespace Pinokio.Animation.User
     {
         public new static bool IsInserted = true;
 
-        public new static double InitialHeight = 0;
+        public new static double InitialHeight = 400;
 
         public RefAGV() : base(nameof(RefAGV))
         {
@@ -46,7 +46,8 @@ namespace Pinokio.Animation.User
 
         public static void CreateBlock(PinokioBaseModel model, params object[] objects)
         {
-            AnimationModelManager.CreatePart(nameof(RefAGV), Path.Combine("C:\\Carlo\\Pinokio\\Pinokio.Asset\\agv.obj"), model, 1, new Point3D(0, 0, 0), 255, System.Drawing.Color.DarkGray);
+            Block block = LoadModelFile("C:\\Carlo\\Pinokio\\Pinokio.Asset\\agv.obj", nameof(RefAGV), model);
+            model.Blocks.Add(block);
         }
 
         protected override string GetTypeName()

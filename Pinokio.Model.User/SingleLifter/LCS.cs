@@ -10,6 +10,7 @@ using System.Threading.Tasks;
 
 namespace Pinokio.Model.User
 {
+    [Serializable]
     public class LCS : VSubCS
     {
         private Dictionary<string, ElevatorLine> _dicRailLine;

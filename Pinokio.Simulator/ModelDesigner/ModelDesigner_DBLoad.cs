@@ -26,6 +26,7 @@ using Pinokio.UI.Base;
 using Simulation.Engine;
 using DevExpress.XtraBars.Docking2010.Customization;
 using System.Diagnostics;
+using DevExpress.XtraBars.Docking;
 
 namespace Pinokio.Designer
 {
@@ -106,8 +107,16 @@ namespace Pinokio.Designer
             NewItem(true);
             List<SimNode> totalNodes = new List<SimNode>();
             List<FloorPlan> floors;
-            bool isSuccess = pinokio3DModel1.LoadSnapShotDB(filePath, out totalNodes, out floors);
+            this.dockPanelSimNodeProperties.Visibility = DockVisibility.Visible;
+            this.dockPanelSimNodeProperties.Show();
 
+            this.dockPanelInsertRefNode.Hide();
+            this.dockPanelInsertCoupledModel.Hide();
+            this.dockPanelInsertedSimNodes.Visibility = DockVisibility.Visible;
+            this.dockPanelInsertedSimNodes.Dock = DockingStyle.Right;
+            this.dockPanelParts.Visibility = DevExpress.XtraBars.Docking.DockVisibility.Visible;
+            this.dockPanelParts.DockTo(dockPanelInsertedSimNodes);
+            bool isSuccess = pinokio3DModel1.LoadSnapShotDB(filePath, out totalNodes, out floors);
 
             beiSimStartTimeSetting.EditValue = SimEngine.Instance.StartDateTime;
             beiSimEndTimeSetting.EditValue = SimEngine.Instance.EndDateTime;
@@ -131,10 +140,7 @@ namespace Pinokio.Designer
                 //MessageBox.Show("Success");
                 FlyoutDialog.Show(Application.OpenForms[0], new FOAInfo("Success"));
 
-                bbiLoadAMHSReport.Enabled = true;
-                bbiLoadProductionReport.Enabled = true;
-                bbiAMHSReport.Enabled = false;
-                bbiProductionReport.Enabled = false;
+                ChangeButtonEnabledForSimulation();
 
                 dicVisibleNodeTypeInfo.Clear();
                 dicSimNodeType.Clear();

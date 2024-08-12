@@ -19,40 +19,40 @@ namespace Pinokio.Designer
     public partial class EditVisibleForm : DevExpress.XtraEditors.XtraForm
     {
         List<DataInVisualListGrid> dataInVisualListGrid = new List<DataInVisualListGrid>();
-        Dictionary<string, List<SimNodeTreeListNode>> _dicSimNodeType = new Dictionary<string, List<SimNodeTreeListNode>>();
-        public Dictionary<bool, List<SimNodeTreeListNode>> visibilityNodes = new Dictionary<bool, List<SimNodeTreeListNode>>();
-        public Dictionary<string, bool> _visibleCheckedInfo = new Dictionary<string, bool>();
-        public EditVisibleForm(Dictionary<string, List<SimNodeTreeListNode>> dicSimNodeType, Dictionary<string, bool> visibleCheckedInfo)
+        public Dictionary<string, Tuple<bool, bool>> _visibleCheckedInfo = new Dictionary<string, Tuple<bool, bool>>();
+        public EditVisibleForm(Dictionary<string, Tuple<bool,bool>> visibleCheckedInfo)
         {
             InitializeComponent();
-            _dicSimNodeType = dicSimNodeType;
             _visibleCheckedInfo = visibleCheckedInfo;
-            InitializeGirdInVisualList(_dicSimNodeType);
+            InitializeGirdInVisualList();
         }
+
         public class DataInVisualListGrid
         {
-            public bool Visible
+            public bool Visible { get; set; }
+            private bool text;
+            public bool Text 
             {
-                get; set;
+                get { return text; }
+                set 
+                {
+                    if (Visible)
+                        text = value;
+                    else
+                        text = false;
+                }
             }
-
             public string NodeType { get; set; }
         }
-        private void InitializeGirdInVisualList(Dictionary<string, List<SimNodeTreeListNode>> dicSimNodeType)
+
+        private void InitializeGirdInVisualList()
         {
             try
             {
                 dataInVisualListGrid.Clear();
                 foreach (var dic in _visibleCheckedInfo)
                 {
-                    dataInVisualListGrid.Add(new DataInVisualListGrid() { Visible = dic.Value, NodeType = dic.Key });
-                }
-                foreach (var dic in dicSimNodeType)
-                {
-                    if (_visibleCheckedInfo.ContainsKey(dic.Key))
-                        dataInVisualListGrid.Add(new DataInVisualListGrid() { Visible = _visibleCheckedInfo[dic.Key], NodeType = dic.Key});
-                    else
-                        dataInVisualListGrid.Add(new DataInVisualListGrid() { Visible = !dic.Value.Any(n => n.Checked == false), NodeType = dic.Key });
+                    dataInVisualListGrid.Add(new DataInVisualListGrid() { Visible = dic.Value.Item1, Text = dic.Value.Item2, NodeType = dic.Key });
                 }
 
                 this.gridControlEditVisible.DataSource = dataInVisualListGrid;
@@ -67,40 +67,12 @@ namespace Pinokio.Designer
 
         private void simpleButton1_Click(object sender, EventArgs e)
         {
-            visibilityNodes = new Dictionary<bool, List<SimNodeTreeListNode>>();
-            visibilityNodes[true] = new List<SimNodeTreeListNode>();
-            visibilityNodes[false] = new List<SimNodeTreeListNode>();
-            _visibleCheckedInfo = new Dictionary<string, bool>();
-
             foreach (var rowData in dataInVisualListGrid)
             {
-                #region cho 추가
                 if (rowData.NodeType == "Blueprint")
-                {
-                    _visibleCheckedInfo[rowData.NodeType] = rowData.Visible;
-                    continue;
-                }
-                if (rowData.NodeType == "Label")
-                {
-                    _visibleCheckedInfo[rowData.NodeType] = rowData.Visible;
-                    continue;
-                } 
-                #endregion
-                if (rowData.Visible == false)
-                {
-                    foreach (SimNodeTreeListNode node in _dicSimNodeType[rowData.NodeType])
-                    {
-                        visibilityNodes[false].Add(node);
-                    }
-                }
+                    _visibleCheckedInfo[rowData.NodeType] = new Tuple<bool, bool>(rowData.Visible, false);
                 else
-                {
-                    foreach (SimNodeTreeListNode node in _dicSimNodeType[rowData.NodeType])
-                    {
-                        visibilityNodes[true].Add(node);
-                    }
-                }
-                _visibleCheckedInfo[rowData.NodeType] = rowData.Visible;
+                    _visibleCheckedInfo[rowData.NodeType] = new Tuple<bool, bool>(rowData.Visible, rowData.Text);
             }
             DialogResult = DialogResult.OK;
             this.Close();
@@ -109,6 +81,16 @@ namespace Pinokio.Designer
         private void simpleButton2_Click(object sender, EventArgs e)
         {
             Close();
+        }
+
+        private void gridViewEditVisible_CellValueChanging(object sender, DevExpress.XtraGrid.Views.Base.CellValueChangedEventArgs e)
+        {
+            var VisibleValue = (bool)gridViewEditVisible.GetRowCellValue(e.RowHandle, "Visible");
+            var TextValue = (bool)gridViewEditVisible.GetRowCellValue(e.RowHandle, "Text");
+            if (VisibleValue && TextValue && e.Column.FieldName == "Visible") // Icon off시 Text도 off
+                gridViewEditVisible.SetFocusedRowCellValue("Text", false);
+            if (!VisibleValue && !TextValue && e.Column.FieldName == "Text") // Icon off인데 Text true 시도할 경우 막음
+                gridViewEditVisible.SetFocusedRowCellValue("Text", false);
         }
     }
 }

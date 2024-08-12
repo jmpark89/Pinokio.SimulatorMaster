@@ -148,45 +148,32 @@ namespace Pinokio.Designer
                 AddSelectedNodeReferenceFromTreeSelect(child);
         }
 
-        private void SimEntityTreeList_AfterCheckNode(object sender, NodeEventArgs e)
-        {
-            PartTreeListNode treeNode = e.Node as PartTreeListNode;
+        //private void SimEntityTreeList_MouseClick(object sender, System.Windows.Forms.MouseEventArgs e)
+        //{
+        //    if (_isCheckBoxClick == true)
+        //    {
+        //        _isCheckBoxClick = false;
+        //        return;
+        //    }
+        //    PartTreeListNode selectedNode = (PartTreeListNode)partTreeList.FocusedNode;
 
-            if (treeNode != null)
-            {
-                treeNode.RefPart.Visible = treeNode.Checked;
-            }
-            pinokio3DModel1.Invalidate();
-            //pinokio3DModel1.Focus();
-            _isCheckBoxClick = true;
-        }
+        //    if (selectedNode == null)
+        //        return;
 
-        private void SimEntityTreeList_MouseClick(object sender, System.Windows.Forms.MouseEventArgs e)
-        {
-            if (_isCheckBoxClick == true)
-            {
-                _isCheckBoxClick = false;
-                return;
-            }
-            PartTreeListNode selectedNode = (PartTreeListNode)partTreeList.FocusedNode;
+        //    CloseObjectManipulator();
 
-            if (selectedNode == null)
-                return;
+        //    ClearPropertyGrid();
 
-            CloseObjectManipulator();
-
-            ClearPropertyGrid();
-
-            SelectedEntityReferences.Add(selectedNode.RefPart);
-            selectedNode.RefPart.Selected = true;
+        //    SelectedEntityReferences.Add(selectedNode.RefPart);
+        //    selectedNode.RefPart.Selected = true;
                         
-            BeginInvoke(new Action(() => pinokio3DModel1.Focus()));
-            ChangeCameraPositionBySelectedReferencesEntitiy();
-            BeginInvoke(new Action(() => pinokio3DModel1.Entities.Regen()));
-            BeginInvoke(new Action(() => Invalidate()));
+        //    BeginInvoke(new Action(() => pinokio3DModel1.Focus()));
+        //    ChangeCameraPositionBySelectedReferencesEntitiy();
+        //    BeginInvoke(new Action(() => pinokio3DModel1.Entities.Regen()));
+        //    BeginInvoke(new Action(() => Invalidate()));
 
-            CheangeSelectedSimObject4PropertyGrid(selectedNode.Part);          
-        }
+        //    CheangeSelectedSimObject4PropertyGrid(selectedNode.Part);          
+        //}
 
         bool isDropCoupledModel = false;
 
@@ -277,25 +264,25 @@ namespace Pinokio.Designer
             foreach (SimNodeTreeListNode childNode in parentNode.Nodes)
                 ChildCheckIfParentCheck(childNode);
         }
-        private void ChangeCameraPositionBySelectedReferencesEntitiy()
-        {
-            PartTreeListNode selectedNode = (PartTreeListNode)partTreeList.FocusedNode;
+        //private void ChangeCameraPositionBySelectedReferencesEntitiy()
+        //{
+        //    PartTreeListNode selectedNode = (PartTreeListNode)partTreeList.FocusedNode;
 
-            if (selectedNode == null)
-                return;
+        //    if (selectedNode == null)
+        //        return;
 
-            PartTreeListNode rootNode = (PartTreeListNode)selectedNode.RootNode;
+        //    PartTreeListNode rootNode = (PartTreeListNode)selectedNode.RootNode;
 
-            if (rootNode != null)
-            {
-                if (selectedNode.Part != null)
-                {
-                    pinokio3DModel1.Camera.Location = new Point3D(selectedNode.Part.PosVec3.X, selectedNode.Part.PosVec3.Y);
-                }
-            }
-            else
-            { BeginInvoke(new Action(() => pinokio3DModel1.ZoomFit())); return; }
-        }
+        //    if (rootNode != null)
+        //    {
+        //        if (selectedNode.Part != null)
+        //        {
+        //            pinokio3DModel1.Camera.Location = new Point3D(selectedNode.Part.PosVec3.X, selectedNode.Part.PosVec3.Y);
+        //        }
+        //    }
+        //    else
+        //    { BeginInvoke(new Action(() => pinokio3DModel1.ZoomFit())); return; }
+        //}
 
         public void ChangeCameraPositionBySelectedReferences()
         {

@@ -13,11 +13,12 @@ using Simulation.Engine;
 using System.Diagnostics;
 using DevExpress.XtraTreeList.Columns;
 using DevExpress.XtraTreeList.Nodes;
-//TODO devDept: Now you need to pass through the Model.ActiveViewport property to get/set the active viewport grid.
 using DevExpress.XtraGrid.Views.Grid;
 using DevExpress.Utils;
 using DevExpress.Data;
 using Pinokio.Simulation;
+using devDept.Eyeshot.Entities;
+using devDept.Geometry;
 
 namespace Pinokio.Designer
 {
@@ -87,26 +88,16 @@ namespace Pinokio.Designer
                 {
                     ModelManager.Instance.AddAnimationNode(0.1, true);
                     ModelManager.Instance.AnimationNode.AnimationEvent += this.AnimationEvent;
-                    ModelManager.Instance.AnimationNode.EvtCalendar = SimEngine.Instance.EventCalender;
                 }
 
                 if (!IsExistUpdateNode(ModelManager.Instance.SetAccelerationTimeNode))
                 {
                     ModelManager.Instance.AddSetAccelerationTimeNode(0.1, true);
-                    ModelManager.Instance.SetAccelerationTimeNode.EvtCalendar = SimEngine.Instance.EventCalender;
                 }
 
                 if (!IsExistUpdateNode(ModelManager.Instance.MeasureAccelerationTimeNode))
                 {
                     ModelManager.Instance.AddAccelerationTimeNode(10, true);
-                    ModelManager.Instance.MeasureAccelerationTimeNode.EvtCalendar = SimEngine.Instance.EventCalender;
-                }
-
-                if (!IsExistUpdateNode(ModelManager.Instance.TimeNode))
-                {
-                    ModelManager.Instance.AddSimTimeNode(1, true);
-                    ModelManager.Instance.TimeNode.SimTimeGetEvent += this.SimTimeEvent;
-                    ModelManager.Instance.TimeNode.EvtCalendar = SimEngine.Instance.EventCalender;
                 }
 
                 if (!IsExistSettingNode(ModelManager.Instance.EngineStopNode))
@@ -174,16 +165,29 @@ namespace Pinokio.Designer
             }
         }
 
-        private void SimTimeEvent(object sender, EventArgs e)
+        private void UpdateSimTime()
         {
             try
             {
                 beiCurrentSimTimeView.BeginUpdate();
-                SimTimeNode simTimeNode = (SimTimeNode)sender;
-                TimeSpan timeSpan = TimeSpan.FromSeconds(simTimeNode.TimeNow.TotalSeconds);
+                TimeSpan timeSpan = TimeSpan.FromSeconds(SimEngine.Instance.TimeNow.TotalSeconds);
                 beiCurrentSimTimeView.EditValue = timeSpan.ToString("dd\\/hh\\:mm\\:ss\\.fff");
-                beSimulationAcceleration.EditValue = ModelManager.Instance.AccelerationRate;
                 beiCurrentSimTimeView.EndUpdate();
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine(ex.Message);
+                Console.WriteLine(ex.StackTrace);
+            }
+        }
+
+        private void UpdateAccelerationRate()
+        {
+            try
+            {
+                beSimulationAcceleration.BeginUpdate();
+                beSimulationAcceleration.EditValue = ModelManager.Instance.AccelerationRate;
+                beSimulationAcceleration.EndUpdate();
             }
             catch (Exception ex)
             {
@@ -214,15 +218,11 @@ namespace Pinokio.Designer
 
         private void AnimationOnOff()
         {
-            if (SimEngine.Instance.EngineState != ENGINE_STATE.STOP)
-            {
-                ModelManager.Instance.UpdateAnimationPose();
-            }
-
             if (Animation_Tog_Switch.Checked) //켰을때
             {
                 if (SimEngine.Instance.EngineState != ENGINE_STATE.STOP)
                 {
+                    ModelManager.Instance.UpdateAnimationPose();
                     ModelManager.Instance.SetAccelerationTimeNode.Queue = 0;
                     ModelManager.Instance.SetAccelerationTimeNode.stopwatch = new Stopwatch();
                 }
@@ -351,6 +351,12 @@ namespace Pinokio.Designer
 
         private void bbiSimRun_ItemClick(object sender, DevExpress.XtraBars.ItemClickEventArgs e)
         {
+            ChangeButtonEnabledForSimulation();
+            startSimulation();
+        }
+
+        private void ChangeButtonEnabledForSimulation()
+        {
             RB_BTN_NEW.Enabled = false;
             RB_BTN_LOAD.Enabled = false;
             RB_BTN_SAVE.Enabled = false;
@@ -358,8 +364,6 @@ namespace Pinokio.Designer
             barButtonItemImPortModel.Enabled = false;
             bbiAMHSReport.Enabled = true;
             bbiProductionReport.Enabled = true;
-
-            startSimulation();
         }
 
         private void changeVisibleNeedlessNodes(bool isVisible)
@@ -380,7 +384,8 @@ namespace Pinokio.Designer
                     }
                     if (dicVisibleNodeTypeInfo.Count != 0)
                     {
-                        dicVisibleNodeTypeInfo[nodeType] = isVisible;
+                        bool isTextVisible = dicVisibleNodeTypeInfo[nodeType].Item2;
+                        dicVisibleNodeTypeInfo[nodeType] = new Tuple<bool, bool>(isVisible, isTextVisible);
                     }
                 }
             }
@@ -475,15 +480,8 @@ namespace Pinokio.Designer
                 DoChangeVisibleOfBBI(bbiDockLineStatusDetail, DevExpress.XtraBars.BarItemVisibility.Always);
                 bbiDockInsertNode.Enabled = false;
                 bbiDockInsertCoupledModel.Enabled = false;
-                this.dockPanelSimNodeProperties.Visibility = DockVisibility.Visible;
-                this.dockPanelSimNodeProperties.Show();
 
-                this.dockPanelInsertRefNode.Hide();
-                this.dockPanelInsertCoupledModel.Hide();
-                this.dockPanelInsertedSimNodes.Visibility = DockVisibility.Visible;
-                this.dockPanelInsertedSimNodes.Dock = DockingStyle.Right;
-                this.dockPanelParts.Visibility = DevExpress.XtraBars.Docking.DockVisibility.Visible;
-                this.dockPanelParts.DockTo(dockPanelInsertedSimNodes);
+
                 simpleButtonRemoveTreeNode.Enabled = false;
 
                 layoutControlItemRemoveSimNode.Visibility = DevExpress.XtraLayout.Utils.LayoutVisibility.Never;
@@ -568,6 +566,7 @@ namespace Pinokio.Designer
 
         private void SettingPause(object sender, EventArgs e)
         {
+            SimEngine.Instance.EngineState = ENGINE_STATE.PAUSE;
             ModelManager.Instance.EnginePauseNode.IsPause = true;
             DoChangeVisibleOfBBI(bbiSimRun, DevExpress.XtraBars.BarItemVisibility.Always);
             DoChangeVisibleOfBBI(bbiSimPause, DevExpress.XtraBars.BarItemVisibility.Never);
@@ -582,6 +581,7 @@ namespace Pinokio.Designer
         {
             if (SimEngine.Instance.EventCalender.DicEvt.Count != 0)
             {
+                SimEngine.Instance.EngineState = ENGINE_STATE.PAUSE;
                 ModelManager.Instance.EnginePauseNode.IsPause = true;
                 SimPort port = new SimPort(INT_PORT.SETTING_ASSIGN);
                 SimEngine.Instance.EventCalender.AddEvent(SimEngine.Instance.TimeNow, ModelManager.Instance.EnginePauseNode, port);
@@ -795,7 +795,7 @@ namespace Pinokio.Designer
             {
                 case "MRs":
                     List<MR> MRs = FactoryManager.Instance.MCS.DicMR.Values.OrderBy(x => x.Id).ToList();
-                    UpdateListGridControl<MR>(MRs);
+                    UpdateListGridControlLineStatusDetail<MR>(MRs);
                     lbCount.Text = "MR " + MRs.Count.ToString() + " Counts";
                     break;
 
@@ -808,22 +808,22 @@ namespace Pinokio.Designer
                     totalCommands.AddRange(FactoryManager.Instance.MCS.TransferringCommandList);
                     totalCommands.AddRange(FactoryManager.Instance.MCS.UnloadingCommandList);
 
-                    UpdateListGridControl<Command>(totalCommands.OrderBy(x => x.Id).ToList());
+                    UpdateListGridControlLineStatusDetail<Command>(totalCommands.OrderBy(x => x.Id).ToList());
                     lbCount.Text = "Command " + totalCommands.Count.ToString() + " Counts";
                     break;
                 case "PartSteps":
                     List<PartStep> partSteps = FactoryManager.Instance.MES.DicPartStep.Values.ToList();
-                    UpdateListGridControl(partSteps);
+                    UpdateListGridControlLineStatusDetail(partSteps);
                     lbCount.Text = "PartStep " + partSteps.Count.ToString() + " Counts";
                     break;
                 case "EqpSteps":
                     List<EqpStep> eqpSteps = FactoryManager.Instance.MES.EqpSteps.ToList();
-                    UpdateListGridControl(eqpSteps);
+                    UpdateListGridControlLineStatusDetail(eqpSteps);
                     lbCount.Text = "EqpStep " + eqpSteps.Count.ToString() + " Counts";
                     break;
                 case "Vehicles":
                     List<Vehicle.VehicleInfo> vehicles = GetVehicleList(true).Select(x => x._vehicleInfo).ToList();
-                    UpdateListGridControl(vehicles);
+                    UpdateListGridControlLineStatusDetail(vehicles);
                     lbCount.Text = "Vehicle " + vehicles.Count.ToString() + " Counts";
                     break;
             }
@@ -838,7 +838,7 @@ namespace Pinokio.Designer
                     lbCount.Text = COMMAND_STATE.QUEUED + " " + queuedCommands.Count.ToString() + " Counts";
                     lock (queuedCommands)
                     {
-                        UpdateListGridControl<Command>(queuedCommands);
+                        UpdateListGridControlLineStatusDetail<Command>(queuedCommands);
                     }
                     break;
                 case "Waiting Commands":
@@ -846,7 +846,7 @@ namespace Pinokio.Designer
                     lbCount.Text = COMMAND_STATE.WAITING + " " + waitingCommands.Count.ToString() + " Counts";
                     lock (waitingCommands)
                     {
-                        UpdateListGridControl<Command>(waitingCommands);
+                        UpdateListGridControlLineStatusDetail<Command>(waitingCommands);
                     }
                     break;
                 case "Loading Commands":
@@ -854,7 +854,7 @@ namespace Pinokio.Designer
                     lbCount.Text = COMMAND_STATE.LOADING + " " + loadingCommands.Count.ToString() + " Counts";
                     lock (loadingCommands)
                     {
-                        UpdateListGridControl<Command>(loadingCommands);
+                        UpdateListGridControlLineStatusDetail<Command>(loadingCommands);
                     }
                     break;
                 case "Transferring Commands":
@@ -862,7 +862,7 @@ namespace Pinokio.Designer
                     lbCount.Text = COMMAND_STATE.TRANSFERRING + " " + transferringCommands.Count.ToString() + " Counts";
                     lock (transferringCommands)
                     {
-                        UpdateListGridControl<Command>(transferringCommands);
+                        UpdateListGridControlLineStatusDetail<Command>(transferringCommands);
                     }
                     break;
                 case "Unloading Commands":
@@ -870,7 +870,7 @@ namespace Pinokio.Designer
                     lbCount.Text = COMMAND_STATE.UNLOADING + " " + unloadingCommands.Count.ToString() + " Counts";
                     lock (unloadingCommands)
                     {
-                        UpdateListGridControl<Command>(unloadingCommands);
+                        UpdateListGridControlLineStatusDetail<Command>(unloadingCommands);
                     }
                     break;
                 case "WIP PartSteps":
@@ -879,7 +879,7 @@ namespace Pinokio.Designer
                     lbCount.Text = PART_STEP_STATE.WIP + " " + wip.Count.ToString() + " Counts";
                     lock (wip)
                     {
-                        UpdateListGridControl(wip.OrderBy(x => x.State == PART_STEP_STATE.WIP).ToList());
+                        UpdateListGridControlLineStatusDetail(wip.OrderBy(x => x.State == PART_STEP_STATE.WIP).ToList());
                     }
                     break;
                 case "Assigned PartSteps":
@@ -888,7 +888,7 @@ namespace Pinokio.Designer
                     lbCount.Text = PART_STEP_STATE.ASSIGNED + " " + assigned.Count.ToString() + " Counts";
                     lock (assigned)
                     {
-                        UpdateListGridControl(assigned.OrderBy(x => x.State == PART_STEP_STATE.ASSIGNED).ToList());
+                        UpdateListGridControlLineStatusDetail(assigned.OrderBy(x => x.State == PART_STEP_STATE.ASSIGNED).ToList());
                     }
                     break;
                 case "Track-In PartSteps":
@@ -897,7 +897,7 @@ namespace Pinokio.Designer
                     lbCount.Text = PART_STEP_STATE.TRACK_IN + " " + trackIn.Count.ToString() + " Counts";
                     lock (trackIn)
                     {
-                        UpdateListGridControl(trackIn.OrderBy(x => x.State == PART_STEP_STATE.TRACK_IN).ToList());
+                        UpdateListGridControlLineStatusDetail(trackIn.OrderBy(x => x.State == PART_STEP_STATE.TRACK_IN).ToList());
                     }
                     break;
                 case "Processing PartSteps":
@@ -906,7 +906,7 @@ namespace Pinokio.Designer
                     lbCount.Text = PART_STEP_STATE.PROCESSING + " " + processing.Count.ToString() + " Counts";
                     lock (processing)
                     {
-                        UpdateListGridControl(processing.OrderBy(x => x.State == PART_STEP_STATE.PROCESSING).ToList());
+                        UpdateListGridControlLineStatusDetail(processing.OrderBy(x => x.State == PART_STEP_STATE.PROCESSING).ToList());
                     }
                     break;
                 case "Step-End PartSteps":
@@ -915,7 +915,7 @@ namespace Pinokio.Designer
                     lbCount.Text = PART_STEP_STATE.STEP_END + " " + stepEnd.Count.ToString() + " Counts";
                     lock (stepEnd)
                     {
-                        UpdateListGridControl(stepEnd.OrderBy(x => x.State == PART_STEP_STATE.STEP_END).ToList());
+                        UpdateListGridControlLineStatusDetail(stepEnd.OrderBy(x => x.State == PART_STEP_STATE.STEP_END).ToList());
                     }
                     break;
                 case "Dispatching EqpSteps":
@@ -924,7 +924,7 @@ namespace Pinokio.Designer
                     lbCount.Text = EQP_STEP_STATE.DISPATCHING + " " + dispatchingSteps.Count.ToString() + " Counts";
                     lock (dispatchingSteps)
                     {
-                        UpdateListGridControl(dispatchingSteps.OrderBy(x => x.State == EQP_STEP_STATE.DISPATCHING).ToList());
+                        UpdateListGridControlLineStatusDetail(dispatchingSteps.OrderBy(x => x.State == EQP_STEP_STATE.DISPATCHING).ToList());
                     }
                     break;
                 case "Waiting EqpSteps":
@@ -933,7 +933,7 @@ namespace Pinokio.Designer
                     lbCount.Text = EQP_STEP_STATE.WAITING + " " + waitingSteps.Count.ToString() + " Counts";
                     lock (waitingSteps)
                     {
-                        UpdateListGridControl(waitingSteps.OrderBy(x => x.State == EQP_STEP_STATE.WAITING).ToList());
+                        UpdateListGridControlLineStatusDetail(waitingSteps.OrderBy(x => x.State == EQP_STEP_STATE.WAITING).ToList());
                     }
                     break;
                 case "Processing EqpSteps":
@@ -942,7 +942,7 @@ namespace Pinokio.Designer
                     lbCount.Text = EQP_STEP_STATE.PROCESSING + " " + processingSteps.Count.ToString() + " Counts";
                     lock (processingSteps)
                     {
-                        UpdateListGridControl(processingSteps.OrderBy(x => x.State == EQP_STEP_STATE.PROCESSING).ToList());
+                        UpdateListGridControlLineStatusDetail(processingSteps.OrderBy(x => x.State == EQP_STEP_STATE.PROCESSING).ToList());
                     }
                     break;
                 case "Idle":
@@ -952,7 +952,7 @@ namespace Pinokio.Designer
                     lbCount.Text = VEHICLE_STATE.IDLE + " " + idleVehicles.Count.ToString() + " Counts";
                     lock (idleVehicles)
                     {
-                        UpdateListGridControl(idleVehicles);
+                        UpdateListGridControlLineStatusDetail(idleVehicles);
                     }
                     break;
                 case "Move To Load":
@@ -961,7 +961,7 @@ namespace Pinokio.Designer
                     lbCount.Text = VEHICLE_STATE.MOVE_TO_LOAD + " " + moveToLoadVehicles.Count.ToString() + " Counts";
                     lock (moveToLoadVehicles)
                     {
-                        UpdateListGridControl(moveToLoadVehicles);
+                        UpdateListGridControlLineStatusDetail(moveToLoadVehicles);
                     }
                     break;
                 case "Loading":
@@ -970,7 +970,7 @@ namespace Pinokio.Designer
                     lbCount.Text = VEHICLE_STATE.LOADING + " " + loadingVehicles.Count.ToString() + " Counts";
                     lock (loadingVehicles)
                     {
-                        UpdateListGridControl(loadingVehicles);
+                        UpdateListGridControlLineStatusDetail(loadingVehicles);
                     }
                     break;
                 case "Move To Unload":
@@ -979,7 +979,7 @@ namespace Pinokio.Designer
                     lbCount.Text = VEHICLE_STATE.MOVE_TO_UNLOAD + " " + moveToUnloadVehicles.Count.ToString() + " Counts";
                     lock (moveToUnloadVehicles)
                     {
-                        UpdateListGridControl(moveToUnloadVehicles);
+                        UpdateListGridControlLineStatusDetail(moveToUnloadVehicles);
                     }
                     break;
                 case "Unloading":
@@ -988,7 +988,7 @@ namespace Pinokio.Designer
                     lbCount.Text = VEHICLE_STATE.UNLOADING + " " + unloadingVehicles.Count.ToString() + " Counts";
                     lock (unloadingVehicles)
                     {
-                        UpdateListGridControl(unloadingVehicles);
+                        UpdateListGridControlLineStatusDetail(unloadingVehicles);
                     }
                     break;
                 case "Stage":
@@ -997,7 +997,7 @@ namespace Pinokio.Designer
                     lbCount.Text = VEHICLE_STATE.STAGE + " " + stageVehicles.Count.ToString() + " Counts";
                     lock (stageVehicles)
                     {
-                        UpdateListGridControl(stageVehicles);
+                        UpdateListGridControlLineStatusDetail(stageVehicles);
                     }
                     break;
                 default:
@@ -1016,7 +1016,7 @@ namespace Pinokio.Designer
                     lbCount.Text = queuedCommands.Count.ToString() + " Counts";
                     lock (queuedCommands)
                     {
-                        UpdateListGridControl<Command>(queuedCommands);
+                        UpdateListGridControlLineStatusDetail<Command>(queuedCommands);
                     }
                     break;
                 case "Waiting Commands":
@@ -1024,7 +1024,7 @@ namespace Pinokio.Designer
                     lbCount.Text = waitingCommands.Count.ToString() + " Counts";
                     lock (waitingCommands)
                     {
-                        UpdateListGridControl<Command>(waitingCommands);
+                        UpdateListGridControlLineStatusDetail<Command>(waitingCommands);
                     }
                     break;
                 case "Loading Commands":
@@ -1032,7 +1032,7 @@ namespace Pinokio.Designer
                     lbCount.Text = loadingCommands.Count.ToString() + " Counts";
                     lock (loadingCommands)
                     {
-                        UpdateListGridControl<Command>(loadingCommands);
+                        UpdateListGridControlLineStatusDetail<Command>(loadingCommands);
                     }
                     break;
                 case "Transferring Commands":
@@ -1041,7 +1041,7 @@ namespace Pinokio.Designer
                     lbCount.Text = transferringCommands.Count.ToString() + " Counts";
                     lock (transferringCommands)
                     {
-                        UpdateListGridControl<Command>(transferringCommands);
+                        UpdateListGridControlLineStatusDetail<Command>(transferringCommands);
                     }
                     break;
                 case "Unloading Commands":
@@ -1049,7 +1049,7 @@ namespace Pinokio.Designer
                     lbCount.Text = unloadingCommands.Count.ToString() + " Counts";
                     lock (unloadingCommands)
                     {
-                        UpdateListGridControl<Command>(unloadingCommands);
+                        UpdateListGridControlLineStatusDetail<Command>(unloadingCommands);
                     }
                     break;
                 default:
@@ -1057,7 +1057,7 @@ namespace Pinokio.Designer
             }
         }
 
-        private void UpdateListGridControl<T>(List<T> list)
+        private void UpdateListGridControlLineStatusDetail<T>(List<T> list)
         {
             try
             {
@@ -1092,6 +1092,99 @@ namespace Pinokio.Designer
             }
         }
 
+        private void gridViewPart_MouseClick(object sender, System.Windows.Forms.MouseEventArgs e)
+        {
+            int index = gridViewPart.FocusedRowHandle;
+            //gridViewPart.Columns.Clear();
+            Part part = gridViewPart.GetRow(index) as Part;
+
+            if (!pinokio3DModel1.PartReferences.ContainsKey(part.ID))
+                return;
+
+            PartReference selectedPart = pinokio3DModel1.PartReferences[part.ID];
+
+            if (selectedPart == null)
+                return;
+
+            ChangeUpdateViewerBySelectedPart(part, selectedPart);
+        }
+
+        private void ChangeUpdateViewerBySelectedPart(Part part, PartReference refPart)
+        {
+            CloseObjectManipulator();
+            ClearPropertyGrid();
+
+            BeginInvoke(new Action(() => pinokio3DModel1.Focus()));
+
+            if (part != null && pinokio3DModel1.PartReferences.ContainsKey(part.ID))
+            {
+                refPart = pinokio3DModel1.PartReferences[part.ID];
+                if (!SelectedEntityReferences.Contains(refPart))
+                    SelectedEntityReferences.Add(refPart);
+                refPart.Selected = true;
+                pinokio3DModel1.Camera.Location = new Point3D(part.PosVec3.X, part.PosVec3.Y);
+            }
+            else
+                BeginInvoke(new Action(() => pinokio3DModel1.ZoomFit()));
+
+            BeginInvoke(new Action(() => pinokio3DModel1.Entities.Regen()));
+            BeginInvoke(new Action(() => Invalidate()));
+
+            CheangeSelectedSimObject4PropertyGrid(part);
+        }
+
+        private void UpdateListGridControlPart(List<Part> list)
+        {
+            try
+            {
+                gridViewPart.BeginUpdate();
+                gridControlPart.BeginUpdate();
+                int index = gridViewPart.FocusedRowHandle;
+                //gridViewPart.Columns.Clear();
+                Part part = gridViewPart.GetRow(index) as Part;
+                gridControlPart.DataSource = list;
+                int newIndex = 0;
+                if (part != null)
+                    newIndex = list.FindIndex(x => x.ID == part.ID);
+                gridViewPart.VertScrollVisibility = DevExpress.XtraGrid.Views.Base.ScrollVisibility.Always;
+                gridViewPart.OptionsScrollAnnotations.ShowFocusedRow = DefaultBoolean.True;
+                gridViewPart.FocusedRowHandle = newIndex;
+                gridViewPart.Columns["PosVec3"].Visible = false;
+                gridViewPart.Columns["AngleInRadians"].Visible = false;
+                gridViewPart.Columns["Size"].Visible = false;
+                gridViewPart.Columns["GenDateTime"].Visible = false;
+                gridViewPart.Columns["ProductID"].Visible = false;
+                gridViewPart.Columns["Xdimension"].Visible = false;
+                gridViewPart.Columns["Ydimension"].Visible = false;
+                gridViewPart.Columns["Zdimension"].Visible = false;
+                gridViewPart.Columns["PartCapa"].Visible = false;
+                gridViewPart.Columns["CMDStartStationName"].Visible = false;
+                gridViewPart.Columns["CMDEndStationName"].Visible = false;
+                gridViewPart.Columns["Direction"].Visible = false;
+                gridViewPart.Columns["Quantity"].Visible = false;
+                gridViewPart.Columns["RotateAxis"].Visible = false;
+                gridViewPart.Columns["NodeID"].Visible = false;
+                gridViewPart.Columns["Name"].VisibleIndex = 0;
+                gridViewPart.Columns["ProductName"].VisibleIndex = 1;
+                gridViewPart.Columns["CurTXNodeName"].VisibleIndex = 2;
+                gridViewPart.Columns["MRDestination"].VisibleIndex = 3;
+                gridViewPart.Columns["CommandName"].VisibleIndex = 4;
+                gridViewPart.Columns["Name"].Caption = "Name";
+                gridViewPart.Columns["ProductName"].Caption = "Product Name";
+                gridViewPart.Columns["CurTXNodeName"].Caption = "Current";
+                gridViewPart.Columns["MRDestination"].Caption = "Destination";
+                gridViewPart.Columns["CommandName"].Caption = "Command";
+
+                gridControlPart.EndUpdate();
+                gridViewPart.BestFitColumns();
+                gridViewPart.EndUpdate();
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine(ex.Message);
+                Console.WriteLine(ex.StackTrace);
+            }
+        }
         void timer_TreeCommand(object sender, System.Timers.ElapsedEventArgs e)
         {
             if (ModelManager.Instance.AnimationNode != null && ModelManager.Instance.AnimationNode.IsUse)
@@ -1249,7 +1342,12 @@ namespace Pinokio.Designer
             }
         }
 
-        private void UpdateTreeList()
+        private void UpdatePartStatus()
+        {
+            UpdateListGridControlPart(ModelManager.Instance.Parts.Values.ToList());
+        }
+
+        private void UpdateLineStatus()
         {
             try
             {
@@ -1305,8 +1403,6 @@ namespace Pinokio.Designer
                     idx = idx + 5;
                 }
 
-                SetTreeNodes();
-
                 treeListLineStatus.EndUpdate();
             }
             catch (Exception ex)
@@ -1315,15 +1411,16 @@ namespace Pinokio.Designer
                 Console.WriteLine(ex.StackTrace);
             }
         }
-        private void SetTreeNodes()
+
+        private void GridViewPart_FocusedRowChanged(object sender, DevExpress.XtraGrid.Views.Base.FocusedRowChangedEventArgs e)
         {
             try
             {
-                List<TreeListNode> nodes = treeListLineStatus.GetNodeList();
-                int index = 0;
+                UpdateGridViewPart(e.FocusedRowHandle);
             }
             catch (Exception ex)
             {
+                gridViewPart.FocusedRowHandle = -1;
                 Console.WriteLine(ex.Message);
                 Console.WriteLine(ex.StackTrace);
             }
@@ -1345,6 +1442,42 @@ namespace Pinokio.Designer
 
         delegate void TimerEventFiredDelegate();
 
+
+        private void UpdateGridViewPart(int rowHandle)
+        {
+            if (rowHandle < 0 || !gridViewPart.IsFocusedView)
+                return;
+
+            Part part = gridViewPart.GetRow(rowHandle) as Part;
+            PartStep partStep = part.PartStep;
+            NodeReference refNode = null;
+            ClearSelection();
+            PartReference refPart = null; 
+            if(pinokio3DModel1.PartReferences.ContainsKey(part.ID))
+                refPart = pinokio3DModel1.PartReferences[part.ID];
+
+            if (partStep != null)
+            {
+                if (partStep.State is PART_STEP_STATE.WIP)
+                {
+                    if (Pinokio3Dmodel.NodeReferenceByID.ContainsKey(part.CurTXNode.ID))
+                        refNode = pinokio3DModel1.NodeReferenceByID[part.CurTXNode.ID];
+                }
+                else
+                {
+                    if (Pinokio3Dmodel.NodeReferenceByID.ContainsKey(partStep.EqpID))
+                        refNode = pinokio3DModel1.NodeReferenceByID[partStep.EqpID];
+                }
+            }
+
+            if (refNode != null)
+            {
+                SelectedNodeReferences.Add(refNode);
+                refNode.Selected = true;
+            }
+
+            ChangeUpdateViewerBySelectedPart(part, refPart);
+        }
 
         private void UpdateGridViewLineStatusDetail(int rowHandle)
         {
@@ -1439,21 +1572,17 @@ namespace Pinokio.Designer
         {
             try
             {
-                if(ModelManager.Instance.AnimationNode != null && ModelManager.Instance.AnimationNode.IsUse)
-                    treeListLineStatus.BeginInvoke(new TimerEventFiredDelegate(UpdateSimulationStatus));
-            }
-            catch (Exception ex)
-            {
-                Console.WriteLine(ex.Message);
-                Console.WriteLine(ex.StackTrace);
-            }
-        }
+                if (!(SimEngine.Instance.EngineState is ENGINE_STATE.STOP || SimEngine.Instance.EngineState is ENGINE_STATE.PAUSE))
+                {
+                    UpdateSimTime();
+                    UpdateAccelerationRate();
 
-        private void UpdateSimulationStatus()
-        {
-            try
-            {
-                UpdateTreeList();
+                    if (ModelManager.Instance.AnimationNode != null && ModelManager.Instance.AnimationNode.IsUse)
+                    {
+                        treeListLineStatus.BeginInvoke(new TimerEventFiredDelegate(UpdateLineStatus));
+                        gridControlPart.BeginInvoke(new TimerEventFiredDelegate(UpdatePartStatus));
+                    }
+                }
             }
             catch (Exception ex)
             {
@@ -1626,6 +1755,85 @@ namespace Pinokio.Designer
                     nodeRef.Item1.Color = nodeRef.Item2;
                     nodeRef.Item1.Selected = false;
                 }
+            }
+        }
+
+        private void State_Based_Vehicle_Tog_Switch_CheckedChanged(object sender, DevExpress.XtraBars.ItemClickEventArgs e)
+        {
+            if (!State_Based_Vehicle_Tog_Switch.Checked)
+            {
+                foreach (NodeReference node in pinokio3DModel1.NodeReferenceByID.Values)
+                {
+                    if (node is RefVehicle)
+                    {
+                        Block nodeBlock = pinokio3DModel1.Blocks.FirstOrDefault(x => x.Name == node.BlockName);
+                        foreach (Entity en in nodeBlock.Entities)
+                        {
+                            en.ColorMethod = colorMethodType.byEntity;
+                        }
+                    }
+                }
+            }
+            else
+            {
+                foreach (NodeReference node in pinokio3DModel1.NodeReferenceByID.Values)
+                {
+                    if (node is RefVehicle)
+                    {
+                        Block nodeBlock = pinokio3DModel1.Blocks.FirstOrDefault(x => x.Name == node.BlockName);
+                        foreach (Entity en in nodeBlock.Entities)
+                        {
+                            en.ColorMethod = colorMethodType.byParent;
+                        }
+                    }
+                }
+            }
+            pinokio3DModel1.Invalidate();
+        }
+
+        private void State_Based_Equipment_Tog_Switch_CheckedChanged(object sender, DevExpress.XtraBars.ItemClickEventArgs e)
+        {
+            if (!State_Based_Equipment_Tog_Switch.Checked)
+            {
+                foreach(NodeReference node in pinokio3DModel1.NodeReferenceByID.Values)
+                {
+                    if (node.Core is Equipment)
+                    {
+                        Block nodeBlock = pinokio3DModel1.Blocks.FirstOrDefault(x => x.Name == node.BlockName);
+                        foreach (Entity en in nodeBlock.Entities)
+                        {
+                            en.ColorMethod = colorMethodType.byEntity;
+                        }
+                    }
+                }
+            }
+            else
+            {
+                foreach (NodeReference node in pinokio3DModel1.NodeReferenceByID.Values)
+                {
+                    if (node.Core is Equipment)
+                    {
+                        Block nodeBlock = pinokio3DModel1.Blocks.FirstOrDefault(x => x.Name == node.BlockName);
+                        foreach (Entity en in nodeBlock.Entities)
+                        {
+                            en.ColorMethod = colorMethodType.byParent;
+                        }
+                    }
+                }
+            }
+            pinokio3DModel1.Invalidate();
+
+        }
+
+        private void State_Based_TransportLine_Tog_Switch_CheckedChanged(object sender, DevExpress.XtraBars.ItemClickEventArgs e)
+        {
+
+        }
+        private void StateBasedColorChange(bool isCheckd)
+        {
+            if (isCheckd)
+            { 
+
             }
         }
     }

@@ -19,6 +19,7 @@ namespace Pinokio.Model.User
     /// Stop도 다르고 Reset도 다르면 후발 OHT도 같이 지나갈 수 있다.
     /// Stop은 다르고 Reset은 같으면 후발 OHT가 Stop Point에서 기다렸다가 선발 OHT가 나가면 들어감.
     /// </summary>
+    [Serializable]
     public class OHTZCU
     {
         private string _name;

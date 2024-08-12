@@ -10,6 +10,7 @@ using Pinokio.Geometry;
 
 namespace Pinokio.Model.User
 {
+    [Serializable]
     public class AGV : Vehicle
     {
         private List<double> _lstFollowControlLength;
@@ -80,11 +81,6 @@ namespace Pinokio.Model.User
                 else
                     return 0;
             }
-        }
-
-        public bool IsStoped
-        {
-            get;set;
         }
 
         public AGVZCU CurZcu

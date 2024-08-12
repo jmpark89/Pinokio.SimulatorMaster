@@ -45,8 +45,8 @@ namespace Pinokio.Animation.User
 
         public new static void CreateBlock(PinokioBaseModel model, params object[] objects)
         {
-            AnimationModelManager.CreateCylinder(_blockName, model, 1, 255, System.Drawing.Color.DodgerBlue);
-            AnimationModelManager.CreateCylinder(InnerBlockName, model, 1, 255, System.Drawing.Color.DodgerBlue);
+            AnimationModelManager.CreateCylinder(_blockName, model, 1, 50, System.Drawing.Color.DodgerBlue);
+            AnimationModelManager.CreateCylinder(InnerBlockName, model, 1, 50, System.Drawing.Color.DodgerBlue);
         }
 
         public override Block GetDynamicConveyorMesh(string blockID, Point3D start, Point3D end)

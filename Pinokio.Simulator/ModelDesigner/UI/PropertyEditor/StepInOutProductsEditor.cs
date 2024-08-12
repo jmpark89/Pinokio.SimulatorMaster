@@ -23,11 +23,15 @@ namespace Pinokio.Designer
         }
         public override object EditValue(ITypeDescriptorContext context, IServiceProvider provider, object value)
         {
-            IWindowsFormsEditorService svc = (IWindowsFormsEditorService)provider.GetService(typeof(IWindowsFormsEditorService));
+            
+            Dictionary<uint, Tuple<uint, UNIT_TYPE>> productCounts = (Dictionary<uint, Tuple<uint, UNIT_TYPE>>)value;
+            
+            if (context.PropertyDescriptor.Name == "EditOutputProducts" && (((StepDataEdit)context.Instance).StepType == Model.Base.Structure.STEP_TYPE.ASSEMBLE || ((StepDataEdit)context.Instance).StepType == Model.Base.Structure.STEP_TYPE.STAY))
+                return productCounts;
 
+            IWindowsFormsEditorService svc = (IWindowsFormsEditorService)provider.GetService(typeof(IWindowsFormsEditorService));
             StepInOutProductsModal selectInOutProductModal = new StepInOutProductsModal();
             selectInOutProductModal.StartPosition = System.Windows.Forms.FormStartPosition.CenterScreen;
-            Dictionary<uint, uint> productCounts = (Dictionary<uint, uint>)value;
             selectInOutProductModal.InitializeProductDatas(productCounts, FactoryManager.Instance.ProductDatas.Values.ToList());
 
             if (svc != null)
@@ -36,7 +40,9 @@ namespace Pinokio.Designer
                 {
                     productCounts.Clear();
                     foreach (InOutProductData ioProductData in selectInOutProductModal.InOutProductDatas)
-                        productCounts.Add(ioProductData.ProductID, ioProductData.Count);
+                    {
+                        productCounts.Add(ioProductData.ProductID, new Tuple<uint, UNIT_TYPE>(ioProductData.Value, ioProductData.UnitType));
+                    }
                 }
             }
 

@@ -121,10 +121,10 @@ namespace Pinokio.Designer
             // 
             // gridControlStepData_etc
             // 
-            this.gridControlStepData_etc.Location = new System.Drawing.Point(852, 273);
+            this.gridControlStepData_etc.Location = new System.Drawing.Point(852, 292);
             this.gridControlStepData_etc.MainView = this.gridViewStepData_etc;
             this.gridControlStepData_etc.Name = "gridControlStepData_etc";
-            this.gridControlStepData_etc.Size = new System.Drawing.Size(435, 247);
+            this.gridControlStepData_etc.Size = new System.Drawing.Size(435, 228);
             this.gridControlStepData_etc.TabIndex = 6;
             this.gridControlStepData_etc.ViewCollection.AddRange(new DevExpress.XtraGrid.Views.Base.BaseView[] {
             this.gridViewStepData_etc});
@@ -155,6 +155,7 @@ namespace Pinokio.Designer
             this.gridViewStepData.OptionsBehavior.AllowAddRows = DevExpress.Utils.DefaultBoolean.True;
             this.gridViewStepData.FocusedRowObjectChanged += new DevExpress.XtraGrid.Views.Base.FocusedRowObjectChangedEventHandler(this.gridViewStepData_FocusedRowObjectChanged);
             this.gridViewStepData.CellValueChanged += new DevExpress.XtraGrid.Views.Base.CellValueChangedEventHandler(this.gridViewStepData_CellValueChanged);
+            this.gridViewStepData.CellValueChanging += new DevExpress.XtraGrid.Views.Base.CellValueChangedEventHandler(this.gridViewStepData_CellValueChanging);
             this.gridViewStepData.DataSourceChanged += new System.EventHandler(this.gridViewStepData_DataSourceChanged);
             // 
             // propertyGridControl1
@@ -162,7 +163,7 @@ namespace Pinokio.Designer
             this.propertyGridControl1.Cursor = System.Windows.Forms.Cursors.Default;
             this.propertyGridControl1.Location = new System.Drawing.Point(852, 22);
             this.propertyGridControl1.Name = "propertyGridControl1";
-            this.propertyGridControl1.Size = new System.Drawing.Size(435, 230);
+            this.propertyGridControl1.Size = new System.Drawing.Size(435, 249);
             this.propertyGridControl1.TabIndex = 5;
             this.propertyGridControl1.FocusedRowChanged += new DevExpress.XtraVerticalGrid.Events.FocusedRowChangedEventHandler(this.propertyGridControl1_FocusedRowChanged);
             this.propertyGridControl1.CellValueChanged += new DevExpress.XtraVerticalGrid.Events.CellValueChangedEventHandler(this.propertyGridControl1_CellValueChanged);
@@ -213,7 +214,7 @@ namespace Pinokio.Designer
             this.layoutControlItem3.CustomizationFormText = "Modify step..";
             this.layoutControlItem3.Location = new System.Drawing.Point(830, 0);
             this.layoutControlItem3.Name = "layoutControlItem3";
-            this.layoutControlItem3.Size = new System.Drawing.Size(439, 251);
+            this.layoutControlItem3.Size = new System.Drawing.Size(439, 270);
             this.layoutControlItem3.Text = "Modify step..";
             this.layoutControlItem3.TextLocation = DevExpress.Utils.Locations.Bottom;
             this.layoutControlItem3.TextSize = new System.Drawing.Size(71, 14);
@@ -221,9 +222,9 @@ namespace Pinokio.Designer
             // layoutControlItem6
             // 
             this.layoutControlItem6.Control = this.gridControlStepData_etc;
-            this.layoutControlItem6.Location = new System.Drawing.Point(830, 251);
+            this.layoutControlItem6.Location = new System.Drawing.Point(830, 270);
             this.layoutControlItem6.Name = "layoutControlItem6";
-            this.layoutControlItem6.Size = new System.Drawing.Size(439, 251);
+            this.layoutControlItem6.Size = new System.Drawing.Size(439, 232);
             this.layoutControlItem6.TextSize = new System.Drawing.Size(0, 0);
             this.layoutControlItem6.TextVisible = false;
             // 

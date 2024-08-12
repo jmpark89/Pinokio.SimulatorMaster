@@ -344,6 +344,7 @@ namespace Pinokio.Designer
             }
             return false;
         }
+
         private void InitializeInsertTreeNodes()
         {
             try
@@ -466,59 +467,40 @@ namespace Pinokio.Designer
         private void InitializeInsertNodes()
         {
             try
-            {              
+            {
+                var refTypes = RefTypeDefine.GetRefTypes();
+
                 List<string> nodeTypeList = new List<string>();
+
                 foreach (Type type in TypeDefine.SimNodeTypes)
                     nodeTypeList.Add(type.Name);
 
                 List<InserteNodeTreeData> vs = new List<InserteNodeTreeData>();
-                Assembly a = Assembly.LoadWithPartialName("Pinokio.Animation");
-                if (a != null)
+                if (TypeDefine.InsertableSimNodeTypes != null)
                 {
-                    List<Type> ts = a.GetTypes().ToList();
+                    List<Type> ts = TypeDefine.InsertableSimNodeTypes.ToList();
                     for (int i = 0; i < ts.Count; i++)
                     {
-                        Type t = ts[i];
-                        if (IsInsertNodeReference(t))
-                        {
-                            string name = t.Name.Remove(0, 3);
-                            List<string> value = RefTypeDefine.GetUsableSimNodeTypes(t);
-                            InserteNodeTreeData stdData;
-                            if (value.Contains(name))
-                                stdData = new InserteNodeTreeData() { Category = RefTypeDefine.GetCategoryType(t), RefType = name, NodeType = name, Height = BaseUtill.GetInitialHeight(t) };
-                            else
-                                stdData = new InserteNodeTreeData() { Category = RefTypeDefine.GetCategoryType(t), RefType = name, NodeType = value[0], Height = BaseUtill.GetInitialHeight(t) };
+                        Type simNodeType = ts[i];
+                        List<string> simNodeRefTypes = refTypes[simNodeType.Name];
+                        Type refNodeType;
+                        if (simNodeType.Name == "LineStation")
+                            ;
+                        if(simNodeRefTypes.Contains(simNodeType.Name))
+                            refNodeType = RefTypeDefine.GetTypebyRefTypeName("Ref" + simNodeType.Name);
+                        else
+                            refNodeType = RefTypeDefine.GetTypebyRefTypeName("Ref" + simNodeRefTypes.First());
 
-                            vs.Add(stdData);
-                        }
+                        InserteNodeTreeData stdData = new InserteNodeTreeData() { Category = TypeDefine.GetCategoryType(simNodeType), RefType = refNodeType.Name.Remove(0,3), NodeType = simNodeType.Name, Height = BaseUtill.GetInitialHeight(refNodeType) };
+                        vs.Add(stdData);
                     }
                 }
 
-                a = Assembly.LoadWithPartialName("Pinokio.Animation.User");
-
-                if (a != null)
-                {
-                    List<Type> ts = a.GetTypes().ToList();
-                    for (int i = 0; i < ts.Count; i++)
-                    {
-                        Type t = ts[i];
-                        if (IsInsertNodeReference(t))
-                        {
-                            string name = t.Name.Remove(0, 3);
-
-                            List<string> value = RefTypeDefine.GetUsableSimNodeTypes(t); 
-                            InserteNodeTreeData stdData;
-                            if (value.Contains(name))
-                                stdData = new InserteNodeTreeData() { Category = RefTypeDefine.GetCategoryType(t), RefType = name, NodeType = name, Height = BaseUtill.GetInitialHeight(t) };
-                            else
-                                stdData = new InserteNodeTreeData() { Category = RefTypeDefine.GetCategoryType(t), RefType = name, NodeType = value[0], Height = BaseUtill.GetInitialHeight(t) };
-
-                            vs.Add(stdData);
-                        }
-                    }
-                }
                 vs = vs.OrderByDescending(x => x.Category).ToList();
-
+//                foreach (var item in vs.Where(v => v.NodeType.Contains("Line") && !v.NodeType.Contains("Curved") && !v.NodeType.Contains("Station") && v.NodeType != v.RefType))
+//                {
+////                    item.RefType = "TransportLine2D";
+//                }
                 RepositoryItemComboBox comboBox = new RepositoryItemComboBox();
                 comboBox.Items.AddRange(nodeTypeList.ToArray());
                 comboBox.TextEditStyle = DevExpress.XtraEditors.Controls.TextEditStyles.DisableTextEditor;
@@ -605,7 +587,7 @@ namespace Pinokio.Designer
                 }
 
                 this.gridControlInsertCoupledModel.DataSource = vs;
-                this.gridViewInsertCoupledModel.Columns[1].Visible = false;
+                this.gridViewInsertCoupledModel.Columns[2].Visible = false;
                 this.gridViewInsertCoupledModel.Columns[3].Visible = false;
                 this.gridControlInsertCoupledModel.RefreshDataSource();
                 this.gridViewInsertCoupledModel.ExpandAllGroups();
@@ -654,6 +636,8 @@ namespace Pinokio.Designer
                             temp.EntityData = new Vector3D(startPoint.X, startPoint.Y, startPoint.Z);
 
                             MouseSnapPointBeforeMouseMove = startPoint;
+                            pinokio3DModel1.Focus();
+
                             break;
                         }
                     }
@@ -762,7 +746,7 @@ namespace Pinokio.Designer
 
             pinokio3DModel1.PartReferences.Clear();
             ModelManager.Instance.Parts.Clear();
-            partTreeList.ClearNodes();
+            gridControlPart.DataSource = null;
         }
 
         private void InitializePreviousSimNodes()
@@ -866,18 +850,46 @@ namespace Pinokio.Designer
         {
             InitializeGridViewInsertRefNodeComboBox(e.FocusedRowHandle);
         }
-        
+
         private void InitializeGridViewInsertRefNodeComboBox(int rowHandle)
         {
             string refNodeTypeName = "Ref" + ((InserteNodeTreeData)(this.gridViewInsertRefNode.GetRow(rowHandle))).RefType;
             Type refNodeType = RefTypeDefine.NodeReferenceTypes.Find(x => x.Name == refNodeTypeName);
-            List<string> refNodeSimNodeTypeNames = RefTypeDefine.GetUsableSimNodeTypes(refNodeType);
+
+            string nodeTypeName = ((InserteNodeTreeData)(this.gridViewInsertRefNode.GetRow(rowHandle))).NodeType;
+            Dictionary<string, List<string>> dicNode2RefTypes = RefTypeDefine.GetRefTypes();
+            List<string> refNodeTypeNames = dicNode2RefTypes[nodeTypeName];
+
+            string categoryName = ((InserteNodeTreeData)(this.gridViewInsertRefNode.GetRow(rowHandle))).Category;
+            if (categoryName == "Node")
+            {
+                Dictionary<string, List<string>> dicCategoryNames = RefTypeDefine.GetCategories();
+                List<string> nodeCategory = dicCategoryNames[categoryName];
+                refNodeTypeNames.AddRange(nodeCategory.Where(item => !refNodeTypeNames.Contains(item)));
+            } 
+            
             RepositoryItemComboBox comboBox = new RepositoryItemComboBox();
-            comboBox.Items.AddRange(refNodeSimNodeTypeNames.ToArray());
+            comboBox.Items.AddRange(refNodeTypeNames.ToArray());
             comboBox.TextEditStyle = DevExpress.XtraEditors.Controls.TextEditStyles.DisableTextEditor;
             gridViewInsertRefNode.Columns[2].ColumnEdit = comboBox;
         }
+        private void gridViewInsertRefNode_CellValueChanging(object sender, DevExpress.XtraGrid.Views.Base.CellValueChangedEventArgs e)
+        {
+            string refNodeTypeName = string.Empty;
+            if (e.Column.FieldName == "RefType")
+                refNodeTypeName = "Ref" + e.Value.ToString();
+            else
+                return;
+            string simNodeType = ((InserteNodeTreeData)(this.gridViewInsertRefNode.GetRow(e.RowHandle))).NodeType;
+            Type refNodeType = RefTypeDefine.NodeReferenceTypes.Find(x => x.Name == refNodeTypeName);
+            double height = BaseUtill.GetInitialHeight(refNodeType);
 
+            PrepareInsertingRefNode(refNodeTypeName, simNodeType, height, new Point3D(0, 0, 0));
+
+            ((InserteNodeTreeData)(this.gridViewInsertRefNode.GetRow(e.RowHandle))).RefType = e.Value.ToString();
+            ((InserteNodeTreeData)(this.gridViewInsertRefNode.GetRow(e.RowHandle))).Height = height;
+        }
+        
         private void gridViewInsertRefNode_CellValueChanged(object sender, DevExpress.XtraGrid.Views.Base.CellValueChangedEventArgs e)
         {
             //string refNodeTypeName = ((InserteNodeTreeData)(this.gridViewInsertRefNode.GetRow(e.RowHandle))).RefType;

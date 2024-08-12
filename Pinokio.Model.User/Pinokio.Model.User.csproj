@@ -82,9 +82,18 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="AGVLineStation.cs" />
     <Compile Include="Battery.cs" />
-    <Compile Include="Container_v2_L2.cs" />
     <Compile Include="ConveyorLineStation.cs" />
+    <Compile Include="CSC.cs" />
+    <Compile Include="CSCCS.cs" />
+    <Compile Include="CSCLine.cs" />
+    <Compile Include="CSCLineStation.cs" />
+    <Compile Include="CSCPoint.cs" />
+    <Compile Include="CSCZCU.cs" />
+    <Compile Include="CSCZCUReservation.cs" />
+    <Compile Include="CurvedAGVLine.cs" />
+    <Compile Include="CurvedTrainLine.cs" />
     <Compile Include="DataMartSample.cs" />
     <Compile Include="KPI\UserSimResultDBManager.cs" />
     <Compile Include="SingleLifter\Elevator.cs" />
@@ -95,10 +104,8 @@
     <Compile Include="Stay.cs" />
     <Compile Include="RobotArm.cs" />
     <Compile Include="SimpleAssemblyMachine.cs" />
-    <Compile Include="fence2.cs" />
     <Compile Include="JMMES.cs" />
     <Compile Include="LiftHigh.cs" />
-    <Compile Include="man_1.cs" />
     <Compile Include="ACS.cs" />
     <Compile Include="OCS.cs" />
     <Compile Include="OHCV.cs" />
@@ -113,7 +120,6 @@
     <Compile Include="AGVZCU.cs" />
     <Compile Include="AGVZCUReservation.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
-    <Compile Include="server_computer.cs" />
     <Compile Include="SinkPin.cs" />
     <Compile Include="SourcePin.cs" xmlns="" />
     <Compile Include="Stocker\SCS.cs" />
@@ -121,15 +127,13 @@
     <Compile Include="Stocker\Crane.cs" />
     <Compile Include="Stocker\CraneLine.cs" />
     <Compile Include="Stocker\CraneLineStation.cs" />
-    <Compile Include="street1.cs" />
-    <Compile Include="Tree_1.cs" />
-    <Compile Include="Tree_2.cs" />
-    <Compile Include="Fence.cs" xmlns="" />
     <Compile Include="OHTZCU.cs" />
     <Compile Include="OHTZCUReservation.cs" />
-  </ItemGroup>
-  <ItemGroup>
-    <None Include="packages.config" />
+    <Compile Include="TCS.cs" />
+    <Compile Include="Train.cs" />
+    <Compile Include="TrainLine.cs" />
+    <Compile Include="TrainLineStation.cs" />
+    <Compile Include="TrainPoint.cs" />
   </ItemGroup>
   <ItemGroup />
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />

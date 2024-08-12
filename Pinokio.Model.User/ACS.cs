@@ -9,6 +9,7 @@ using Pinokio.Model.Base;
 
 namespace Pinokio.Model.User
 {
+    [Serializable]
     public class ACS : VSubCS
     {
         private Dictionary<string, AGVLine> _dicRailLine;
@@ -177,7 +178,7 @@ namespace Pinokio.Model.User
             cmd.StartStation = ((AGVLine)greetNode).InLinkNodeConnections[port.FromNode as TXNode];
             int endNodeIndex = part.MR.Route.IndexOf(cmd.EndNode);
             cmd.EndStation = ((AGVLine)part.MR.Route[endNodeIndex - 1]).OutLinkNodeConnections[cmd.EndNode];
-             
+
             AddCommand(simTime, cmd);
         }
     }

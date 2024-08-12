@@ -12,6 +12,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Forms.Design;
+using Pinokio.Geometry;
 
 namespace Pinokio.Designer
 {
@@ -20,10 +21,29 @@ namespace Pinokio.Designer
     {
 
         [Browsable(true),
+            DisplayName("05. IDs of Eqp"),
             Description("IDs of Eqp"),
             Editor(typeof(EqpsEditor), typeof(UITypeEditor))]
-            [DisplayName("04. IDs of Eqp")]
         public List<uint> EditIdsOfEqp { get => _idsOfEqp; set => _idsOfEqp = value; }
+
+        [Browsable(true),
+            DisplayName("06. Processing Time(s)"),
+            Description("Processing Time(s)"),
+            Editor(typeof(ProcessingTimeEditor), typeof(UITypeEditor))]
+        public ProcessingTime ProcessingTimeData 
+        {
+            get => _processingTimeData;
+            
+            set
+            {
+                if (value != null)
+                {
+                    _processingTimeData = value;
+                    this.ProcessingTime = this.SetProcessingTime(_processingTimeData);
+                }                
+            }
+        }
+
 
         /// <summary>
         /// Input Product 종류 + 개수
@@ -38,27 +58,30 @@ namespace Pinokio.Designer
 
 
         [Browsable(true),
+            DisplayName("11. Input Products"),
             Description("Input Products"),
             Editor(typeof(StepInOutProductsEditor), typeof(UITypeEditor))]
-        [DisplayName("07. Input Products")]
         public Dictionary<uint, Tuple<uint, UNIT_TYPE>> EditInputProducts { get => _inputProducts; set => _inputProducts = value; }
 
         [Browsable(true),
+            DisplayName("12. Output Products"),
             Description("Output Products"),
             Editor(typeof(StepInOutProductsEditor), typeof(UITypeEditor))]
-        [DisplayName("08. Output Products")]
         public Dictionary<uint, Tuple<uint, UNIT_TYPE>> EditOutputProducts { get => _outputProducts; set => _outputProducts = value; }
 
-        public StepDataEdit(StepData pd) 
-            : base(pd)
+        public StepDataEdit(StepData sd) 
+            : base(sd)
         {
-            this._id =  pd.ID;
-    
-            this.IdsOfEqp = pd.IdsOfEqp.ToList();
-            this.ProcessingTime = pd.ProcessingTime;
-            this.StepType = pd.StepType;
-            this.InputProducts = pd.InputProducts.ToDictionary(input => input.Key, input => input.Value);
-            this.OutputProducts = pd.OutputProducts.ToDictionary(output => output.Key, output => output.Value);
+            this._id = sd.ID;
+            this.StepType = sd.StepType;
+            this.IdsOfEqp = sd.IdsOfEqp.ToList();
+            this.ProcessingTimeData = sd.ProcessingTimeData;
+            this.ProcessingTime = sd.SetProcessingTime(ProcessingTimeData);
+            this.CascadingIntervalTime = sd.CascadingIntervalTime;
+            this.ProcessingProbability = sd.ProcessingProbability;
+            this.SamplingProbability = sd.SamplingProbability;
+            this.InputProducts = sd.InputProducts.ToDictionary(input => input.Key, input => input.Value);
+            this.OutputProducts = sd.OutputProducts.ToDictionary(output => output.Key, output => output.Value);
         }
         public StepDataEdit(string name, string decription)
             :base(name, decription)

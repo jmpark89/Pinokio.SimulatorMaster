@@ -170,6 +170,11 @@ namespace Pinokio.Designer
                 #region cho 추가 * bool removed로 불필요한 계산 방지
                 bool removed = this.Entities.Remove(DeleteEntity);
                 NodeReferenceByID.Remove(DeleteEntity.ID);
+                if (DeleteEntity.Label != null && Labels.Contains(DeleteEntity.Label))
+                    Labels.Remove(DeleteEntity.Label);
+
+                Blocks.Remove(DeleteEntity.Name);
+
                 if (!removed)
                     Debugger.Break();
                 //Entity findEn = this.Entities.Where(en => ((NodeReference)en).ID == DeleteEntity.ID).FirstOrDefault() as Entity;
@@ -188,6 +193,7 @@ namespace Pinokio.Designer
                 #endregion
             }
             this.Entities.Regen();
+            this.Labels.Regen();
             this.Invalidate();
         }
 
@@ -219,7 +225,7 @@ namespace Pinokio.Designer
         {
             if (FocusedLine != null)
                 DrawRailDistance(MouseLocation, MouseLocationSnapToCorrdinate);
-            else
+            else if(SimEngine.Instance.EngineState is ENGINE_STATE.STOP)
                 DrawPositionMark(MouseLocation, MouseLocationSnapToCorrdinate, this, this.renderContext, myParams);
 
             if (CurrentRef != null)
@@ -585,8 +591,8 @@ namespace Pinokio.Designer
                 List<Type> typeList = new List<Type>();
                 foreach (Type t in totalTypes)
                 {
-                    if (t.Equals(typeof(RefLink)))
-                        continue;
+//                    if (t.Equals(typeof(RefLink)))
+//                        continue;
 
                     if (BaseUtill.IsSameBaseType(t, typeof(NodeReference)))
                     {

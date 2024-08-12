@@ -15,11 +15,12 @@ namespace Pinokio.Model.User
         FORWARD, TWO_WAY, REVERSE
     }
 
+    [Serializable]
     public class AGVLine : GuidedLine
     {
         //---------------------충돌 방지 위한 변수-----------------------
 
-        private List<OHTLineStation> _lstWaitingRailPort;
+        private List<AGVLineStation> _lstWaitingRailPort;
 
         public ACS Acs
         {
@@ -33,9 +34,6 @@ namespace Pinokio.Model.User
         private double maximumScheduleDistance;
         private double dispatchDistance = 5779;
         //--------------------------------------------------------------
-
-        public bool IsCurve
-        { get; set; }
 
         public double MinimumDistance
         { get; set; }
@@ -55,7 +53,7 @@ namespace Pinokio.Model.User
             }
         }
 
-        public List<OHTLineStation> DicWaitingRailPort
+        public List<AGVLineStation> DicWaitingRailPort
         {
             get { return _lstWaitingRailPort; }
         }
@@ -107,7 +105,7 @@ namespace Pinokio.Model.User
 
             maximumScheduleDistance = dispatchDistance - 4252;
             MinimumDistance = 300;
-            _lstWaitingRailPort = new List<OHTLineStation>();
+            _lstWaitingRailPort = new List<AGVLineStation>();
             IsCurve = false;
         }
 

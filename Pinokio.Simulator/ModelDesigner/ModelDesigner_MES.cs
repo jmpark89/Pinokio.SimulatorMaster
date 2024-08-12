@@ -11,6 +11,8 @@ namespace Pinokio.Designer
 {
     public partial class ModelDesigner : UserControl
     {
+        [NonSerialized]
+        public Dictionary<int, string> ChangedRefTypes = new Dictionary<int, string>();
 
         private void bbiModelingProductionData_ItemClick(object sender, DevExpress.XtraBars.ItemClickEventArgs e)
         {
@@ -55,6 +57,16 @@ namespace Pinokio.Designer
                     foreach (StepData sd in modifyStepInfoInEQP.Collection)
                     {
                         FactoryManager.Instance.AddStep(sd);
+                    }
+                    foreach (ProductData pd in FactoryManager.Instance.ProductDatas.Values)
+                    {
+                        for (int i = pd.IdsOfStep.Count - 1; i >= 0; i--)
+                        {
+                            if (!FactoryManager.Instance.StepDatas.Keys.Contains(pd.IdsOfStep[i]))
+                            {
+                                pd.IdsOfStep.RemoveAt(i);
+                            }
+                        }
                     }
                 }
             }
@@ -113,7 +125,7 @@ namespace Pinokio.Designer
         }
         private void bbiEditNodes_ItemClick(object sender, DevExpress.XtraBars.ItemClickEventArgs e)
         {
-            EditNodesDlg editNodeDlg = new EditNodesDlg(this, simNodeTreeList);
+            EditNodesDlg editNodeDlg = new EditNodesDlg(this, pinokio3DModel1, simNodeTreeList);
             editNodeDlg.StartPosition = FormStartPosition.CenterScreen;
             editNodeDlg.Show();
         }
